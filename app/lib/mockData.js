@@ -1,0 +1,172 @@
+export const stories = [
+  { id: "you", name: "Your Story", initials: "YO", isSelf: true, viewed: false },
+  { id: "u1", name: "Maya K.", initials: "MK", viewed: false },
+  { id: "u2", name: "Deshawn", initials: "DW", viewed: false },
+  { id: "u3", name: "Elena", initials: "EL", viewed: true },
+  { id: "u4", name: "Priya", initials: "PS", viewed: false },
+  { id: "u5", name: "Coach Rex", initials: "CR", viewed: false },
+  { id: "u6", name: "Jonas", initials: "JB", viewed: true },
+  { id: "u7", name: "Wren", initials: "WT", viewed: true },
+];
+
+export const sponsoredAd = {
+  brand: "SurgeFuel",
+  tagline: "Electrolytes built for race day. 0 sugar, all send.",
+  cta: "Shop Now",
+  badge: "SF",
+};
+
+export const challenges = [
+  {
+    id: "c1",
+    title: "100K in August",
+    sub: "Running · Ends in 22 days",
+    sport: "Running",
+    description:
+      "Log 100 kilometers of running before the month is out. Tempo runs, long runs, easy shakeouts — every logged run counts toward your total distance.",
+    startDate: "Aug 1, 2026",
+    endDate: "Aug 31, 2026",
+    prize: "Rival Finisher Badge + $50 Gear Credit",
+    participants: 4821,
+    progress: 62,
+    joined: true,
+    unit: "km",
+    accent: "from-rival-red to-rival-red-dim",
+    leaderboard: [
+      { id: "c1-1", name: "Elena Cruz", initials: "EC", score: 84.2 },
+      { id: "c1-2", name: "Marcus Lee", initials: "ML", score: 79.5 },
+      { id: "c1-6", name: "Maya Kowalski", initials: "MK", score: 71.0 },
+      { id: "c1-3", name: "You", initials: "YO", score: 62.0, isSelf: true },
+      { id: "c1-4", name: "Priya Shah", initials: "PS", score: 58.3 },
+      { id: "c1-5", name: "Deshawn W.", initials: "DW", score: 51.7 },
+    ],
+  },
+  {
+    id: "c2",
+    title: "Sunrise Squad",
+    sub: "5 AM sessions · 7 day streak",
+    sport: "Running / General",
+    description:
+      "Beat the sunrise. Log a training session before 6 AM every day for 7 days straight to keep your streak alive — miss a day and it resets.",
+    startDate: "Aug 3, 2026",
+    endDate: "Aug 10, 2026",
+    prize: "Sunrise Squad Trophy Icon",
+    participants: 1209,
+    progress: 30,
+    joined: false,
+    unit: "day streak",
+    accent: "from-rival-red to-rival-red-dim",
+    leaderboard: [
+      { id: "c2-1", name: "Wren Torres", initials: "WT", score: 7 },
+      { id: "c2-2", name: "Jonas B.", initials: "JB", score: 6 },
+      { id: "c2-3", name: "Coach Rex", initials: "CR", score: 5 },
+      { id: "c2-4", name: "Maya K.", initials: "MK", score: 4 },
+    ],
+  },
+  {
+    id: "c3",
+    title: "Iron Grip",
+    sub: "Deadlift volume · Ends in 5 days",
+    sport: "Strength",
+    description:
+      "Total deadlift volume challenge. Log your heaviest working sets — weight × reps determines your total volume and your rank on the board.",
+    startDate: "Jul 29, 2026",
+    endDate: "Aug 14, 2026",
+    prize: "Iron Grip Chalk Bag + Leaderboard Feature",
+    participants: 976,
+    progress: 88,
+    joined: false,
+    unit: "kg vol",
+    accent: "from-rival-red to-rival-red-dim",
+    leaderboard: [
+      { id: "c3-1", name: "Deshawn Walker", initials: "DW", score: 14820 },
+      { id: "c3-2", name: "Marcus Lee", initials: "ML", score: 13990 },
+      { id: "c3-3", name: "Elena Cruz", initials: "EC", score: 11200 },
+      { id: "c3-4", name: "Priya Shah", initials: "PS", score: 9840 },
+    ],
+  },
+  {
+    id: "c4",
+    title: "Vert Gains",
+    sub: "Elevation climbed · Ends in 14 days",
+    sport: "Cycling",
+    description:
+      "Climb as much elevation as you can. Every ride's elevation gain counts toward your monthly total — hills, mountains, repeats, all of it.",
+    startDate: "Aug 1, 2026",
+    endDate: "Aug 15, 2026",
+    prize: "KOM Jersey Giveaway Entry",
+    participants: 542,
+    progress: 15,
+    joined: false,
+    unit: "m",
+    accent: "from-rival-red to-rival-red-dim",
+    leaderboard: [
+      { id: "c4-1", name: "Priya Shah", initials: "PS", score: 4120 },
+      { id: "c4-2", name: "Coach Rex", initials: "CR", score: 3580 },
+      { id: "c4-3", name: "Wren Torres", initials: "WT", score: 2990 },
+      { id: "c4-4", name: "Jonas B.", initials: "JB", score: 2210 },
+    ],
+  },
+];
+
+export const leaderboard = [
+  { id: "l1", rank: 1, name: "Elena Cruz", initials: "EC", score: 12480, unit: "pts", trend: "same" },
+  { id: "l2", rank: 2, name: "Marcus Lee", initials: "ML", score: 12105, unit: "pts", trend: "up" },
+  { id: "l3", rank: 3, name: "You", initials: "YO", score: 11870, unit: "pts", trend: "up", isSelf: true },
+  { id: "l4", rank: 4, name: "Priya Shah", initials: "PS", score: 11340, unit: "pts", trend: "down" },
+  { id: "l5", rank: 5, name: "Deshawn W.", initials: "DW", score: 10990, unit: "pts", trend: "same" },
+];
+
+export const feedPosts = [
+  {
+    id: "p1",
+    user: { name: "Maya Kowalski", initials: "MK", handle: "@maya.runs", athleteId: "maya" },
+    time: "22m ago",
+    type: "Run",
+    title: "Tempo run — new 10K PR",
+    stats: [
+      { label: "Distance", value: "10.2 km" },
+      { label: "Pace", value: "4:12 /km" },
+      { label: "Time", value: "42:51" },
+    ],
+    caption: "Chased that sub-43 for months. Legs are toast but worth it 🔥",
+    likes: 128,
+    comments: [
+      { id: "cm1", user: "Deshawn", text: "LET'S GO. That pace is unreal." },
+      { id: "cm2", user: "Coach Rex", text: "Splits looked perfectly even. Nice pacing." },
+    ],
+    liked: false,
+  },
+  {
+    id: "p2",
+    user: { name: "Deshawn Walker", initials: "DW", handle: "@dwalks_heavy", athleteId: "deshawn" },
+    time: "1h ago",
+    type: "Strength",
+    title: "Leg day — PR on back squat",
+    stats: [
+      { label: "Lift", value: "Back Squat" },
+      { label: "Max", value: "182.5 kg" },
+      { label: "Sets", value: "5x3" },
+    ],
+    caption: "Finally broke through the plateau. Onto 185 next week.",
+    likes: 96,
+    comments: [{ id: "cm3", user: "Maya", text: "Insane depth on that last rep" }],
+    liked: true,
+  },
+  {
+    id: "p3",
+    user: { name: "Priya Shah", initials: "PS", handle: "@priya.climbs", athleteId: "priya" },
+    time: "3h ago",
+    type: "Ride",
+    title: "Sunday long ride — Vert Gains challenge",
+    stats: [
+      { label: "Distance", value: "64.3 km" },
+      { label: "Elevation", value: "1,140 m" },
+      { label: "Avg Power", value: "212 W" },
+    ],
+    caption: "Climbed until my legs gave up. Vert Gains leaderboard, I'm coming for you.",
+    likes: 74,
+    comments: [],
+    liked: false,
+  },
+];

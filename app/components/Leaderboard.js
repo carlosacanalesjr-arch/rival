@@ -1,0 +1,67 @@
+import { leaderboard } from "@/app/lib/mockData";
+
+const trendIcon = {
+  up: <span className="text-emerald-400">▲</span>,
+  down: <span className="text-rival-red">▼</span>,
+  same: <span className="text-zinc-600">–</span>,
+};
+
+export default function Leaderboard() {
+  return (
+    <section className="mx-4 mt-6 overflow-hidden rounded-2xl border border-border-subtle bg-surface">
+      <div className="flex items-center justify-between px-4 pt-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-base font-bold text-white">Leaderboard</h2>
+          <span className="flex items-center gap-1 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
+            <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-rival-red" />
+            LIVE
+          </span>
+        </div>
+        <button className="text-xs font-semibold text-rival-red">Full board</button>
+      </div>
+
+      <ul className="mt-2 divide-y divide-border-subtle">
+        {leaderboard.map((entry) => (
+          <li
+            key={entry.id}
+            className={`flex items-center gap-3 px-4 py-3 ${
+              entry.isSelf ? "bg-rival-red/5" : ""
+            }`}
+          >
+            <span
+              className={`w-5 shrink-0 text-sm font-extrabold ${
+                entry.rank === 1
+                  ? "text-yellow-400"
+                  : entry.rank === 2
+                  ? "text-zinc-300"
+                  : entry.rank === 3
+                  ? "text-orange-400"
+                  : "text-zinc-500"
+              }`}
+            >
+              {entry.rank}
+            </span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-white">
+              {entry.initials}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+              {entry.name}
+              {entry.isSelf && (
+                <span className="ml-1.5 text-[10px] font-bold text-rival-red">
+                  YOU
+                </span>
+              )}
+            </span>
+            <span className="text-xs">{trendIcon[entry.trend]}</span>
+            <span className="w-16 shrink-0 text-right text-sm font-bold text-white">
+              {entry.score.toLocaleString()}
+              <span className="ml-1 text-[10px] font-normal text-zinc-500">
+                {entry.unit}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
