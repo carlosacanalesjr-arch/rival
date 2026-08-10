@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { ChallengesProvider } from "@/app/lib/ChallengesContext";
+import { ProgramsProvider } from "@/app/lib/ProgramsContext";
 import { AuthProvider } from "@/app/lib/AuthContext";
 import "./globals.css";
 
@@ -32,7 +33,9 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col bg-black">
         <AuthProvider>
-          <ChallengesProvider>{children}</ChallengesProvider>
+          <ChallengesProvider>
+            <ProgramsProvider>{children}</ProgramsProvider>
+          </ChallengesProvider>
         </AuthProvider>
       </body>
     </html>
