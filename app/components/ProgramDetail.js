@@ -97,7 +97,7 @@ export default function ProgramDetail({ id }) {
             <InfoTile label="Duration" value={`${program.duration} weeks`} />
             {program.difficulty && <InfoTile label="Difficulty" value={program.difficulty} />}
             <InfoTile label="Category" value={program.category} />
-            <InfoTile label="Athletes" value={program.enrolledCount.toLocaleString()} />
+            <InfoTile label="Sessions/Week" value={program.sessionsPerWeek} />
           </div>
 
           {program.joined && (

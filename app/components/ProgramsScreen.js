@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import TopBar from "@/app/components/TopBar";
 import BottomNav from "@/app/components/BottomNav";
 import { usePrograms } from "@/app/lib/ProgramsContext";
-import { programCategories, categoriesWithLevelSelector, getEnrollmentStatus } from "@/app/lib/programsData";
+import {
+  programCategories,
+  categoriesWithLevelSelector,
+  getCardStatus,
+  getEnrollmentStatus,
+  getCompletionAction,
+} from "@/app/lib/programsData";
 
 const LEVEL_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
@@ -150,25 +156,45 @@ function EnrollButton({ status, onClick }) {
   );
 }
 
-function ProgramCard({ program, onOpen, onChangeLevel }) {
-  const [level, setLevel] = useState(null);
-  const showLevelSelector = categoriesWithLevelSelector.includes(program.category);
-  const status = getEnrollmentStatus(program);
+// Shown only when the *live* cycle just finished (see getEnrollmentStatus), not the
+// permanent card badge — otherwise this would stay glued on screen forever once a
+// program is ever completed, even mid-way through a fresh round or level.
+function CompletionActionButton({ action, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-full border border-rival-red/40 bg-rival-red/10 py-2 text-xs font-bold text-rival-red transition hover:bg-rival-red/20"
+    >
+      {action.kind === "continue" ? "Continue" : "Level Up"}
+      <span aria-hidden>→</span>
+    </button>
+  );
+}
 
+function ProgramCard({ program, onOpen, onChangeLevel, allPrograms, onCompletionAction }) {
+  const showLevelSelector = categoriesWithLevelSelector.includes(program.category);
+  // badgeStatus is the permanent "have you ever completed this" state used for the top
+  // pill; liveStatus reflects the cycle actually in progress right now, so the
+  // Continue/Level Up button only shows the instant a cycle finishes, not forever after.
+  const badgeStatus = getCardStatus(program);
+  const liveStatus = getEnrollmentStatus(program);
+  const completionAction = liveStatus === "completed" ? getCompletionAction(program, allPrograms) : null;
+
+  // enrolledLevel lives on the program record itself (via context), not local state,
+  // so the picked/enrolled level survives card remounts (collapsing a category,
+  // navigating away and back, etc.) instead of resetting to "Select Level".
   let levelControl = null;
   if (showLevelSelector) {
-    if (status === "completed" && program.enrolledLevel) {
+    if (badgeStatus === "completed" && program.enrolledLevel) {
       levelControl = <LevelBadge level={program.enrolledLevel} />;
-    } else if (status === "enrolled") {
+    } else {
       levelControl = (
         <LevelSelector
-          selected={program.enrolledLevel}
+          selected={program.enrolledLevel || null}
           onSelect={(newLevel) => onChangeLevel(program.id, newLevel)}
-          variant="current"
+          variant={badgeStatus === "enrolled" ? "current" : "picker"}
         />
       );
-    } else {
-      levelControl = <LevelSelector selected={level} onSelect={setLevel} />;
     }
   }
 
@@ -196,7 +222,7 @@ function ProgramCard({ program, onOpen, onChangeLevel }) {
 
       <div className="mt-3 flex items-center justify-end">
         <EnrollButton
-          status={status}
+          status={badgeStatus}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -204,13 +230,26 @@ function ProgramCard({ program, onOpen, onChangeLevel }) {
           }}
         />
       </div>
+
+      {completionAction && (
+        <CompletionActionButton
+          action={completionAction}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onCompletionAction(program, completionAction);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function MyProgramRow({ program, onOpen }) {
+function MyProgramRow({ program, onOpen, allPrograms, onCompletionAction }) {
   const percent = Math.round((program.currentWeek / program.duration) * 100);
-  const status = getEnrollmentStatus(program);
+  const badgeStatus = getCardStatus(program);
+  const liveStatus = getEnrollmentStatus(program);
+  const completionAction = liveStatus === "completed" ? getCompletionAction(program, allPrograms) : null;
 
   return (
     <div
@@ -230,7 +269,7 @@ function MyProgramRow({ program, onOpen }) {
           <p className="truncate text-sm font-bold text-white">{program.title}</p>
           <p className="mt-0.5 text-xs text-zinc-500">{program.category}</p>
         </div>
-        {status === "completed" ? (
+        {badgeStatus === "completed" ? (
           <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-zinc-200">
             <TrophyIcon className="text-yellow-400" />
             Completed ✓
@@ -242,23 +281,45 @@ function MyProgramRow({ program, onOpen }) {
         )}
       </div>
 
-      <div className="mt-3">
-        <div className="flex items-center justify-between text-xs text-zinc-500">
-          <span>Progress</span>
-          <span className="font-semibold text-white">{percent}%</span>
+      {badgeStatus !== "completed" && (
+        <div className="mt-3">
+          <div className="flex items-center justify-between text-xs text-zinc-500">
+            <span>Progress</span>
+            <span className="font-semibold text-white">{percent}%</span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
         </div>
-        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      </div>
+      )}
+
+      {completionAction && (
+        <CompletionActionButton
+          action={completionAction}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onCompletionAction(program, completionAction);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function CategoryDropdown({ category, programsInCategory, isOpen, onToggle, onOpenProgram, onChangeLevel }) {
+function CategoryDropdown({
+  category,
+  programsInCategory,
+  isOpen,
+  onToggle,
+  onOpenProgram,
+  onChangeLevel,
+  allPrograms,
+  onCompletionAction,
+}) {
   return (
     <section className="overflow-hidden rounded-2xl border border-border-subtle bg-surface">
       <button
@@ -288,7 +349,14 @@ function CategoryDropdown({ category, programsInCategory, isOpen, onToggle, onOp
       {isOpen && (
         <div className="space-y-3 border-t border-border-subtle p-3">
           {programsInCategory.map((program) => (
-            <ProgramCard key={program.id} program={program} onOpen={onOpenProgram} onChangeLevel={onChangeLevel} />
+            <ProgramCard
+              key={program.id}
+              program={program}
+              onOpen={onOpenProgram}
+              onChangeLevel={onChangeLevel}
+              allPrograms={allPrograms}
+              onCompletionAction={onCompletionAction}
+            />
           ))}
         </div>
       )}
@@ -300,12 +368,28 @@ const TABS = ["Browse", "My Programs"];
 
 export default function ProgramsScreen() {
   const router = useRouter();
-  const { programs, updateEnrolledLevel } = usePrograms();
+  const { programs, updateEnrolledLevel, levelUpProgram, continueProgram } = usePrograms();
   const [activeTab, setActiveTab] = useState("Browse");
   const [openCategories, setOpenCategories] = useState(() => new Set());
 
   const openProgram = (id) => router.push(`/programs/${id}`);
   const myPrograms = programs.filter((p) => p.joined);
+
+  // "continue" repeats the same program at the same level for a fresh 3-month block.
+  // "level-up" / "same-program" re-enrolls that exact program at the next level (only
+  // touches its own record). "level-up" / "different-program" (HYROX) just points at the
+  // sibling level's page.
+  const handleCompletionAction = (program, action) => {
+    if (action.kind === "continue") {
+      continueProgram(program.id);
+      openProgram(program.id);
+    } else if (action.type === "same-program") {
+      levelUpProgram(program.id, action.nextLevel);
+      openProgram(program.id);
+    } else {
+      openProgram(action.programId);
+    }
+  };
 
   const toggleCategory = (category) => {
     setOpenCategories((prev) => {
@@ -359,6 +443,8 @@ export default function ProgramsScreen() {
                   onToggle={() => toggleCategory(category)}
                   onOpenProgram={openProgram}
                   onChangeLevel={updateEnrolledLevel}
+                  allPrograms={programs}
+                  onCompletionAction={handleCompletionAction}
                 />
               );
             })}
@@ -383,7 +469,13 @@ export default function ProgramsScreen() {
             ) : (
               <div className="space-y-3">
                 {myPrograms.map((program) => (
-                  <MyProgramRow key={program.id} program={program} onOpen={openProgram} />
+                  <MyProgramRow
+                    key={program.id}
+                    program={program}
+                    onOpen={openProgram}
+                    allPrograms={programs}
+                    onCompletionAction={handleCompletionAction}
+                  />
                 ))}
               </div>
             )}

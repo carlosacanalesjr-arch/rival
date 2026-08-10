@@ -27,8 +27,50 @@ export function ProgramsProvider({ children }) {
     setPrograms((prev) => prev.map((p) => (p.id === id ? { ...p, enrolledLevel: level } : p)));
   };
 
+  // Re-enrolls the same program at a new level, restarting progress and resetting the
+  // rounds-at-level counter. Only ever touches the one program record by id, so it never
+  // affects any other program's enrollment. hasCompletedLevel is explicitly kept true (a
+  // one-way ratchet) so the card-level "Completed" badge never disappears just because a
+  // fresh cycle started.
+  const levelUpProgram = (id, nextLevel) => {
+    setPrograms((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              enrolledLevel: nextLevel,
+              joined: true,
+              currentWeek: 1,
+              roundsCompletedAtLevel: 0,
+              hasCompletedLevel: true,
+            }
+          : p
+      )
+    );
+  };
+
+  // Re-enrolls the same program at the *same* level for a fresh 3-month block, bumping
+  // the completed-rounds count so a second completion at this level offers Level Up.
+  const continueProgram = (id) => {
+    setPrograms((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              joined: true,
+              currentWeek: 1,
+              roundsCompletedAtLevel: (p.roundsCompletedAtLevel || 0) + 1,
+              hasCompletedLevel: true,
+            }
+          : p
+      )
+    );
+  };
+
   return (
-    <ProgramsContext.Provider value={{ programs, toggleEnroll, updateEnrolledLevel }}>
+    <ProgramsContext.Provider
+      value={{ programs, toggleEnroll, updateEnrolledLevel, levelUpProgram, continueProgram }}
+    >
       {children}
     </ProgramsContext.Provider>
   );

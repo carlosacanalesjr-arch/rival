@@ -3,25 +3,32 @@ export const programCategories = ["HYROX", "DEKA", "Running", "Strength & Condit
 // HYROX programs are already split into Beginner/Intermediate/Advanced cards, so they don't get a selector.
 export const categoriesWithLevelSelector = ["DEKA", "Running", "Strength & Conditioning"];
 
+// Completing a program in these categories goes straight to the next level, immediately,
+// with no repeat of the same level. Everything else (Running, Strength & Conditioning)
+// repeats the same level for a second 3-month round before Level Up is offered.
+export const directLevelUpCategories = ["HYROX", "DEKA"];
+
 export const programs = [
   {
     id: "p1",
     title: "HYROX Beginner",
     category: "HYROX",
-    duration: 8,
+    duration: 12,
     difficulty: "Beginner",
     shortDescription: "Learn the eight HYROX stations and build the base fitness to finish strong.",
     fullDescription:
-      "An 8-week on-ramp for first-time HYROX athletes. Covers proper technique for every station, builds running consistency, and layers in compromised running so race day doesn't come as a shock.",
+      "A 12-week on-ramp for first-time HYROX athletes. Covers proper technique for every station, builds running consistency, and layers in compromised running so race day doesn't come as a shock.",
     coach: {
-      name: "Elena Cruz",
-      initials: "EC",
-      title: "HYROX Coach & Running Specialist",
-      bio: "Coaches first-timers through their debut HYROX events with a focus on technique before intensity.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 963,
-    joined: false,
-    currentWeek: 0,
+    sessionsPerWeek: "3-4 sessions/week",
+    joined: true,
+    currentWeek: 12,
+    hasCompletedLevel: true,
     weeks: [
       { week: 1, title: "Meet the Stations", focus: "Technique walkthrough for all eight stations" },
       { week: 2, title: "Running Consistency", focus: "Establishing a repeatable easy running pace" },
@@ -29,26 +36,31 @@ export const programs = [
       { week: 4, title: "Carries & Grip", focus: "Farmer's carry and sandbag lunge volume" },
       { week: 5, title: "Compromised Running I", focus: "Short runs off station fatigue" },
       { week: 6, title: "Compromised Running II", focus: "Longer runs off station fatigue" },
-      { week: 7, title: "Full Station Walkthrough", focus: "All eight stations back to back, easy pace" },
-      { week: 8, title: "Race Week Prep", focus: "Deload and race-day logistics" },
+      { week: 7, title: "Station Strength Building", focus: "Increasing load across all stations" },
+      { week: 8, title: "Aerobic Volume", focus: "Building overall running endurance" },
+      { week: 9, title: "Full Station Walkthrough I", focus: "All eight stations back to back, easy pace" },
+      { week: 10, title: "Full Station Walkthrough II", focus: "All eight stations back to back, faster pace" },
+      { week: 11, title: "Sharpen & Simulate", focus: "Short race simulation at moderate effort" },
+      { week: 12, title: "Race Week Prep", focus: "Deload and race-day logistics" },
     ],
   },
   {
     id: "p2",
     title: "HYROX Intermediate",
     category: "HYROX",
-    duration: 10,
+    duration: 12,
     difficulty: "Intermediate",
     shortDescription: "Race-specific engine and station work to peak for your next HYROX.",
     fullDescription:
-      "A 10-week block built around HYROX's eight-station format — running intervals paired with sled pushes, wall balls, farmer's carries, and burpee broad jumps. Designed to build the mixed aerobic-strength engine HYROX demands, with a taper in the final week so you toe the line fresh.",
+      "A 12-week block built around HYROX's eight-station format — running intervals paired with sled pushes, wall balls, farmer's carries, and burpee broad jumps. Designed to build the mixed aerobic-strength engine HYROX demands, with a taper in the final week so you toe the line fresh.",
     coach: {
-      name: "Coach Rex",
-      initials: "CR",
-      title: "Certified HYROX Coach",
-      bio: "Former HYROX Open podium finisher turned coach. Programs 200+ athletes through race prep every season.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1842,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: true,
     currentWeek: 4,
     weeks: [
@@ -57,29 +69,32 @@ export const programs = [
       { week: 3, title: "Station Strength", focus: "Heavy sled work and carries, moderate running" },
       { week: 4, title: "Engine Building", focus: "Interval running under fatigue" },
       { week: 5, title: "Mixed Modal", focus: "Full station circuits at race pace" },
-      { week: 6, title: "Peak Volume", focus: "Highest weekly training load of the block" },
-      { week: 7, title: "Race Simulation", focus: "Half-distance HYROX simulation" },
-      { week: 8, title: "Strength Retention", focus: "Maintain power output, reduce volume" },
-      { week: 9, title: "Sharpen", focus: "Race-pace intervals and technique polish" },
-      { week: 10, title: "Taper & Race Week", focus: "Deload, mobility, and race day" },
+      { week: 6, title: "Compromised Running Intensives", focus: "Hard running off station fatigue" },
+      { week: 7, title: "Peak Volume", focus: "Highest weekly training load of the block" },
+      { week: 8, title: "Race Simulation I", focus: "Half-distance HYROX simulation" },
+      { week: 9, title: "Race Simulation II", focus: "Full-distance HYROX simulation" },
+      { week: 10, title: "Strength Retention", focus: "Maintain power output, reduce volume" },
+      { week: 11, title: "Sharpen", focus: "Race-pace intervals and technique polish" },
+      { week: 12, title: "Taper & Race Week", focus: "Deload, mobility, and race day" },
     ],
   },
   {
     id: "p3",
     title: "HYROX Advanced",
     category: "HYROX",
-    duration: 10,
+    duration: 12,
     difficulty: "Advanced",
     shortDescription: "A race-simulation-heavy block for athletes chasing a podium finish.",
     fullDescription:
-      "Ten weeks of high-volume running and near-maximal station loading, capped with two full race simulations. Built for experienced HYROX athletes with at least one race under their belt.",
+      "Twelve weeks of high-volume running and near-maximal station loading, capped with two full race simulations. Built for experienced HYROX athletes with at least one race under their belt.",
     coach: {
-      name: "Marcus Lee",
-      initials: "ML",
-      title: "HYROX Performance Coach",
-      bio: "Coaches podium-track HYROX athletes on race pacing, station efficiency, and peak-week strategy.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 512,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -87,12 +102,14 @@ export const programs = [
       { week: 2, title: "High Volume Running", focus: "Elevated mileage under normal fatigue" },
       { week: 3, title: "Heavy Station Load", focus: "Max-effort sled and carry work" },
       { week: 4, title: "Race Pace Intervals", focus: "Running intervals at target race pace" },
-      { week: 5, title: "Compromised Running Intensives", focus: "Hard running off heavy station fatigue" },
-      { week: 6, title: "Peak Volume", focus: "Highest combined running and station load" },
-      { week: 7, title: "Full Race Simulation", focus: "Complete HYROX simulation at race intensity" },
-      { week: 8, title: "Power Retention", focus: "Maintain intensity, trim volume" },
-      { week: 9, title: "Sharpen & Simulate", focus: "Second full race simulation" },
-      { week: 10, title: "Taper & Race Week", focus: "Deload into race day" },
+      { week: 5, title: "Compromised Running Intensives I", focus: "Hard running off heavy station fatigue" },
+      { week: 6, title: "Compromised Running Intensives II", focus: "Extended hard running off station fatigue" },
+      { week: 7, title: "Peak Volume", focus: "Highest combined running and station load" },
+      { week: 8, title: "Full Race Simulation I", focus: "Complete HYROX simulation at race intensity" },
+      { week: 9, title: "Full Race Simulation II", focus: "Second full race simulation" },
+      { week: 10, title: "Power Retention", focus: "Maintain intensity, trim volume" },
+      { week: 11, title: "Sharpen & Simulate", focus: "Final race simulation, technique polish" },
+      { week: 12, title: "Taper & Race Week", focus: "Deload into race day" },
     ],
   },
   {
@@ -105,12 +122,13 @@ export const programs = [
     fullDescription:
       "A 12-week program blending running with strength-endurance zone work, built for athletes preparing for DEKA FIT's 10-zone format.",
     coach: {
-      name: "Priya Shah",
-      initials: "PS",
-      title: "DEKA Fit Coach",
-      bio: "Builds balanced strength-and-endurance programming for athletes across all DEKA event formats.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 745,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: true,
     currentWeek: 5,
     enrolledLevel: "Beginner",
@@ -139,12 +157,13 @@ export const programs = [
     fullDescription:
       "Twelve weeks targeting the strength-endurance blend DEKA STRONG demands — sandbag work, sled work, rope climbs, and odd-object carries under time pressure across all 23 zones.",
     coach: {
-      name: "Marcus Lee",
-      initials: "ML",
-      title: "DEKA Fit Coach",
-      bio: "Specializes in functional strength programming for hybrid athletes competing in DEKA events.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 587,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -172,14 +191,17 @@ export const programs = [
     fullDescription:
       "A 12-week endurance-first program pairing steady running with light functional zone work, built for athletes tackling their first DEKA MILE.",
     coach: {
-      name: "Priya Shah",
-      initials: "PS",
-      title: "Endurance Coach",
-      bio: "Builds aerobic bases for endurance and hybrid athletes across running, cycling, and functional racing.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 421,
-    joined: false,
-    currentWeek: 0,
+    sessionsPerWeek: "3-4 sessions/week",
+    joined: true,
+    currentWeek: 12,
+    enrolledLevel: "Beginner",
+    hasCompletedLevel: true,
     weeks: [
       { week: 1, title: "Base Building", focus: "Easy running volume, zone technique intro" },
       { week: 2, title: "Zone Intro", focus: "Light functional work between runs" },
@@ -205,12 +227,13 @@ export const programs = [
     fullDescription:
       "A 12-week peak program combining the running volume of DEKA MILE with the strength demands of DEKA STRONG, preparing athletes for DEKA ATLAS's extended combined format.",
     coach: {
-      name: "Marcus Lee",
-      initials: "ML",
-      title: "DEKA Performance Coach",
-      bio: "Coaches athletes through DEKA's most demanding combined running-and-strength formats.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 298,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -238,12 +261,13 @@ export const programs = [
     fullDescription:
       "A 12-week endurance-focused program built for DEKA DOUBLE's extended distance and zone count, layering running volume onto steady zone-circuit progression.",
     coach: {
-      name: "Priya Shah",
-      initials: "PS",
-      title: "DEKA Endurance Coach",
-      bio: "Prepares athletes for DEKA's extended-distance formats with a strength-endurance blend.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 214,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -265,45 +289,56 @@ export const programs = [
     id: "p8",
     title: "5K",
     category: "Running",
-    duration: 6,
+    duration: 12,
     difficulty: "Intermediate",
     shortDescription: "Sharpen your speed and dial in pacing to run your best 5K.",
     fullDescription:
-      "A 6-week block combining tempo runs, VO2max intervals, and race-pace repeats for runners looking to PR their 5K.",
+      "A 12-week block combining tempo runs, VO2max intervals, and race-pace repeats for runners looking to PR their 5K.",
     coach: {
-      name: "Maya Kowalski",
-      initials: "MK",
-      title: "USATF Level 2 Running Coach",
-      bio: "Coaches competitive amateur runners chasing PRs from the mile to the marathon.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1105,
-    joined: false,
-    currentWeek: 0,
+    sessionsPerWeek: "4-5 sessions/week",
+    joined: true,
+    currentWeek: 12,
+    enrolledLevel: "Beginner",
+    roundsCompletedAtLevel: 2,
+    hasCompletedLevel: true,
     weeks: [
-      { week: 1, title: "Threshold Base", focus: "Establishing lactate threshold pace" },
-      { week: 2, title: "Speed Intro", focus: "Short intervals at 5K effort" },
-      { week: 3, title: "Race Pace Repeats I", focus: "Repeats at target 5K pace" },
-      { week: 4, title: "Volume Peak", focus: "Highest weekly mileage of the block" },
-      { week: 5, title: "Race Pace Repeats II", focus: "Longer repeats at target pace" },
-      { week: 6, title: "Taper & Race", focus: "Deload into race day" },
+      { week: 1, title: "Base Building", focus: "Establishing consistent running volume" },
+      { week: 2, title: "Threshold Base", focus: "Establishing lactate threshold pace" },
+      { week: 3, title: "Speed Intro", focus: "Short intervals at 5K effort" },
+      { week: 4, title: "Aerobic Volume", focus: "Building overall running endurance" },
+      { week: 5, title: "Race Pace Repeats I", focus: "Repeats at target 5K pace" },
+      { week: 6, title: "Volume Peak", focus: "Highest weekly mileage of the block" },
+      { week: 7, title: "Race Pace Repeats II", focus: "Longer repeats at target pace" },
+      { week: 8, title: "Race Pace Repeats III", focus: "Increasing repeat volume at target pace" },
+      { week: 9, title: "Speed Sharpening", focus: "Short, fast reps with full recovery" },
+      { week: 10, title: "Peak Speed Work", focus: "Highest-intensity session of the block" },
+      { week: 11, title: "Taper Begins", focus: "Reduced volume, legs freshening up" },
+      { week: 12, title: "Taper & Race", focus: "Deload into race day" },
     ],
   },
   {
     id: "p16",
     title: "10K",
     category: "Running",
-    duration: 8,
+    duration: 12,
     difficulty: "Intermediate",
     shortDescription: "Bridge the gap from 5K fitness to a strong, confident 10K finish.",
     fullDescription:
-      "An 8-week progression building weekly mileage and steady-state endurance to take you from 5K fitness to a confident 10K finish.",
+      "A 12-week progression building weekly mileage and steady-state endurance to take you from 5K fitness to a confident 10K finish.",
     coach: {
-      name: "Wren Torres",
-      initials: "WT",
-      title: "Distance Running Coach",
-      bio: "Guides runners from their first 5K through longer distances with steady, sustainable progression.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1476,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -311,10 +346,14 @@ export const programs = [
       { week: 2, title: "Aerobic Volume I", focus: "Extending easy run distance" },
       { week: 3, title: "Tempo Intro", focus: "First tempo run of the block" },
       { week: 4, title: "Aerobic Volume II", focus: "Continued mileage buildup" },
-      { week: 5, title: "Race Pace Intro", focus: "Short repeats at 10K effort" },
-      { week: 6, title: "Peak Volume", focus: "Highest weekly mileage of the block" },
-      { week: 7, title: "Race Pace Repeats", focus: "Longer repeats at 10K pace" },
-      { week: 8, title: "Taper & Race", focus: "Deload into race day" },
+      { week: 5, title: "Aerobic Volume III", focus: "Further extending weekly mileage" },
+      { week: 6, title: "Race Pace Intro", focus: "Short repeats at 10K effort" },
+      { week: 7, title: "Peak Volume I", focus: "Building toward highest weekly mileage" },
+      { week: 8, title: "Peak Volume II", focus: "Highest weekly mileage of the block" },
+      { week: 9, title: "Race Pace Repeats I", focus: "Repeats at target 10K pace" },
+      { week: 10, title: "Race Pace Repeats II", focus: "Longer repeats at 10K pace" },
+      { week: 11, title: "Taper Begins", focus: "Reduced volume, legs freshening up" },
+      { week: 12, title: "Taper & Race", focus: "Deload into race day" },
     ],
   },
   {
@@ -327,12 +366,13 @@ export const programs = [
     fullDescription:
       "A 12-week progression of long runs, tempo work, and easy mileage designed to get you race-ready for 21.1 kilometers.",
     coach: {
-      name: "Elena Cruz",
-      initials: "EC",
-      title: "Endurance Running Coach",
-      bio: "Guides runners from their first half marathon through PR attempts with a focus on smart mileage buildup.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1348,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -354,18 +394,19 @@ export const programs = [
     id: "p10",
     title: "Full Marathon",
     category: "Running",
-    duration: 16,
+    duration: 12,
     difficulty: "Advanced",
-    shortDescription: "A complete 16-week buildup to race-day-ready marathon fitness.",
+    shortDescription: "A complete 12-week buildup to race-day-ready marathon fitness.",
     fullDescription:
-      "Sixteen weeks of progressive mileage, long runs, and race-pace tempo work for runners with a solid base preparing to take on 42.2 kilometers.",
+      "Twelve weeks of progressive mileage, long runs, and race-pace tempo work for runners with a solid base preparing to take on 42.2 kilometers.",
     coach: {
-      name: "Maya Kowalski",
-      initials: "MK",
-      title: "USATF Level 2 Running Coach",
-      bio: "Coaches competitive amateur runners chasing PRs from the mile to the marathon.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 892,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -375,16 +416,12 @@ export const programs = [
       { week: 4, title: "Long Run Progression I", focus: "Extending the weekly long run" },
       { week: 5, title: "Tempo Intro", focus: "First tempo run of the block" },
       { week: 6, title: "Long Run Progression II", focus: "Continued long run buildup" },
-      { week: 7, title: "Speed Intro", focus: "Short intervals to sharpen turnover" },
-      { week: 8, title: "Peak Volume I", focus: "High weekly mileage phase begins" },
-      { week: 9, title: "Long Run Progression III", focus: "Approaching peak long run distance" },
-      { week: 10, title: "Peak Volume II", focus: "Highest weekly mileage of the block" },
-      { week: 11, title: "Race Pace Tempo", focus: "Tempo runs at goal marathon pace" },
-      { week: 12, title: "Longest Run", focus: "Final and longest long run" },
-      { week: 13, title: "Sharpening", focus: "Shorter, faster reps with recovery" },
-      { week: 14, title: "Taper Begins", focus: "Reduced volume, legs freshening up" },
-      { week: 15, title: "Taper Continues", focus: "Further reduced volume, race prep" },
-      { week: 16, title: "Race Week", focus: "Full taper into race day" },
+      { week: 7, title: "Peak Volume", focus: "Highest weekly mileage of the block" },
+      { week: 8, title: "Race Pace Tempo", focus: "Tempo runs at goal marathon pace" },
+      { week: 9, title: "Longest Run", focus: "Final and longest long run" },
+      { week: 10, title: "Sharpening", focus: "Shorter, faster reps with recovery" },
+      { week: 11, title: "Taper Begins", focus: "Reduced volume, legs freshening up" },
+      { week: 12, title: "Race Week", focus: "Full taper into race day" },
     ],
   },
   {
@@ -396,15 +433,18 @@ export const programs = [
     fullDescription:
       "A 12-week linear progression through squat, bench, deadlift, and press, paired with conditioning finishers — built for lifters at any stage who want a well-rounded strength base.",
     coach: {
-      name: "Deshawn Walker",
-      initials: "DW",
-      title: "Strength & Conditioning Coach",
-      bio: "Teaches barbell fundamentals with an emphasis on technique before load.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1560,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: true,
     currentWeek: 12,
     enrolledLevel: "Intermediate",
+    roundsCompletedAtLevel: 1,
+    hasCompletedLevel: true,
     weeks: [
       { week: 1, title: "Movement Screening", focus: "Assessing mobility and lift technique" },
       { week: 2, title: "Squat Focus", focus: "Building squat pattern and confidence" },
@@ -429,12 +469,13 @@ export const programs = [
     fullDescription:
       "A 12-week bodybuilding block split across push, pull, and leg days, emphasizing progressive overload and mind-muscle connection to maximize muscle growth.",
     coach: {
-      name: "Jonas B.",
-      initials: "JB",
-      title: "Bodybuilding & Hypertrophy Coach",
-      bio: "Coaches lifters of all backgrounds through structured hypertrophy training for long-term muscle growth.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1024,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -461,12 +502,13 @@ export const programs = [
     fullDescription:
       "A 12-week lower-body-focused block combining hip hinge patterning, unilateral strength work, and progressive volume to build the glutes, hamstrings, and quads.",
     coach: {
-      name: "Priya Shah",
-      initials: "PS",
-      title: "Lower Body Strength Coach",
-      bio: "Specializes in glute and lower body programming, blending strength work with joint-friendly volume.",
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
     },
     enrolledCount: 1287,
+    sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
     weeks: [
@@ -495,4 +537,60 @@ export function getEnrollmentStatus(program) {
   if (!program.joined) return "not-enrolled";
   if (program.currentWeek >= program.duration) return "completed";
   return "enrolled";
+}
+
+// Card-level status (Browse tab, My Programs tab). Once a program has ever been
+// completed, hasCompletedLevel is a one-way ratchet — it never gets cleared, so the
+// "Completed" badge stays put permanently even after leveling up starts a fresh
+// currentWeek cycle. The detail page still uses getEnrollmentStatus directly so it can
+// show real live progress (current week, phase checkmarks) for whatever cycle is active.
+export function getCardStatus(program) {
+  return program.hasCompletedLevel ? "completed" : getEnrollmentStatus(program);
+}
+
+const LEVEL_ORDER = ["Beginner", "Intermediate", "Advanced"];
+
+export function getNextLevel(level) {
+  const index = LEVEL_ORDER.indexOf(level);
+  if (index === -1 || index === LEVEL_ORDER.length - 1) return null;
+  return LEVEL_ORDER[index + 1];
+}
+
+// What action a *just-finished* cycle (live status "completed") should offer.
+//
+// HYROX / DEKA (directLevelUpCategories): completing always offers "level-up" immediately,
+// never a repeat.
+//   - DEKA has a level selector, so leveling up re-enrolls the *same* program record at
+//     the next level (type "same-program").
+//   - HYROX has no selector — each level is its own separate program record, so leveling
+//     up points at the sibling program in the same category (type "different-program").
+//
+// Running / Strength & Conditioning: completing offers "continue" (repeat the same level,
+// a fresh 3-month block) until roundsCompletedAtLevel reaches 2, at which point it offers
+// "level-up" (same-program, since these categories all use the level selector).
+export function getCompletionAction(program, allPrograms) {
+  const currentLevel = program.enrolledLevel || program.difficulty;
+
+  if (directLevelUpCategories.includes(program.category)) {
+    const nextLevel = getNextLevel(currentLevel);
+    if (!nextLevel) return null;
+
+    if (categoriesWithLevelSelector.includes(program.category)) {
+      return { kind: "level-up", type: "same-program", nextLevel };
+    }
+
+    const sibling = allPrograms.find(
+      (p) => p.category === program.category && p.difficulty === nextLevel && p.id !== program.id
+    );
+    return sibling ? { kind: "level-up", type: "different-program", programId: sibling.id, nextLevel } : null;
+  }
+
+  const rounds = program.roundsCompletedAtLevel || 0;
+  if (rounds < 2) {
+    return { kind: "continue" };
+  }
+
+  const nextLevel = getNextLevel(currentLevel);
+  if (!nextLevel) return null;
+  return { kind: "level-up", type: "same-program", nextLevel };
 }
