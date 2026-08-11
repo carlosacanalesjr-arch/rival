@@ -1,12 +1,19 @@
-export const programCategories = ["HYROX", "DEKA", "Running", "Strength & Conditioning"];
+export const programCategories = ["HYROX", "DEKA", "Running", "Strength & Conditioning", "Public Safety Prep"];
 
 // HYROX programs are already split into Beginner/Intermediate/Advanced cards, so they don't get a selector.
-export const categoriesWithLevelSelector = ["DEKA", "Running", "Strength & Conditioning"];
+export const categoriesWithLevelSelector = ["DEKA", "Running", "Strength & Conditioning", "Public Safety Prep"];
 
 // Completing a program in these categories goes straight to the next level, immediately,
-// with no repeat of the same level. Everything else (Running, Strength & Conditioning)
-// repeats the same level for a second 3-month round before Level Up is offered.
+// with no repeat of the same level. Running / Strength & Conditioning repeat the same level
+// for a second 3-month round before Level Up is offered. Public Safety Prep (see
+// freeChoiceLevelUpCategories below) offers both options every time.
 export const directLevelUpCategories = ["HYROX", "DEKA"];
+
+// Completing a cycle in these categories always offers a free choice between repeating the
+// same level and leveling up (no forced repeat count, no forced immediate advance) — the
+// athlete decides each time. Test-day readiness (CPAT, agency PT tests) is the kind of thing
+// you repeat at your own pace rather than on a fixed schedule.
+export const freeChoiceLevelUpCategories = ["Public Safety Prep"];
 
 export const programs = [
   {
@@ -526,6 +533,73 @@ export const programs = [
       { week: 12, title: "Deload & Retest", focus: "Recovery week and strength retest" },
     ],
   },
+  {
+    id: "p17",
+    title: "Fire Department Prep",
+    category: "Public Safety Prep",
+    duration: 12,
+    shortDescription: "Build the continuous-effort engine and event technique to pass the CPAT.",
+    fullDescription:
+      "A 12-week program built around the CPAT's continuous timed circuit — stair climb, hose drag, equipment carry, ladder raise, forcible entry, search, rescue, and ceiling breach/pull, all performed back to back against the clock. Training layers event technique onto a growing aerobic and muscular-endurance base so the circuit stops feeling like eight separate tests and starts feeling like one continuous effort.",
+    coach: {
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
+    },
+    enrolledCount: 312,
+    sessionsPerWeek: "4-5 sessions/week",
+    joined: false,
+    currentWeek: 0,
+    weeks: [
+      { week: 1, title: "Foundation Testing", focus: "Baseline CPAT circuit assessment and pacing introduction" },
+      { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events" },
+      { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort" },
+      { week: 4, title: "Load Carry Basics", focus: "Stair climb with weighted vest, equipment carry technique" },
+      { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
+      { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
+      { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
+      { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
+      { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
+      { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
+      { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
+      { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
+    ],
+  },
+  {
+    id: "p18",
+    title: "Law Enforcement Prep",
+    category: "Public Safety Prep",
+    duration: 12,
+    shortDescription: "One 12-week program covering the shared core of Police, DPS Trooper, and Border Patrol fitness tests.",
+    fullDescription:
+      "A 12-week program built around the run, push-ups, sit-ups, and agility/step-test components that overlap across Police, DPS Trooper, and Border Patrol PT tests. Pick an agency focus to get phase-level emphasis notes tailored to your test — the underlying workouts stay the same since the core components are shared.",
+    coach: {
+      name: "Carlos Canales",
+      initials: "CC",
+      title: "HYROX Competitor & Personal Trainer",
+      bio: "HYROX competitor, Spartan World Championship qualifier, and certified personal trainer. Programs built from real competition experience.",
+    },
+    enrolledCount: 428,
+    sessionsPerWeek: "4-5 sessions/week",
+    joined: false,
+    currentWeek: 0,
+    focusOptions: ["Police", "DPS Trooper", "Border Patrol"],
+    weeks: [
+      { week: 1, title: "Foundation Testing", focus: "Baseline run, push-up, and sit-up benchmarks" },
+      { week: 2, title: "Aerobic Base", focus: "Building running volume and pacing consistency" },
+      { week: 3, title: "Muscular Endurance Base", focus: "Push-up and sit-up volume building" },
+      { week: 4, title: "Agility & Step Test Intro", focus: "Technique for agility run and step test components" },
+      { week: 5, title: "Circuit Building I", focus: "Linking running and calisthenics under fatigue" },
+      { week: 6, title: "Muscular Endurance Peak", focus: "Max push-up and sit-up set volume" },
+      { week: 7, title: "Circuit Building II", focus: "Full test circuit at moderate pace" },
+      { week: 8, title: "Peak Volume", focus: "Highest combined running and calisthenics load" },
+      { week: 9, title: "Full Test Simulation I", focus: "Complete agency test circuit, controlled pace" },
+      { week: 10, title: "Full Test Simulation II", focus: "Complete agency test circuit, test pace" },
+      { week: 11, title: "Sharpen", focus: "Pacing strategy and technique polish" },
+      { week: 12, title: "Test Week", focus: "Taper and test-day prep" },
+    ],
+  },
 ];
 
 export function getProgram(id) {
@@ -548,15 +622,30 @@ export function getCardStatus(program) {
   return program.hasCompletedLevel ? "completed" : getEnrollmentStatus(program);
 }
 
-const LEVEL_ORDER = ["Beginner", "Intermediate", "Advanced"];
+// Most categories progress Beginner -> Intermediate -> Advanced. Public Safety Prep uses
+// "Test-Ready" in place of "Advanced" since the top level is framed around test-day
+// readiness rather than a generic difficulty tier.
+const DEFAULT_LEVEL_ORDER = ["Beginner", "Intermediate", "Advanced"];
+const LEVEL_ORDER_BY_CATEGORY = {
+  "Public Safety Prep": ["Beginner", "Intermediate", "Test-Ready"],
+};
 
-export function getNextLevel(level) {
-  const index = LEVEL_ORDER.indexOf(level);
-  if (index === -1 || index === LEVEL_ORDER.length - 1) return null;
-  return LEVEL_ORDER[index + 1];
+export function getLevelOrder(category) {
+  return LEVEL_ORDER_BY_CATEGORY[category] || DEFAULT_LEVEL_ORDER;
+}
+
+export function getNextLevel(level, category) {
+  const order = getLevelOrder(category);
+  const index = order.indexOf(level);
+  if (index === -1 || index === order.length - 1) return null;
+  return order[index + 1];
 }
 
 // What action a *just-finished* cycle (live status "completed") should offer.
+//
+// Public Safety Prep (freeChoiceLevelUpCategories): completing always offers a free choice —
+// repeat the same level, or (if there's a next level) level up. The athlete decides each
+// time; there's no forced repeat count and no forced immediate advance.
 //
 // HYROX / DEKA (directLevelUpCategories): completing always offers "level-up" immediately,
 // never a repeat.
@@ -570,9 +659,13 @@ export function getNextLevel(level) {
 // "level-up" (same-program, since these categories all use the level selector).
 export function getCompletionAction(program, allPrograms) {
   const currentLevel = program.enrolledLevel || program.difficulty;
+  const nextLevel = getNextLevel(currentLevel, program.category);
+
+  if (freeChoiceLevelUpCategories.includes(program.category)) {
+    return { kind: "choice", nextLevel };
+  }
 
   if (directLevelUpCategories.includes(program.category)) {
-    const nextLevel = getNextLevel(currentLevel);
     if (!nextLevel) return null;
 
     if (categoriesWithLevelSelector.includes(program.category)) {
@@ -590,7 +683,6 @@ export function getCompletionAction(program, allPrograms) {
     return { kind: "continue" };
   }
 
-  const nextLevel = getNextLevel(currentLevel);
   if (!nextLevel) return null;
   return { kind: "level-up", type: "same-program", nextLevel };
 }

@@ -27,6 +27,12 @@ export function ProgramsProvider({ children }) {
     setPrograms((prev) => prev.map((p) => (p.id === id ? { ...p, enrolledLevel: level } : p)));
   };
 
+  // Agency focus (Police / DPS Trooper / Border Patrol) is just a phase-emphasis tag, not
+  // tied to progress, so unlike level changes it never needs a confirm or a progress reset.
+  const updateEnrolledFocus = (id, focus) => {
+    setPrograms((prev) => prev.map((p) => (p.id === id ? { ...p, enrolledFocus: focus } : p)));
+  };
+
   // Re-enrolls the same program at a new level, restarting progress and resetting the
   // rounds-at-level counter. Only ever touches the one program record by id, so it never
   // affects any other program's enrollment. hasCompletedLevel is explicitly kept true (a
@@ -69,7 +75,7 @@ export function ProgramsProvider({ children }) {
 
   return (
     <ProgramsContext.Provider
-      value={{ programs, toggleEnroll, updateEnrolledLevel, levelUpProgram, continueProgram }}
+      value={{ programs, toggleEnroll, updateEnrolledLevel, updateEnrolledFocus, levelUpProgram, continueProgram }}
     >
       {children}
     </ProgramsContext.Provider>

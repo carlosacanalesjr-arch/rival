@@ -97,6 +97,9 @@ export default function ProgramDetail({ id }) {
             <InfoTile label="Duration" value={`${program.duration} weeks`} />
             {program.difficulty && <InfoTile label="Difficulty" value={program.difficulty} />}
             <InfoTile label="Category" value={program.category} />
+            {program.focusOptions && (
+              <InfoTile label="Agency Focus" value={program.enrolledFocus || "Not selected"} />
+            )}
             <InfoTile label="Sessions/Week" value={program.sessionsPerWeek} />
           </div>
 
