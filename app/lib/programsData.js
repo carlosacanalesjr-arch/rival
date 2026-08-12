@@ -668,6 +668,38 @@ export function getActiveWeeks(program) {
   return program.levels[level]?.weeks || [];
 }
 
+// program.sessionsPerWeek is a display string like "4-5 sessions/week" — pull the lower
+// bound out to use as a session/day count when a week has no real day content yet.
+function parseSessionsPerWeek(text) {
+  const match = /(\d+)/.exec(text || "");
+  return match ? Math.min(Math.max(parseInt(match[1], 10), 1), 6) : 4;
+}
+
+// Resolves the actual training days to check off for a given week. Real day-level content
+// (warmup/exercises/cooldown, written per program) takes priority when it exists; almost no
+// week has that yet, so this falls back to generic "Day N" sessions sized off
+// sessionsPerWeek, so the training flow works everywhere before real content is written.
+export function getDaysForWeek(program, week) {
+  if (week.days && week.days.length > 0) {
+    return week.days.map((d, i) => ({
+      day: d.day ?? i + 1,
+      label: d.label || `Day ${d.day ?? i + 1}`,
+      source: d,
+    }));
+  }
+  const count = parseSessionsPerWeek(program.sessionsPerWeek);
+  return Array.from({ length: count }, (_, i) => ({
+    day: i + 1,
+    label: `Day ${i + 1}`,
+    source: null,
+  }));
+}
+
+// Which day numbers are checked off for a given week, as a plain array (never undefined).
+export function getCompletedDays(program, weekNumber) {
+  return program.completedDays?.[weekNumber] || [];
+}
+
 // "not-enrolled" | "enrolled" | "completed"
 export function getEnrollmentStatus(program) {
   if (!program.joined) return "not-enrolled";

@@ -17,8 +17,34 @@ export function ProgramsProvider({ children }) {
           ...p,
           joined,
           currentWeek: joined ? 1 : 0,
+          completedDays: joined ? {} : p.completedDays,
           enrolledCount: joined ? p.enrolledCount + 1 : Math.max(0, p.enrolledCount - 1),
         };
+      })
+    );
+  };
+
+  // Toggles one day's complete/pending state for a given week. Marking (not unmarking) the
+  // last remaining day of the athlete's *current* pending week auto-advances currentWeek —
+  // completing a preview week ahead of or behind where they actually are doesn't move
+  // anything, since only the live pending week drives progress. totalDaysInWeek is passed in
+  // by the caller (via getDaysForWeek) rather than recomputed here, since the fallback
+  // generic day count depends on program.sessionsPerWeek parsing that already lives there.
+  const toggleDayComplete = (id, weekNumber, dayNumber, totalDaysInWeek) => {
+    setPrograms((prev) =>
+      prev.map((p) => {
+        if (p.id !== id) return p;
+        const existing = new Set(p.completedDays?.[weekNumber] || []);
+        const wasComplete = existing.has(dayNumber);
+        if (wasComplete) existing.delete(dayNumber);
+        else existing.add(dayNumber);
+        const completedDays = { ...(p.completedDays || {}), [weekNumber]: Array.from(existing) };
+
+        const justFinishedCurrentWeek =
+          !wasComplete && existing.size >= totalDaysInWeek && weekNumber === p.currentWeek;
+        const currentWeek = justFinishedCurrentWeek ? Math.min(p.currentWeek + 1, p.duration) : p.currentWeek;
+
+        return { ...p, completedDays, currentWeek };
       })
     );
   };
@@ -47,6 +73,7 @@ export function ProgramsProvider({ children }) {
               enrolledLevel: nextLevel,
               joined: true,
               currentWeek: 1,
+              completedDays: {},
               roundsCompletedAtLevel: 0,
               hasCompletedLevel: true,
             }
@@ -65,6 +92,7 @@ export function ProgramsProvider({ children }) {
               ...p,
               joined: true,
               currentWeek: 1,
+              completedDays: {},
               roundsCompletedAtLevel: (p.roundsCompletedAtLevel || 0) + 1,
               hasCompletedLevel: true,
             }
@@ -75,7 +103,15 @@ export function ProgramsProvider({ children }) {
 
   return (
     <ProgramsContext.Provider
-      value={{ programs, toggleEnroll, updateEnrolledLevel, updateEnrolledFocus, levelUpProgram, continueProgram }}
+      value={{
+        programs,
+        toggleEnroll,
+        updateEnrolledLevel,
+        updateEnrolledFocus,
+        levelUpProgram,
+        continueProgram,
+        toggleDayComplete,
+      }}
     >
       {children}
     </ProgramsContext.Provider>

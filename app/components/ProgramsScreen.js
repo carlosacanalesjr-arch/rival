@@ -318,7 +318,14 @@ export default function ProgramsScreen() {
   const [activeTab, setActiveTab] = useState("Browse");
   const [openCategories, setOpenCategories] = useState(() => new Set());
 
-  const openProgram = (id) => router.push(`/programs/${id}`);
+  // Enrolled-and-in-progress programs open straight into the training flow (their current
+  // pending week), so reopening the app lands athletes where they left off instead of on
+  // the static overview. Not-yet-enrolled and completed programs still open the overview.
+  const openProgram = (id) => {
+    const program = programs.find((p) => p.id === id);
+    const status = program ? getEnrollmentStatus(program) : "not-enrolled";
+    router.push(status === "enrolled" ? `/programs/${id}/train` : `/programs/${id}`);
+  };
   const myPrograms = programs.filter((p) => p.joined);
 
   // "continue" repeats the same program at the same level for a fresh 3-month block.

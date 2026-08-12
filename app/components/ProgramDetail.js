@@ -51,9 +51,9 @@ function FocusReadOnlyBadge({ focus }) {
 }
 
 const PHASE_META = [
-  { number: 1, label: "Foundation" },
-  { number: 2, label: "Build" },
-  { number: 3, label: "Peak" },
+  { number: 1, label: "Foundation", summary: "General fitness base building — aerobic capacity, movement technique, and work capacity." },
+  { number: 2, label: "Build", summary: "Increasing volume and intensity as your base solidifies." },
+  { number: 3, label: "Peak", summary: "Event-specific work, full simulations, and taper into peak readiness." },
 ];
 
 function getPhases(weeks) {
@@ -115,6 +115,9 @@ export default function ProgramDetail({ id }) {
   const router = useRouter();
   const { programs, toggleEnroll, updateEnrolledLevel, updateEnrolledFocus } = usePrograms();
   const [expandedWeeks, setExpandedWeeks] = useState(() => new Set());
+  // Accordion: a single open phase number (or null), not a Set — opening one phase
+  // collapses whichever other phase was open, so the page can't grow to show all 12 weeks.
+  const [openPhase, setOpenPhase] = useState(null);
 
   const program = programs.find((p) => p.id === id);
 
@@ -158,6 +161,10 @@ export default function ProgramDetail({ id }) {
       else next.add(weekNumber);
       return next;
     });
+  };
+
+  const togglePhase = (phaseNumber) => {
+    setOpenPhase((prev) => (prev === phaseNumber ? null : phaseNumber));
   };
 
   return (
@@ -269,21 +276,57 @@ export default function ProgramDetail({ id }) {
 
         <section className="mt-6">
           <h3 className="px-4 text-base font-bold text-white">3-Month Breakdown</h3>
-          <div className="mx-4 mt-3 space-y-4">
+          <div className="mx-4 mt-3 space-y-3">
             {phases.map((phase) => {
               const firstWeek = phase.weeks[0].week;
               const lastWeek = phase.weeks[phase.weeks.length - 1].week;
+              const isPhaseOpen = openPhase === phase.number;
+              const isPhaseCurrent = status === "enrolled" && phase.weeks.some((w) => w.week === program.currentWeek);
               return (
-                <div key={phase.number} className="overflow-hidden rounded-2xl border border-border-subtle bg-surface">
-                  <div className="border-b border-border-subtle px-4 py-3">
-                    <p className="text-sm font-extrabold text-white">
-                      Phase {phase.number} · {phase.label}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-zinc-500">
-                      {firstWeek === lastWeek ? `Week ${firstWeek}` : `Weeks ${firstWeek}–${lastWeek}`}
-                    </p>
-                  </div>
-                  <ol className="space-y-2 p-3">
+                <div
+                  key={phase.number}
+                  className={`overflow-hidden rounded-2xl border ${
+                    isPhaseCurrent ? "border-rival-red/50 bg-rival-red/5" : "border-border-subtle bg-surface"
+                  }`}
+                >
+                  <button
+                    onClick={() => togglePhase(phase.number)}
+                    aria-expanded={isPhaseOpen}
+                    className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-2 text-sm font-extrabold text-white">
+                        Month {phase.number}: {phase.label}
+                        {isPhaseCurrent && (
+                          <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
+                            NOW
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-0.5 text-xs text-zinc-500">{phase.summary}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-[11px] text-zinc-500">
+                        {firstWeek === lastWeek ? `Week ${firstWeek}` : `Weeks ${firstWeek}–${lastWeek}`}
+                      </span>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className={`shrink-0 text-zinc-400 transition-transform duration-200 ${
+                          isPhaseOpen ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {isPhaseOpen && (
+                  <ol className="space-y-2 border-t border-border-subtle p-3">
                     {phase.weeks.map((w) => {
                       const isDone = status === "completed" || (program.joined && w.week < program.currentWeek);
                       const isCurrent = status === "enrolled" && w.week === program.currentWeek;
@@ -359,6 +402,7 @@ export default function ProgramDetail({ id }) {
                       );
                     })}
                   </ol>
+                  )}
                 </div>
               );
             })}
@@ -373,15 +417,21 @@ export default function ProgramDetail({ id }) {
             <span className="text-sm font-bold text-zinc-100">Completed ✓</span>
           </div>
         ) : status === "enrolled" ? (
-          <div className="flex items-center gap-3 rounded-full bg-rival-red px-4 py-3">
-            <span className="text-sm font-bold text-white">✓ Enrolled</span>
+          <button
+            onClick={() => router.push(`/programs/${program.id}/train`)}
+            className="flex w-full items-center gap-3 rounded-full bg-rival-red px-4 py-3 transition hover:bg-red-600"
+          >
+            <span className="text-sm font-bold text-white">Continue Training</span>
             <span className="ml-auto text-xs text-white/80">
               Week {program.currentWeek} of {program.duration}
             </span>
-          </div>
+          </button>
         ) : (
           <button
-            onClick={() => toggleEnroll(program.id)}
+            onClick={() => {
+              toggleEnroll(program.id);
+              router.push(`/programs/${program.id}/train`);
+            }}
             className="w-full rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white hover:bg-red-600"
           >
             START PROGRAM
