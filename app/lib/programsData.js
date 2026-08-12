@@ -551,20 +551,71 @@ export const programs = [
     sessionsPerWeek: "4-5 sessions/week",
     joined: false,
     currentWeek: 0,
-    weeks: [
-      { week: 1, title: "Foundation Testing", focus: "Baseline CPAT circuit assessment and pacing introduction" },
-      { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events" },
-      { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort" },
-      { week: 4, title: "Load Carry Basics", focus: "Stair climb with weighted vest, equipment carry technique" },
-      { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
-      { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
-      { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
-      { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
-      { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
-      { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
-      { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
-      { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
-    ],
+    // Beginner/Intermediate/Test-Ready get their own Month 1-3 content (see `levels`
+    // below) rather than sharing one generic `weeks` array — CPAT prep genuinely differs
+    // by level, unlike categories where the level selector is just a difficulty label.
+    levels: {
+      Beginner: {
+        weeks: [
+          {
+            week: 1,
+            title: "Foundation Testing",
+            focus: "Baseline CPAT circuit assessment and pacing introduction",
+            days: [],
+          },
+          { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events", days: [] },
+          { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort", days: [] },
+          {
+            week: 4,
+            title: "Load Carry Basics",
+            focus: "Stair climb with weighted vest, equipment carry technique",
+            days: [],
+          },
+          { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
+          { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
+          { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
+          { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
+          { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
+          { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
+          { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
+          { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
+        ],
+      },
+      // Intermediate / Test-Ready reuse the Beginner scaffolding as a placeholder until
+      // their own level-specific content is written — same 12-week shape, no `days` yet.
+      Intermediate: {
+        weeks: [
+          { week: 1, title: "Foundation Testing", focus: "Baseline CPAT circuit assessment and pacing introduction" },
+          { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events" },
+          { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort" },
+          { week: 4, title: "Load Carry Basics", focus: "Stair climb with weighted vest, equipment carry technique" },
+          { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
+          { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
+          { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
+          { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
+          { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
+          { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
+          { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
+          { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
+        ],
+      },
+      "Test-Ready": {
+        weeks: [
+          { week: 1, title: "Foundation Testing", focus: "Baseline CPAT circuit assessment and pacing introduction" },
+          { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events" },
+          { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort" },
+          { week: 4, title: "Load Carry Basics", focus: "Stair climb with weighted vest, equipment carry technique" },
+          { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
+          { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
+          { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
+          { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
+          { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
+          { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
+          { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
+          { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
+        ],
+      },
+    },
   },
   {
     id: "p18",
@@ -606,6 +657,17 @@ export function getProgram(id) {
   return programs.find((p) => p.id === id);
 }
 
+// Resolves the week list to actually render for a program. Most categories still just
+// have a flat `weeks` array shared across every level. Programs that need level-specific
+// content (e.g. Fire Department Prep) instead have a `levels` map — this picks the weeks
+// for whichever level the athlete is enrolled at, falling back to the first defined level
+// before they've chosen one (so the Browse-tab preview isn't empty).
+export function getActiveWeeks(program) {
+  if (!program.levels) return program.weeks || [];
+  const level = program.enrolledLevel || Object.keys(program.levels)[0];
+  return program.levels[level]?.weeks || [];
+}
+
 // "not-enrolled" | "enrolled" | "completed"
 export function getEnrollmentStatus(program) {
   if (!program.joined) return "not-enrolled";
@@ -639,6 +701,18 @@ export function getNextLevel(level, category) {
   const index = order.indexOf(level);
   if (index === -1 || index === order.length - 1) return null;
   return order[index + 1];
+}
+
+// For categories where each level is its own separate program record (HYROX has no level
+// selector — Beginner/Intermediate/Advanced are three distinct programs), finds the sibling
+// record one level up. Returns null at the top level or if no sibling exists.
+export function getNextLevelProgram(program, allPrograms) {
+  const nextLevel = getNextLevel(program.difficulty, program.category);
+  if (!nextLevel) return null;
+  return (
+    allPrograms.find((p) => p.category === program.category && p.difficulty === nextLevel && p.id !== program.id) ||
+    null
+  );
 }
 
 // What action a *just-finished* cycle (live status "completed") should offer.

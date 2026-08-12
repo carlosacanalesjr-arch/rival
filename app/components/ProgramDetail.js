@@ -1,8 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePrograms } from "@/app/lib/ProgramsContext";
-import { getEnrollmentStatus } from "@/app/lib/programsData";
+import {
+  getEnrollmentStatus,
+  getActiveWeeks,
+  categoriesWithLevelSelector,
+  getNextLevelProgram,
+} from "@/app/lib/programsData";
+import { LEVEL_STYLES, PLACEHOLDER_TRIGGER_STYLE, LevelSelector, FocusSelector } from "@/app/components/LevelFocusSelectors";
 
 function BackIcon() {
   return (
@@ -33,6 +40,16 @@ function InfoTile({ label, value }) {
   );
 }
 
+function LevelReadOnlyBadge({ level }) {
+  const style = level ? LEVEL_STYLES[level]?.trigger || PLACEHOLDER_TRIGGER_STYLE : PLACEHOLDER_TRIGGER_STYLE;
+  return <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${style}`}>{level || "Not selected"}</span>;
+}
+
+function FocusReadOnlyBadge({ focus }) {
+  const style = focus ? "border-amber-500/40 bg-amber-500/15 text-amber-400" : PLACEHOLDER_TRIGGER_STYLE;
+  return <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${style}`}>{focus || "Not selected"}</span>;
+}
+
 const PHASE_META = [
   { number: 1, label: "Foundation" },
   { number: 2, label: "Build" },
@@ -47,9 +64,57 @@ function getPhases(weeks) {
   })).filter((phase) => phase.weeks.length > 0);
 }
 
+// Turns { sets, reps, duration, rest } into a single compact line, e.g. "3 × 12 · Rest 60 sec"
+// or "25 min · Zone 2". Any subset of fields can be present depending on the exercise.
+function formatPrescription(item) {
+  const parts = [];
+  if (item.sets && item.reps) parts.push(`${item.sets} × ${item.reps}`);
+  else if (item.reps) parts.push(item.reps);
+  else if (item.sets) parts.push(`${item.sets} sets`);
+  if (item.duration) parts.push(item.duration);
+  if (item.intensity) parts.push(item.intensity);
+  if (item.rest) parts.push(`Rest ${item.rest}`);
+  return parts.join(" · ");
+}
+
+function ExerciseGroup({ title, items }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mt-2 first:mt-0">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{title}</p>
+      <ul className="mt-1 space-y-1.5">
+        {items.map((item, i) => (
+          <li key={i}>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
+              <span className="shrink-0 text-[11px] text-zinc-500">{formatPrescription(item)}</span>
+            </div>
+            {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function DayBreakdown({ day }) {
+  return (
+    <div className="rounded-xl border border-border-subtle bg-surface-raised p-3">
+      <p className="text-xs font-extrabold text-white">
+        Day {day.day}
+        {day.label ? ` · ${day.label}` : ""}
+      </p>
+      <ExerciseGroup title="Warm-Up" items={day.warmup} />
+      <ExerciseGroup title="Exercises" items={day.exercises} />
+      <ExerciseGroup title="Cooldown" items={day.cooldown} />
+    </div>
+  );
+}
+
 export default function ProgramDetail({ id }) {
   const router = useRouter();
-  const { programs, toggleEnroll } = usePrograms();
+  const { programs, toggleEnroll, updateEnrolledLevel, updateEnrolledFocus } = usePrograms();
+  const [expandedWeeks, setExpandedWeeks] = useState(() => new Set());
 
   const program = programs.find((p) => p.id === id);
 
@@ -68,8 +133,32 @@ export default function ProgramDetail({ id }) {
   }
 
   const percent = Math.round((program.currentWeek / program.duration) * 100);
-  const phases = getPhases(program.weeks);
+  const phases = getPhases(getActiveWeeks(program));
   const status = getEnrollmentStatus(program);
+
+  const showLevelRow = categoriesWithLevelSelector.includes(program.category);
+  const showFocusRow = Boolean(program.focusOptions);
+  // Selections are only editable pre-enrollment. Once an athlete has actually started
+  // workouts, changing level/focus goes through the existing level-up/repeat flow
+  // (CompletionActionButton on the Browse / My Programs cards) instead of a silent swap
+  // here that would yank them into different content mid-cycle.
+  const canEditSelections = status === "not-enrolled";
+
+  // HYROX has no level selector — Beginner/Intermediate/Advanced are separate program
+  // records — so instead of a review-and-change row it gets a direct link to the next
+  // tier's own page. This is just navigation (not a data edit), so it's shown regardless
+  // of enrollment status rather than being locked once the athlete has started workouts.
+  const isHyrox = program.category === "HYROX";
+  const nextLevelProgram = isHyrox ? getNextLevelProgram(program, programs) : null;
+
+  const toggleWeek = (weekNumber) => {
+    setExpandedWeeks((prev) => {
+      const next = new Set(prev);
+      if (next.has(weekNumber)) next.delete(weekNumber);
+      else next.add(weekNumber);
+      return next;
+    });
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-black">
@@ -85,21 +174,66 @@ export default function ProgramDetail({ id }) {
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-28">
-        <div className="relative overflow-hidden border-b border-border-subtle bg-surface px-4 pb-5 pt-5">
+        <div className="relative border-b border-border-subtle bg-surface px-4 pb-5 pt-5">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rival-red to-orange-500" aria-hidden />
           <span className="inline-block rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
             {program.category}
           </span>
           <h2 className="mt-3 text-2xl font-extrabold text-white">{program.title}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">{program.fullDescription}</p>
+
+          {isHyrox && nextLevelProgram && (
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-xs font-semibold text-zinc-500">Next Level</span>
+              <button
+                onClick={() => router.push(`/programs/${nextLevelProgram.id}`)}
+                className="flex items-center gap-1.5 rounded-full border border-rival-red/40 bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red transition hover:bg-rival-red/25"
+              >
+                Level Up to {nextLevelProgram.difficulty}
+                <span aria-hidden>→</span>
+              </button>
+            </div>
+          )}
+
+          {(showLevelRow || showFocusRow) && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              {showLevelRow && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-zinc-500">Level</span>
+                  {canEditSelections ? (
+                    <LevelSelector
+                      selected={program.enrolledLevel || null}
+                      onSelect={(level) => updateEnrolledLevel(program.id, level)}
+                      variant="picker"
+                      category={program.category}
+                    />
+                  ) : (
+                    <LevelReadOnlyBadge level={program.enrolledLevel} />
+                  )}
+                </div>
+              )}
+              {showFocusRow && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-zinc-500">Agency Focus</span>
+                  {canEditSelections ? (
+                    <FocusSelector
+                      options={program.focusOptions}
+                      selected={program.enrolledFocus || null}
+                      onSelect={(focus) => updateEnrolledFocus(program.id, focus)}
+                    />
+                  ) : (
+                    <FocusReadOnlyBadge focus={program.enrolledFocus} />
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">{program.fullDescription}</p>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
             <InfoTile label="Duration" value={`${program.duration} weeks`} />
             {program.difficulty && <InfoTile label="Difficulty" value={program.difficulty} />}
             <InfoTile label="Category" value={program.category} />
-            {program.focusOptions && (
-              <InfoTile label="Agency Focus" value={program.enrolledFocus || "Not selected"} />
-            )}
             <InfoTile label="Sessions/Week" value={program.sessionsPerWeek} />
           </div>
 
@@ -153,32 +287,73 @@ export default function ProgramDetail({ id }) {
                     {phase.weeks.map((w) => {
                       const isDone = status === "completed" || (program.joined && w.week < program.currentWeek);
                       const isCurrent = status === "enrolled" && w.week === program.currentWeek;
+                      const hasDays = w.days && w.days.length > 0;
+                      const isExpanded = expandedWeeks.has(w.week);
                       return (
                         <li
                           key={w.week}
-                          className={`flex items-center gap-3 rounded-xl border p-3 ${
+                          className={`overflow-hidden rounded-xl border ${
                             isCurrent ? "border-rival-red bg-rival-red/5" : "border-border-subtle bg-black"
                           }`}
                         >
-                          <span
-                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${
-                              isDone
-                                ? "bg-rival-red text-white"
-                                : isCurrent
-                                ? "border border-rival-red text-rival-red"
-                                : "bg-surface-raised text-zinc-400"
-                            }`}
+                          <div
+                            role={hasDays ? "button" : undefined}
+                            tabIndex={hasDays ? 0 : undefined}
+                            onClick={hasDays ? () => toggleWeek(w.week) : undefined}
+                            onKeyDown={
+                              hasDays
+                                ? (e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      toggleWeek(w.week);
+                                    }
+                                  }
+                                : undefined
+                            }
+                            className={`flex items-center gap-3 p-3 ${hasDays ? "cursor-pointer" : ""}`}
                           >
-                            {isDone ? "✓" : w.week}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold text-white">{w.title}</p>
-                            <p className="mt-0.5 text-xs text-zinc-400">{w.focus}</p>
-                          </div>
-                          {isCurrent && (
-                            <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
-                              NOW
+                            <span
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${
+                                isDone
+                                  ? "bg-rival-red text-white"
+                                  : isCurrent
+                                  ? "border border-rival-red text-rival-red"
+                                  : "bg-surface-raised text-zinc-400"
+                              }`}
+                            >
+                              {isDone ? "✓" : w.week}
                             </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold text-white">{w.title}</p>
+                              <p className="mt-0.5 text-xs text-zinc-400">{w.focus}</p>
+                            </div>
+                            {isCurrent && (
+                              <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
+                                NOW
+                              </span>
+                            )}
+                            {hasDays && (
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className={`shrink-0 text-zinc-400 transition-transform duration-200 ${
+                                  isExpanded ? "rotate-180" : ""
+                                }`}
+                              >
+                                <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </div>
+                          {hasDays && isExpanded && (
+                            <div className="space-y-2 border-t border-border-subtle p-3">
+                              {w.days.map((day) => (
+                                <DayBreakdown key={day.day} day={day} />
+                              ))}
+                            </div>
                           )}
                         </li>
                       );
