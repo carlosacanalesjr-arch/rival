@@ -11,7 +11,7 @@ import {
 } from "@/app/lib/programsData";
 import { LEVEL_STYLES, PLACEHOLDER_TRIGGER_STYLE, LevelSelector, FocusSelector } from "@/app/components/LevelFocusSelectors";
 import ImageSlot from "@/app/components/ImageSlot";
-import VideoLinkField from "@/app/components/VideoLinkField";
+import { ExerciseGroup } from "@/app/components/ExerciseBreakdown";
 
 function BackIcon() {
   return (
@@ -64,53 +64,6 @@ function getPhases(weeks) {
     ...phase,
     weeks: weeks.slice(i * size, Math.min((i + 1) * size, weeks.length)),
   })).filter((phase) => phase.weeks.length > 0);
-}
-
-// Turns { sets, reps, duration, rest } into a single compact line, e.g. "3 × 12 · Rest 60 sec"
-// or "25 min · Zone 2". Any subset of fields can be present depending on the exercise.
-function formatPrescription(item) {
-  const parts = [];
-  if (item.sets && item.reps) parts.push(`${item.sets} × ${item.reps}`);
-  else if (item.reps) parts.push(item.reps);
-  else if (item.sets) parts.push(`${item.sets} sets`);
-  if (item.duration) parts.push(item.duration);
-  if (item.intensity) parts.push(item.intensity);
-  if (item.rest) parts.push(`Rest ${item.rest}`);
-  return parts.join(" · ");
-}
-
-// Exercise items don't carry a stable id, so the media key for each one is built from its
-// position within program/week/day/section — stable as long as the seed data for that slot
-// doesn't get reordered.
-function ExerciseGroup({ title, items, keyPrefix }) {
-  if (!items || items.length === 0) return null;
-  const sectionSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  return (
-    <div className="mt-2 first:mt-0">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{title}</p>
-      <ul className="mt-1.5 space-y-2.5">
-        {items.map((item, i) => (
-          <li key={i} className="flex gap-2.5">
-            <ImageSlot
-              mediaKey={`exercise:${keyPrefix}:${sectionSlug}:${i}`}
-              alt={item.name}
-              compact
-              showLabel={false}
-              className="h-11 w-11 shrink-0 rounded-lg"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
-                <span className="shrink-0 text-[11px] text-zinc-500">{formatPrescription(item)}</span>
-              </div>
-              {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
-              <VideoLinkField mediaKey={`exercise:${keyPrefix}:${sectionSlug}:${i}`} />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 function DayBreakdown({ day, keyPrefix }) {

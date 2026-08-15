@@ -6,6 +6,7 @@ import { usePrograms } from "@/app/lib/ProgramsContext";
 import { getActiveWeeks, getDaysForWeek, getCompletedDays, getEnrollmentStatus } from "@/app/lib/programsData";
 import { firePushNotification } from "@/app/lib/notifications";
 import ImageSlot from "@/app/components/ImageSlot";
+import { ExerciseGroup } from "@/app/components/ExerciseBreakdown";
 
 function BackIcon() {
   return (
@@ -32,52 +33,92 @@ function CheckIcon() {
   );
 }
 
-function DayRow({ day, isComplete, onToggle, mediaKey }) {
+function DayRow({ day, isComplete, onToggle, mediaKey, exerciseKeyPrefix }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasBreakdown = Boolean(
+    day.source?.warmup?.length || day.source?.exercises?.length || day.source?.cooldown?.length
+  );
+
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={onToggle}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onToggle();
-        }
-      }}
-      aria-pressed={isComplete}
-      className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border p-3 text-left transition ${
+      className={`overflow-hidden rounded-xl border transition ${
         isComplete ? "border-emerald-500/40 bg-emerald-500/10" : "border-border-subtle bg-surface"
       }`}
     >
-      <span
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition ${
-          isComplete ? "bg-emerald-500 text-black" : "border border-border-subtle text-zinc-400"
-        }`}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
+        aria-pressed={isComplete}
+        className="flex w-full cursor-pointer items-center gap-3 p-3 text-left"
       >
-        {isComplete ? <CheckIcon /> : day.day}
-      </span>
-      {/* stopPropagation so uploading/replacing/removing the thumbnail doesn't also toggle day-complete */}
-      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
-        <ImageSlot
-          mediaKey={mediaKey}
-          alt={day.label}
-          compact
-          showLabel={false}
-          className="h-10 w-10 rounded-lg"
-        />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold text-white">{day.label}</p>
-        {day.source?.exercises?.length > 0 ? (
-          <p className="mt-0.5 truncate text-xs text-zinc-500">
-            {day.source.exercises.map((e) => e.name).join(" · ")}
-          </p>
-        ) : (
-          <p className="mt-0.5 text-xs text-zinc-500">{isComplete ? "Complete" : "Pending"}</p>
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition ${
+            isComplete ? "bg-emerald-500 text-black" : "border border-border-subtle text-zinc-400"
+          }`}
+        >
+          {isComplete ? <CheckIcon /> : day.day}
+        </span>
+        {/* stopPropagation so uploading/replacing/removing the thumbnail doesn't also toggle day-complete */}
+        <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+          <ImageSlot
+            mediaKey={mediaKey}
+            alt={day.label}
+            compact
+            showLabel={false}
+            className="h-10 w-10 rounded-lg"
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-white">{day.label}</p>
+          {day.source?.exercises?.length > 0 ? (
+            <p className="mt-0.5 truncate text-xs text-zinc-500">
+              {day.source.exercises.map((e) => e.name).join(" · ")}
+            </p>
+          ) : (
+            <p className="mt-0.5 text-xs text-zinc-500">{isComplete ? "Complete" : "Pending"}</p>
+          )}
+        </div>
+        {isComplete && (
+          <span className="shrink-0 text-[11px] font-bold text-emerald-400">Done</span>
+        )}
+        {hasBreakdown && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded((prev) => !prev);
+            }}
+            aria-label={expanded ? "Hide exercise details" : "Show exercise details"}
+            aria-expanded={expanded}
+            className="shrink-0 p-1 text-zinc-400 transition hover:text-white"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            >
+              <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         )}
       </div>
-      {isComplete && (
-        <span className="shrink-0 text-[11px] font-bold text-emerald-400">Done</span>
+      {hasBreakdown && expanded && (
+        <div className="space-y-2 border-t border-border-subtle p-3">
+          <ExerciseGroup title="Warm-Up" items={day.source.warmup} keyPrefix={exerciseKeyPrefix} />
+          <ExerciseGroup title="Exercises" items={day.source.exercises} keyPrefix={exerciseKeyPrefix} />
+          <ExerciseGroup title="Cooldown" items={day.source.cooldown} keyPrefix={exerciseKeyPrefix} />
+        </div>
       )}
     </div>
   );
@@ -118,6 +159,7 @@ function WeekPanel({ program, week, onDayToggle }) {
             isComplete={completed.includes(day.day)}
             onToggle={() => onDayToggle(week, day, days.length)}
             mediaKey={`day-thumb:${program.id}:${week.week}:${day.day}`}
+            exerciseKeyPrefix={`${program.id}:${week.week}:${day.day}`}
           />
         ))}
       </div>
