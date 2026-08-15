@@ -88,12 +88,27 @@ function WeekPanel({ program, week, onDayToggle }) {
   const completed = getCompletedDays(program, week.week);
   return (
     <div className="w-full shrink-0 snap-center px-4">
-      <div className="pt-2">
-        <p className="text-xs font-semibold text-zinc-500">
-          Week {week.week} of {program.duration}
-        </p>
-        <h2 className="mt-1 text-xl font-extrabold text-white">{week.title}</h2>
-        <p className="mt-1 text-sm text-zinc-400">{week.focus}</p>
+      <div className="relative mt-2 flex min-h-44 flex-col justify-end overflow-hidden rounded-2xl">
+        <div className="absolute inset-0">
+          <ImageSlot
+            mediaKey={`week-bg:${program.id}:${week.week}`}
+            alt={`Week ${week.week} background`}
+            label="Add image"
+            cornerControlsOnly
+            className="h-full w-full"
+          />
+        </div>
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent"
+          aria-hidden
+        />
+        <div className="relative z-10 p-4">
+          <p className="text-xs font-bold text-white/80">
+            Week {week.week} of {program.duration}
+          </p>
+          <h2 className="mt-1 text-xl font-extrabold text-white">{week.title}</h2>
+          <p className="mt-1 text-sm text-white/80">{week.focus}</p>
+        </div>
       </div>
       <div className="mt-4 space-y-2 pb-10">
         {days.map((day) => (

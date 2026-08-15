@@ -39,32 +39,49 @@ function XIcon() {
 
 // Reusable placeholder / upload slot backed by MediaContext. Renders a dashed "Add image"
 // box when empty, or the stored image with replace/remove controls once one is set. Used
-// for program hero banners, day thumbnails, and exercise thumbnails — callers control
-// exact sizing/rounding via `className` on the outer wrapper.
+// for program hero banners, day thumbnails, exercise thumbnails, and week-card backgrounds
+// — callers control exact sizing/rounding via `className` on the outer wrapper.
+//
+// `cornerControlsOnly`: for slots that sit as a full-bleed background *inside another
+// clickable card* (week cards) — clicking anywhere on the image would otherwise swallow
+// the card's own click (toggle-expand), and visually a full-box "Add image" placeholder
+// sitting under card text invites taps that land on the text instead. In this mode the
+// placeholder/image is purely decorative and only a small corner button opens the picker,
+// so the rest of the card's surface is free for the card's own click handler.
 export default function ImageSlot({
   mediaKey,
   alt = "",
   label = "Add image",
   showLabel = true,
   compact = false,
+  cornerControlsOnly = false,
   className = "",
 }) {
   const { imageUrl, setImage, removeImage } = useMedia(mediaKey);
   const inputRef = useRef(null);
   const [error, setError] = useState(null);
 
-  const openPicker = () => inputRef.current?.click();
+  // stopPropagation so these buttons work even when nested inside another clickable card.
+  const openPicker = (e) => {
+    e?.stopPropagation();
+    inputRef.current?.click();
+  };
+
+  const handleRemove = (e) => {
+    e.stopPropagation();
+    removeImage();
+  };
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // allow re-selecting the same file later
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setError(compact ? null : "Choose an image file.");
+      setError(compact || cornerControlsOnly ? null : "Choose an image file.");
       return;
     }
     if (file.size > MAX_BYTES) {
-      setError(compact ? null : "Image is too large (max 4MB).");
+      setError(compact || cornerControlsOnly ? null : "Image is too large (max 4MB).");
       return;
     }
     setError(null);
@@ -75,19 +92,26 @@ export default function ImageSlot({
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFile}
+        onClick={(e) => e.stopPropagation()}
+      />
 
       {imageUrl ? (
         <>
-          <button
-            type="button"
-            onClick={openPicker}
-            aria-label="Replace image"
-            className="block h-full w-full"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets */}
+          {cornerControlsOnly ? (
+            // eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets
             <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
-          </button>
+          ) : (
+            <button type="button" onClick={openPicker} aria-label="Replace image" className="block h-full w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets */}
+              <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
+            </button>
+          )}
           {!compact && (
             <button
               type="button"
@@ -100,16 +124,28 @@ export default function ImageSlot({
           )}
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              removeImage();
-            }}
+            onClick={handleRemove}
             aria-label="Remove image"
             className={`absolute flex items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black ${
               compact ? "right-1 top-1 h-4 w-4" : "right-1.5 top-9 h-6 w-6"
             }`}
           >
             <XIcon />
+          </button>
+        </>
+      ) : cornerControlsOnly ? (
+        <>
+          <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500">
+            <ImageIcon size={20} />
+            {showLabel && <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>}
+          </div>
+          <button
+            type="button"
+            onClick={openPicker}
+            aria-label={label}
+            className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black"
+          >
+            <ImageIcon size={14} />
           </button>
         </>
       ) : (

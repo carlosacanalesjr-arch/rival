@@ -362,7 +362,7 @@ export default function ProgramDetail({ id }) {
                         <li
                           key={w.week}
                           className={`overflow-hidden rounded-xl border ${
-                            isCurrent ? "border-rival-red bg-rival-red/5" : "border-border-subtle bg-black"
+                            isCurrent ? "border-rival-red" : "border-border-subtle"
                           }`}
                         >
                           <div
@@ -379,43 +379,56 @@ export default function ProgramDetail({ id }) {
                                   }
                                 : undefined
                             }
-                            className={`flex items-center gap-3 p-3 ${hasDays ? "cursor-pointer" : ""}`}
+                            className={`relative flex min-h-28 flex-col justify-end ${hasDays ? "cursor-pointer" : ""}`}
                           >
-                            <span
-                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${
-                                isDone
-                                  ? "bg-rival-red text-white"
-                                  : isCurrent
-                                  ? "border border-rival-red text-rival-red"
-                                  : "bg-surface-raised text-zinc-400"
-                              }`}
-                            >
-                              {isDone ? "✓" : w.week}
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-bold text-white">{w.title}</p>
-                              <p className="mt-0.5 text-xs text-zinc-400">{w.focus}</p>
+                            <div className="absolute inset-0">
+                              <ImageSlot
+                                mediaKey={`week-bg:${program.id}:${w.week}`}
+                                alt={`Week ${w.week} background`}
+                                label="Add image"
+                                cornerControlsOnly
+                                className="h-full w-full"
+                              />
                             </div>
-                            {isCurrent && (
-                              <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
-                                NOW
-                              </span>
-                            )}
-                            {hasDays && (
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className={`shrink-0 text-zinc-400 transition-transform duration-200 ${
-                                  isExpanded ? "rotate-180" : ""
-                                }`}
-                              >
-                                <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            )}
+                            <div
+                              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent"
+                              aria-hidden
+                            />
+
+                            <div className="absolute left-2 top-2 z-10 flex items-center gap-1.5">
+                              {isDone && (
+                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rival-red text-xs font-extrabold text-white">
+                                  ✓
+                                </span>
+                              )}
+                              {isCurrent && (
+                                <span className="rounded-full bg-rival-red px-2 py-0.5 text-[10px] font-bold text-white">
+                                  NOW
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="relative z-10 flex items-end justify-between gap-2 p-3">
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-white/80">Week {w.week}</p>
+                                <p className="truncate text-sm font-extrabold text-white">{w.title}</p>
+                              </div>
+                              {hasDays && (
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  className={`shrink-0 text-white/80 transition-transform duration-200 ${
+                                    isExpanded ? "rotate-180" : ""
+                                  }`}
+                                >
+                                  <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              )}
+                            </div>
                           </div>
                           {hasDays && isExpanded && (
                             <div className="space-y-2 border-t border-border-subtle p-3">
