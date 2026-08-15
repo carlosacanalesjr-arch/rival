@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePrograms } from "@/app/lib/ProgramsContext";
 import { getActiveWeeks, getDaysForWeek, getCompletedDays, getEnrollmentStatus } from "@/app/lib/programsData";
 import { firePushNotification } from "@/app/lib/notifications";
+import ImageSlot from "@/app/components/ImageSlot";
 
 function BackIcon() {
   return (
@@ -31,12 +32,20 @@ function CheckIcon() {
   );
 }
 
-function DayRow({ day, isComplete, onToggle }) {
+function DayRow({ day, isComplete, onToggle, mediaKey }) {
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onToggle}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onToggle();
+        }
+      }}
       aria-pressed={isComplete}
-      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
+      className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border p-3 text-left transition ${
         isComplete ? "border-emerald-500/40 bg-emerald-500/10" : "border-border-subtle bg-surface"
       }`}
     >
@@ -47,6 +56,16 @@ function DayRow({ day, isComplete, onToggle }) {
       >
         {isComplete ? <CheckIcon /> : day.day}
       </span>
+      {/* stopPropagation so uploading/replacing/removing the thumbnail doesn't also toggle day-complete */}
+      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+        <ImageSlot
+          mediaKey={mediaKey}
+          alt={day.label}
+          compact
+          showLabel={false}
+          className="h-10 w-10 rounded-lg"
+        />
+      </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-white">{day.label}</p>
         {day.source?.exercises?.length > 0 ? (
@@ -60,7 +79,7 @@ function DayRow({ day, isComplete, onToggle }) {
       {isComplete && (
         <span className="shrink-0 text-[11px] font-bold text-emerald-400">Done</span>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -83,6 +102,7 @@ function WeekPanel({ program, week, onDayToggle }) {
             day={day}
             isComplete={completed.includes(day.day)}
             onToggle={() => onDayToggle(week, day, days.length)}
+            mediaKey={`day-thumb:${program.id}:${week.week}:${day.day}`}
           />
         ))}
       </div>

@@ -10,6 +10,8 @@ import {
   getNextLevelProgram,
 } from "@/app/lib/programsData";
 import { LEVEL_STYLES, PLACEHOLDER_TRIGGER_STYLE, LevelSelector, FocusSelector } from "@/app/components/LevelFocusSelectors";
+import ImageSlot from "@/app/components/ImageSlot";
+import VideoLinkField from "@/app/components/VideoLinkField";
 
 function BackIcon() {
   return (
@@ -77,19 +79,33 @@ function formatPrescription(item) {
   return parts.join(" · ");
 }
 
-function ExerciseGroup({ title, items }) {
+// Exercise items don't carry a stable id, so the media key for each one is built from its
+// position within program/week/day/section — stable as long as the seed data for that slot
+// doesn't get reordered.
+function ExerciseGroup({ title, items, keyPrefix }) {
   if (!items || items.length === 0) return null;
+  const sectionSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div className="mt-2 first:mt-0">
       <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{title}</p>
-      <ul className="mt-1 space-y-1.5">
+      <ul className="mt-1.5 space-y-2.5">
         {items.map((item, i) => (
-          <li key={i}>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
-              <span className="shrink-0 text-[11px] text-zinc-500">{formatPrescription(item)}</span>
+          <li key={i} className="flex gap-2.5">
+            <ImageSlot
+              mediaKey={`exercise:${keyPrefix}:${sectionSlug}:${i}`}
+              alt={item.name}
+              compact
+              showLabel={false}
+              className="h-11 w-11 shrink-0 rounded-lg"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
+                <span className="shrink-0 text-[11px] text-zinc-500">{formatPrescription(item)}</span>
+              </div>
+              {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
+              <VideoLinkField mediaKey={`exercise:${keyPrefix}:${sectionSlug}:${i}`} />
             </div>
-            {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
           </li>
         ))}
       </ul>
@@ -97,16 +113,17 @@ function ExerciseGroup({ title, items }) {
   );
 }
 
-function DayBreakdown({ day }) {
+function DayBreakdown({ day, keyPrefix }) {
+  const dayKeyPrefix = `${keyPrefix}:${day.day}`;
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-raised p-3">
       <p className="text-xs font-extrabold text-white">
         Day {day.day}
         {day.label ? ` · ${day.label}` : ""}
       </p>
-      <ExerciseGroup title="Warm-Up" items={day.warmup} />
-      <ExerciseGroup title="Exercises" items={day.exercises} />
-      <ExerciseGroup title="Cooldown" items={day.cooldown} />
+      <ExerciseGroup title="Warm-Up" items={day.warmup} keyPrefix={dayKeyPrefix} />
+      <ExerciseGroup title="Exercises" items={day.exercises} keyPrefix={dayKeyPrefix} />
+      <ExerciseGroup title="Cooldown" items={day.cooldown} keyPrefix={dayKeyPrefix} />
     </div>
   );
 }
@@ -181,6 +198,15 @@ export default function ProgramDetail({ id }) {
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-28">
+        <div className="relative h-44 w-full">
+          <ImageSlot
+            mediaKey={`program-hero:${program.id}`}
+            alt={`${program.title} hero image`}
+            label="Add program image"
+            className="h-full w-full"
+          />
+        </div>
+
         <div className="relative border-b border-border-subtle bg-surface px-4 pb-5 pt-5">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rival-red to-orange-500" aria-hidden />
           <span className="inline-block rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
@@ -394,7 +420,7 @@ export default function ProgramDetail({ id }) {
                           {hasDays && isExpanded && (
                             <div className="space-y-2 border-t border-border-subtle p-3">
                               {w.days.map((day) => (
-                                <DayBreakdown key={day.day} day={day} />
+                                <DayBreakdown key={day.day} day={day} keyPrefix={`${program.id}:${w.week}`} />
                               ))}
                             </div>
                           )}
