@@ -15,6 +15,19 @@ export const directLevelUpCategories = ["HYROX", "DEKA"];
 // you repeat at your own pace rather than on a fixed schedule.
 export const freeChoiceLevelUpCategories = ["Public Safety Prep"];
 
+// Generic placeholder day/exercise scaffolding, reused across not-yet-programmed weeks so
+// the image/video slots in the app have exercises to attach to before real programming is
+// written. Names are generic stand-ins, not real CPAT/PT-test content. Every week below
+// shares this same array reference — that's safe because MediaContext keys are built from
+// program+week+day+section+index, not from this content, so uploads never collide across
+// weeks even though the exercise names repeat.
+const PLACEHOLDER_TRAINING_DAYS = [1, 2, 3, 4].map((day) => ({
+  day,
+  warmup: [{ name: "Warm-Up 1" }],
+  exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+  cooldown: [{ name: "Cooldown 1" }],
+}));
+
 export const programs = [
   {
     id: "p1",
@@ -561,52 +574,74 @@ export const programs = [
             week: 1,
             title: "Foundation Testing",
             focus: "Baseline CPAT circuit assessment and pacing introduction",
-            // Placeholder day/exercise scaffolding so the image/video slots have something to
-            // attach to in the app — names are generic stand-ins, not real CPAT programming.
-            // Replace with real content, then extend the same shape to later weeks.
-            days: [
-              {
-                day: 1,
-                warmup: [{ name: "Warm-Up 1" }],
-                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-                cooldown: [{ name: "Cooldown 1" }],
-              },
-              {
-                day: 2,
-                warmup: [{ name: "Warm-Up 1" }],
-                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-                cooldown: [{ name: "Cooldown 1" }],
-              },
-              {
-                day: 3,
-                warmup: [{ name: "Warm-Up 1" }],
-                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-                cooldown: [{ name: "Cooldown 1" }],
-              },
-              {
-                day: 4,
-                warmup: [{ name: "Warm-Up 1" }],
-                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-                cooldown: [{ name: "Cooldown 1" }],
-              },
-            ],
+            days: PLACEHOLDER_TRAINING_DAYS,
           },
-          { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events", days: [] },
-          { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort", days: [] },
+          {
+            week: 2,
+            title: "Circuit Familiarization",
+            focus: "Technique for all eight CPAT events",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 3,
+            title: "Aerobic Base",
+            focus: "Building the engine for continuous timed effort",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
           {
             week: 4,
             title: "Load Carry Basics",
             focus: "Stair climb with weighted vest, equipment carry technique",
-            days: [],
+            days: PLACEHOLDER_TRAINING_DAYS,
           },
-          { week: 5, title: "Continuous Circuit I", focus: "Linking events under moderate fatigue" },
-          { week: 6, title: "Grip & Carry Strength", focus: "Equipment carry and forcible entry simulation" },
-          { week: 7, title: "Continuous Circuit II", focus: "Linking events under race-pace fatigue" },
-          { week: 8, title: "Peak Volume", focus: "Highest combined circuit and conditioning load" },
-          { week: 9, title: "Full CPAT Simulation I", focus: "All eight events back to back, controlled pace" },
-          { week: 10, title: "Full CPAT Simulation II", focus: "All eight events back to back, test pace" },
-          { week: 11, title: "Sharpen", focus: "Technique polish and pacing strategy" },
-          { week: 12, title: "Test Week", focus: "Taper and CPAT test-day prep" },
+          {
+            week: 5,
+            title: "Continuous Circuit I",
+            focus: "Linking events under moderate fatigue",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 6,
+            title: "Grip & Carry Strength",
+            focus: "Equipment carry and forcible entry simulation",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 7,
+            title: "Continuous Circuit II",
+            focus: "Linking events under race-pace fatigue",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 8,
+            title: "Peak Volume",
+            focus: "Highest combined circuit and conditioning load",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 9,
+            title: "Full CPAT Simulation I",
+            focus: "All eight events back to back, controlled pace",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 10,
+            title: "Full CPAT Simulation II",
+            focus: "All eight events back to back, test pace",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 11,
+            title: "Sharpen",
+            focus: "Technique polish and pacing strategy",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
+          {
+            week: 12,
+            title: "Test Week",
+            focus: "Taper and CPAT test-day prep",
+            days: PLACEHOLDER_TRAINING_DAYS,
+          },
         ],
       },
       // Intermediate / Test-Ready reuse the Beginner scaffolding as a placeholder until
@@ -669,47 +704,74 @@ export const programs = [
         week: 1,
         title: "Foundation Testing",
         focus: "Baseline run, push-up, and sit-up benchmarks",
-        // Placeholder day/exercise scaffolding so the image/video slots have something to
-        // attach to in the app — names are generic stand-ins, not real PT-test programming.
-        // Replace with real content, then extend the same shape to later weeks.
-        days: [
-          {
-            day: 1,
-            warmup: [{ name: "Warm-Up 1" }],
-            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-            cooldown: [{ name: "Cooldown 1" }],
-          },
-          {
-            day: 2,
-            warmup: [{ name: "Warm-Up 1" }],
-            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-            cooldown: [{ name: "Cooldown 1" }],
-          },
-          {
-            day: 3,
-            warmup: [{ name: "Warm-Up 1" }],
-            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-            cooldown: [{ name: "Cooldown 1" }],
-          },
-          {
-            day: 4,
-            warmup: [{ name: "Warm-Up 1" }],
-            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
-            cooldown: [{ name: "Cooldown 1" }],
-          },
-        ],
+        days: PLACEHOLDER_TRAINING_DAYS,
       },
-      { week: 2, title: "Aerobic Base", focus: "Building running volume and pacing consistency" },
-      { week: 3, title: "Muscular Endurance Base", focus: "Push-up and sit-up volume building" },
-      { week: 4, title: "Agility & Step Test Intro", focus: "Technique for agility run and step test components" },
-      { week: 5, title: "Circuit Building I", focus: "Linking running and calisthenics under fatigue" },
-      { week: 6, title: "Muscular Endurance Peak", focus: "Max push-up and sit-up set volume" },
-      { week: 7, title: "Circuit Building II", focus: "Full test circuit at moderate pace" },
-      { week: 8, title: "Peak Volume", focus: "Highest combined running and calisthenics load" },
-      { week: 9, title: "Full Test Simulation I", focus: "Complete agency test circuit, controlled pace" },
-      { week: 10, title: "Full Test Simulation II", focus: "Complete agency test circuit, test pace" },
-      { week: 11, title: "Sharpen", focus: "Pacing strategy and technique polish" },
-      { week: 12, title: "Test Week", focus: "Taper and test-day prep" },
+      {
+        week: 2,
+        title: "Aerobic Base",
+        focus: "Building running volume and pacing consistency",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 3,
+        title: "Muscular Endurance Base",
+        focus: "Push-up and sit-up volume building",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 4,
+        title: "Agility & Step Test Intro",
+        focus: "Technique for agility run and step test components",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 5,
+        title: "Circuit Building I",
+        focus: "Linking running and calisthenics under fatigue",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 6,
+        title: "Muscular Endurance Peak",
+        focus: "Max push-up and sit-up set volume",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 7,
+        title: "Circuit Building II",
+        focus: "Full test circuit at moderate pace",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 8,
+        title: "Peak Volume",
+        focus: "Highest combined running and calisthenics load",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 9,
+        title: "Full Test Simulation I",
+        focus: "Complete agency test circuit, controlled pace",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 10,
+        title: "Full Test Simulation II",
+        focus: "Complete agency test circuit, test pace",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 11,
+        title: "Sharpen",
+        focus: "Pacing strategy and technique polish",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
+      {
+        week: 12,
+        title: "Test Week",
+        focus: "Taper and test-day prep",
+        days: PLACEHOLDER_TRAINING_DAYS,
+      },
     ],
   },
 ];
