@@ -16,6 +16,13 @@ export function formatPrescription(item) {
   return parts.join(" · ");
 }
 
+// Exported so any other UI that needs to build/match an exercise's MediaContext key (e.g.
+// the admin editor) derives the exact same slug instead of duplicating this regex and
+// risking drift.
+export function getSectionSlug(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
 // Shared between the phase-accordion breakdown (ProgramDetail) and the day-thumbnail
 // breakdown (TrainingFlow) so both views render exercise media identically and — critically
 // — derive the exact same MediaContext key for a given exercise, so an image/video added in
@@ -25,7 +32,7 @@ export function formatPrescription(item) {
 // reordered.
 export function ExerciseGroup({ title, items, keyPrefix }) {
   if (!items || items.length === 0) return null;
-  const sectionSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const sectionSlug = getSectionSlug(title);
   return (
     <div className="mt-2 first:mt-0">
       <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{title}</p>

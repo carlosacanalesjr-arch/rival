@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { usePrograms } from "@/app/lib/ProgramsContext";
 import { getWeeksForLevel } from "@/app/lib/programsData";
 import { useDayContent } from "@/app/lib/ExerciseContentContext";
-import { formatPrescription } from "@/app/components/ExerciseBreakdown";
+import { formatPrescription, getSectionSlug } from "@/app/components/ExerciseBreakdown";
+import VideoLinkField from "@/app/components/VideoLinkField";
 import ExerciseRowForm from "@/app/components/admin/ExerciseRowForm";
 import { BackIcon } from "@/app/components/admin/AdminIcons";
 
@@ -41,7 +42,18 @@ function DayLabelField({ label, onSave }) {
   );
 }
 
-function ExerciseSectionEditor({ title, items, editingIndex, onStartEdit, onCancelEdit, onAdd, onEdit, onRemove }) {
+function ExerciseSectionEditor({
+  title,
+  items,
+  mediaKeyPrefix,
+  editingIndex,
+  onStartEdit,
+  onCancelEdit,
+  onAdd,
+  onEdit,
+  onRemove,
+}) {
+  const sectionSlug = getSectionSlug(title);
   return (
     <div className="mt-4">
       <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{title}</p>
@@ -58,6 +70,7 @@ function ExerciseSectionEditor({ title, items, editingIndex, onStartEdit, onCanc
                 <p className="truncate text-sm font-semibold text-white">{item.name}</p>
                 <p className="text-[11px] text-zinc-500">{formatPrescription(item)}</p>
                 {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
+                <VideoLinkField mediaKey={`exercise:${mediaKeyPrefix}:${sectionSlug}:${i}`} />
               </div>
               <div className="flex shrink-0 gap-3">
                 <button
@@ -147,6 +160,7 @@ export default function AdminDayEditor({ programId, levelKey, week, day }) {
           key={key}
           title={title}
           items={content[key]}
+          mediaKeyPrefix={`${programId}:${levelKey}:${week}:${day}`}
           editingIndex={editing[key]}
           onStartEdit={(index) => startEdit(key, index)}
           onCancelEdit={() => cancelEdit(key)}
