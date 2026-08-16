@@ -310,6 +310,11 @@ export default function ProgramDetail({ id }) {
                       const isDone = status === "completed" || (program.joined && w.week < program.currentWeek);
                       const isCurrent = status === "enrolled" && w.week === program.currentWeek;
                       const hasDays = w.days && w.days.length > 0;
+                      // Exercise-level detail (names, sets/reps, warmup/cooldown) is an
+                      // enrolled-athlete feature — pre-enrollment, weeks stay listed but not
+                      // individually expandable, and browsing gets the phase-level summary
+                      // instead (see phase.summary above).
+                      const canExpandDays = hasDays && status !== "not-enrolled";
                       const isExpanded = expandedWeeks.has(w.week);
                       return (
                         <li
@@ -319,11 +324,11 @@ export default function ProgramDetail({ id }) {
                           }`}
                         >
                           <div
-                            role={hasDays ? "button" : undefined}
-                            tabIndex={hasDays ? 0 : undefined}
-                            onClick={hasDays ? () => toggleWeek(w.week) : undefined}
+                            role={canExpandDays ? "button" : undefined}
+                            tabIndex={canExpandDays ? 0 : undefined}
+                            onClick={canExpandDays ? () => toggleWeek(w.week) : undefined}
                             onKeyDown={
-                              hasDays
+                              canExpandDays
                                 ? (e) => {
                                     if (e.key === "Enter" || e.key === " ") {
                                       e.preventDefault();
@@ -332,7 +337,7 @@ export default function ProgramDetail({ id }) {
                                   }
                                 : undefined
                             }
-                            className={`relative flex min-h-28 flex-col justify-end ${hasDays ? "cursor-pointer" : ""}`}
+                            className={`relative flex min-h-28 flex-col justify-end ${canExpandDays ? "cursor-pointer" : ""}`}
                           >
                             <div className="absolute inset-0">
                               <ImageSlot
@@ -366,7 +371,7 @@ export default function ProgramDetail({ id }) {
                                 <p className="text-xs font-bold text-white/80">Week {w.week}</p>
                                 <p className="truncate text-sm font-extrabold text-white">{w.title}</p>
                               </div>
-                              {hasDays && (
+                              {canExpandDays && (
                                 <svg
                                   width="16"
                                   height="16"
@@ -383,7 +388,7 @@ export default function ProgramDetail({ id }) {
                               )}
                             </div>
                           </div>
-                          {hasDays && isExpanded && (
+                          {canExpandDays && isExpanded && (
                             <div className="space-y-2 border-t border-border-subtle p-3">
                               {w.days.map((day) => (
                                 <DayBreakdown key={day.day} day={day} keyPrefix={`${program.id}:${w.week}`} />
