@@ -2360,6 +2360,14 @@ export function getActiveWeeks(program) {
   return program.levels[level]?.weeks || [];
 }
 
+// Same shape as getActiveWeeks, but for an explicit level rather than the athlete's own
+// enrolledLevel — used by the admin editor, which resolves the level from its route
+// instead of from an enrollment. Read-only; doesn't touch `programs` or any seed data.
+export function getWeeksForLevel(program, levelKey) {
+  if (!program.levels) return program.weeks || [];
+  return program.levels[levelKey]?.weeks || program.levels[Object.keys(program.levels)[0]]?.weeks || [];
+}
+
 // program.sessionsPerWeek is a display string like "4-5 sessions/week" — pull the lower
 // bound out to use as a session/day count when a week has no real day content yet.
 function parseSessionsPerWeek(text) {

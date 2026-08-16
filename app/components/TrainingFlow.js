@@ -7,6 +7,7 @@ import { getActiveWeeks, getDaysForWeek, getCompletedDays, getEnrollmentStatus }
 import { firePushNotification } from "@/app/lib/notifications";
 import ImageSlot from "@/app/components/ImageSlot";
 import { ExerciseGroup } from "@/app/components/ExerciseBreakdown";
+import { useDayContent, resolveLevelKey } from "@/app/lib/ExerciseContentContext";
 
 function BackIcon() {
   return (
@@ -33,11 +34,13 @@ function CheckIcon() {
   );
 }
 
-function DayRow({ day, isComplete, onToggle, mediaKey, exerciseKeyPrefix }) {
+function DayRow({ program, week, day, isComplete, onToggle, mediaKey }) {
   const [expanded, setExpanded] = useState(false);
-  const hasBreakdown = Boolean(
-    day.source?.warmup?.length || day.source?.exercises?.length || day.source?.cooldown?.length
-  );
+  const { content } = useDayContent(program, week.week, day.day, day.source);
+  const hasBreakdown = Boolean(content.warmup?.length || content.exercises?.length || content.cooldown?.length);
+  // Includes level so different levels of the same leveled program never share an
+  // image/video for the "same" week/day/exercise position once they have distinct content.
+  const exerciseKeyPrefix = `${program.id}:${resolveLevelKey(program)}:${week.week}:${day.day}`;
 
   return (
     <div
@@ -76,10 +79,10 @@ function DayRow({ day, isComplete, onToggle, mediaKey, exerciseKeyPrefix }) {
           />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-white">{day.label}</p>
-          {day.source?.exercises?.length > 0 ? (
+          <p className="text-sm font-bold text-white">{content.label ?? day.label}</p>
+          {content.exercises?.length > 0 ? (
             <p className="mt-0.5 truncate text-xs text-zinc-500">
-              {day.source.exercises.map((e) => e.name).join(" · ")}
+              {content.exercises.map((e) => e.name).join(" · ")}
             </p>
           ) : (
             <p className="mt-0.5 text-xs text-zinc-500">{isComplete ? "Complete" : "Pending"}</p>
@@ -115,9 +118,9 @@ function DayRow({ day, isComplete, onToggle, mediaKey, exerciseKeyPrefix }) {
       </div>
       {hasBreakdown && expanded && (
         <div className="space-y-2 border-t border-border-subtle p-3">
-          <ExerciseGroup title="Warm-Up" items={day.source.warmup} keyPrefix={exerciseKeyPrefix} />
-          <ExerciseGroup title="Exercises" items={day.source.exercises} keyPrefix={exerciseKeyPrefix} />
-          <ExerciseGroup title="Cooldown" items={day.source.cooldown} keyPrefix={exerciseKeyPrefix} />
+          <ExerciseGroup title="Warm-Up" items={content.warmup} keyPrefix={exerciseKeyPrefix} />
+          <ExerciseGroup title="Exercises" items={content.exercises} keyPrefix={exerciseKeyPrefix} />
+          <ExerciseGroup title="Cooldown" items={content.cooldown} keyPrefix={exerciseKeyPrefix} />
         </div>
       )}
     </div>
@@ -127,12 +130,13 @@ function DayRow({ day, isComplete, onToggle, mediaKey, exerciseKeyPrefix }) {
 function WeekPanel({ program, week, onDayToggle }) {
   const days = getDaysForWeek(program, week);
   const completed = getCompletedDays(program, week.week);
+  const levelKey = resolveLevelKey(program);
   return (
     <div className="w-full shrink-0 snap-center px-4">
       <div className="relative mt-2 flex min-h-44 flex-col justify-end overflow-hidden rounded-2xl">
         <div className="absolute inset-0">
           <ImageSlot
-            mediaKey={`week-bg:${program.id}:${week.week}`}
+            mediaKey={`week-bg:${program.id}:${levelKey}:${week.week}`}
             alt={`Week ${week.week} background`}
             label="Add image"
             cornerControlsOnly
@@ -155,11 +159,12 @@ function WeekPanel({ program, week, onDayToggle }) {
         {days.map((day) => (
           <DayRow
             key={day.day}
+            program={program}
+            week={week}
             day={day}
             isComplete={completed.includes(day.day)}
             onToggle={() => onDayToggle(week, day, days.length)}
-            mediaKey={`day-thumb:${program.id}:${week.week}:${day.day}`}
-            exerciseKeyPrefix={`${program.id}:${week.week}:${day.day}`}
+            mediaKey={`day-thumb:${program.id}:${levelKey}:${week.week}:${day.day}`}
           />
         ))}
       </div>

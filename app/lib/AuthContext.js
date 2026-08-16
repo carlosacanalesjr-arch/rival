@@ -5,6 +5,16 @@ import { createContext, useContext, useSyncExternalStore } from "react";
 const AuthContext = createContext(null);
 const STORAGE_KEY = "rival_auth_user";
 
+// Hardcoded trainer allowlist — this app has no backend/user database, so admin
+// status is purely a client-side flag, not real server-side security. Derived at
+// read time (not at each signUp*/logIn* call site) so it's the one place to
+// maintain and re-derives live if the allowlist ever grows.
+const TRAINER_EMAILS = new Set(["carlosa.canalesjr@gmail.com"]);
+
+function computeIsTrainer(email) {
+  return Boolean(email) && TRAINER_EMAILS.has(email.trim().toLowerCase());
+}
+
 let cachedRaw;
 let cachedUser = null;
 const listeners = new Set();
@@ -22,7 +32,8 @@ function getSnapshot() {
   if (raw !== cachedRaw) {
     cachedRaw = raw;
     try {
-      cachedUser = raw ? JSON.parse(raw) : null;
+      const parsed = raw ? JSON.parse(raw) : null;
+      cachedUser = parsed ? { ...parsed, isTrainer: computeIsTrainer(parsed.email) } : null;
     } catch {
       cachedUser = null;
     }

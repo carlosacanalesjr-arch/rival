@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMedia } from "@/app/lib/MediaContext";
+import { useAuth } from "@/app/lib/AuthContext";
 
 function VideoIcon() {
   return (
@@ -26,9 +27,12 @@ function LinkIcon() {
 
 // Small inline "add a video link" affordance for exercises, backed by MediaContext under
 // the same key as the exercise's ImageSlot (an entry can hold both an imageUrl and a
-// videoUrl — some exercises may only need one or the other).
+// videoUrl — some exercises may only need one or the other). Adding/editing/removing the
+// link is trainer-only; athletes can watch an existing link but not change it.
 export default function VideoLinkField({ mediaKey }) {
   const { videoUrl, setVideoUrl, removeVideoUrl } = useMedia(mediaKey);
+  const { user } = useAuth();
+  const isTrainer = Boolean(user?.isTrainer);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
 
@@ -44,7 +48,7 @@ export default function VideoLinkField({ mediaKey }) {
     setEditing(false);
   };
 
-  if (editing) {
+  if (editing && isTrainer) {
     return (
       <div className="mt-1 flex items-center gap-1.5">
         <input
@@ -78,15 +82,25 @@ export default function VideoLinkField({ mediaKey }) {
         >
           <VideoIcon /> Watch video
         </a>
-        <button type="button" onClick={startEdit} className="text-[10px] text-zinc-500 hover:text-zinc-300">
-          Edit
-        </button>
-        <button type="button" onClick={removeVideoUrl} className="text-[10px] text-zinc-500 hover:text-zinc-300">
-          Remove
-        </button>
+        {isTrainer && (
+          <>
+            <button type="button" onClick={startEdit} className="text-[10px] text-zinc-500 hover:text-zinc-300">
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={removeVideoUrl}
+              className="text-[10px] text-zinc-500 hover:text-zinc-300"
+            >
+              Remove
+            </button>
+          </>
+        )}
       </div>
     );
   }
+
+  if (!isTrainer) return null;
 
   return (
     <button

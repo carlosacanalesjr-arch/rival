@@ -12,6 +12,7 @@ import {
 import { LEVEL_STYLES, PLACEHOLDER_TRIGGER_STYLE, LevelSelector, FocusSelector } from "@/app/components/LevelFocusSelectors";
 import ImageSlot from "@/app/components/ImageSlot";
 import { ExerciseGroup } from "@/app/components/ExerciseBreakdown";
+import { useDayContent, resolveLevelKey } from "@/app/lib/ExerciseContentContext";
 
 function BackIcon() {
   return (
@@ -66,17 +67,21 @@ function getPhases(weeks) {
   })).filter((phase) => phase.weeks.length > 0);
 }
 
-function DayBreakdown({ day, keyPrefix }) {
-  const dayKeyPrefix = `${keyPrefix}:${day.day}`;
+function DayBreakdown({ program, week, day }) {
+  const { content } = useDayContent(program, week.week, day.day, day);
+  // Includes level so different levels of the same leveled program (e.g. Fire Dept Prep's
+  // Beginner/Intermediate/Test-Ready) never share an image/video for the "same" week/day/
+  // exercise position once they have distinct real content.
+  const dayKeyPrefix = `${program.id}:${resolveLevelKey(program)}:${week.week}:${day.day}`;
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-raised p-3">
       <p className="text-xs font-extrabold text-white">
         Day {day.day}
-        {day.label ? ` · ${day.label}` : ""}
+        {content.label ? ` · ${content.label}` : ""}
       </p>
-      <ExerciseGroup title="Warm-Up" items={day.warmup} keyPrefix={dayKeyPrefix} />
-      <ExerciseGroup title="Exercises" items={day.exercises} keyPrefix={dayKeyPrefix} />
-      <ExerciseGroup title="Cooldown" items={day.cooldown} keyPrefix={dayKeyPrefix} />
+      <ExerciseGroup title="Warm-Up" items={content.warmup} keyPrefix={dayKeyPrefix} />
+      <ExerciseGroup title="Exercises" items={content.exercises} keyPrefix={dayKeyPrefix} />
+      <ExerciseGroup title="Cooldown" items={content.cooldown} keyPrefix={dayKeyPrefix} />
     </div>
   );
 }
@@ -341,7 +346,7 @@ export default function ProgramDetail({ id }) {
                           >
                             <div className="absolute inset-0">
                               <ImageSlot
-                                mediaKey={`week-bg:${program.id}:${w.week}`}
+                                mediaKey={`week-bg:${program.id}:${resolveLevelKey(program)}:${w.week}`}
                                 alt={`Week ${w.week} background`}
                                 label="Add image"
                                 cornerControlsOnly
@@ -391,7 +396,7 @@ export default function ProgramDetail({ id }) {
                           {canExpandDays && isExpanded && (
                             <div className="space-y-2 border-t border-border-subtle p-3">
                               {w.days.map((day) => (
-                                <DayBreakdown key={day.day} day={day} keyPrefix={`${program.id}:${w.week}`} />
+                                <DayBreakdown key={day.day} program={program} week={w} day={day} />
                               ))}
                             </div>
                           )}
