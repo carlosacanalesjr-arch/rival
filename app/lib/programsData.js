@@ -561,7 +561,35 @@ export const programs = [
             week: 1,
             title: "Foundation Testing",
             focus: "Baseline CPAT circuit assessment and pacing introduction",
-            days: [],
+            // Placeholder day/exercise scaffolding so the image/video slots have something to
+            // attach to in the app — names are generic stand-ins, not real CPAT programming.
+            // Replace with real content, then extend the same shape to later weeks.
+            days: [
+              {
+                day: 1,
+                warmup: [{ name: "Warm-Up 1" }],
+                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+                cooldown: [{ name: "Cooldown 1" }],
+              },
+              {
+                day: 2,
+                warmup: [{ name: "Warm-Up 1" }],
+                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+                cooldown: [{ name: "Cooldown 1" }],
+              },
+              {
+                day: 3,
+                warmup: [{ name: "Warm-Up 1" }],
+                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+                cooldown: [{ name: "Cooldown 1" }],
+              },
+              {
+                day: 4,
+                warmup: [{ name: "Warm-Up 1" }],
+                exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+                cooldown: [{ name: "Cooldown 1" }],
+              },
+            ],
           },
           { week: 2, title: "Circuit Familiarization", focus: "Technique for all eight CPAT events", days: [] },
           { week: 3, title: "Aerobic Base", focus: "Building the engine for continuous timed effort", days: [] },
@@ -637,7 +665,40 @@ export const programs = [
     currentWeek: 0,
     focusOptions: ["Police", "DPS Trooper", "Border Patrol"],
     weeks: [
-      { week: 1, title: "Foundation Testing", focus: "Baseline run, push-up, and sit-up benchmarks" },
+      {
+        week: 1,
+        title: "Foundation Testing",
+        focus: "Baseline run, push-up, and sit-up benchmarks",
+        // Placeholder day/exercise scaffolding so the image/video slots have something to
+        // attach to in the app — names are generic stand-ins, not real PT-test programming.
+        // Replace with real content, then extend the same shape to later weeks.
+        days: [
+          {
+            day: 1,
+            warmup: [{ name: "Warm-Up 1" }],
+            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+            cooldown: [{ name: "Cooldown 1" }],
+          },
+          {
+            day: 2,
+            warmup: [{ name: "Warm-Up 1" }],
+            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+            cooldown: [{ name: "Cooldown 1" }],
+          },
+          {
+            day: 3,
+            warmup: [{ name: "Warm-Up 1" }],
+            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+            cooldown: [{ name: "Cooldown 1" }],
+          },
+          {
+            day: 4,
+            warmup: [{ name: "Warm-Up 1" }],
+            exercises: [{ name: "Exercise 1" }, { name: "Exercise 2" }, { name: "Exercise 3" }],
+            cooldown: [{ name: "Cooldown 1" }],
+          },
+        ],
+      },
       { week: 2, title: "Aerobic Base", focus: "Building running volume and pacing consistency" },
       { week: 3, title: "Muscular Endurance Base", focus: "Push-up and sit-up volume building" },
       { week: 4, title: "Agility & Step Test Intro", focus: "Technique for agility run and step test components" },
