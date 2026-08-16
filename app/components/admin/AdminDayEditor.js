@@ -15,6 +15,32 @@ const SECTIONS = [
   { key: "cooldown", title: "Cooldown" },
 ];
 
+// Explicit-save field, matching ExerciseRowForm's pattern — typing only updates local
+// draft state; nothing is written to the persisted override until Save is clicked.
+function DayLabelField({ label, onSave }) {
+  const [value, setValue] = useState(label || "");
+  const dirty = value !== (label || "");
+
+  return (
+    <div className="mt-3">
+      <label className="text-xs font-bold uppercase tracking-wide text-zinc-500">Day label</label>
+      <div className="mt-1 flex items-center gap-2">
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Optional day label"
+          className="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-white outline-none focus:border-rival-red"
+        />
+        {dirty && (
+          <button type="button" onClick={() => onSave(value)} className="shrink-0 text-xs font-bold text-rival-red">
+            Save
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ExerciseSectionEditor({ title, items, editingIndex, onStartEdit, onCancelEdit, onAdd, onEdit, onRemove }) {
   return (
     <div className="mt-4">
@@ -108,15 +134,13 @@ export default function AdminDayEditor({ programId, levelKey, week, day }) {
         {program.title} · Week {week} · Day {day}
       </h1>
 
-      <div className="mt-3">
-        <label className="text-xs font-bold uppercase tracking-wide text-zinc-500">Day label</label>
-        <input
-          defaultValue={content.label || ""}
-          onBlur={(e) => setDay({ ...content, label: e.target.value })}
-          placeholder="Optional day label"
-          className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-white outline-none focus:border-rival-red"
-        />
-      </div>
+      {/* Keyed by isOverridden so "Reset day to placeholder" remounts this with the fresh
+          (un-overridden) label instead of showing stale locally-held draft text. */}
+      <DayLabelField
+        key={isOverridden ? "overridden" : "base"}
+        label={content.label}
+        onSave={(label) => setDay({ ...content, label })}
+      />
 
       {SECTIONS.map(({ key, title }) => (
         <ExerciseSectionEditor
