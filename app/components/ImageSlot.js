@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useMedia } from "@/app/lib/MediaContext";
+import { useAuth } from "@/app/lib/AuthContext";
 
 // ~4MB raw file size guard — data URLs inflate ~33% on top of that, and localStorage
 // (the only persistence available in this all-client-side app) tops out around 5-10MB.
@@ -58,21 +59,26 @@ export default function ImageSlot({
   className = "",
 }) {
   const { imageUrl, setImage, removeImage } = useMedia(mediaKey);
+  const { user } = useAuth();
+  const isTrainer = Boolean(user?.isTrainer);
   const inputRef = useRef(null);
   const [error, setError] = useState(null);
 
   // stopPropagation so these buttons work even when nested inside another clickable card.
   const openPicker = (e) => {
+    if (!isTrainer) return;
     e?.stopPropagation();
     inputRef.current?.click();
   };
 
   const handleRemove = (e) => {
+    if (!isTrainer) return;
     e.stopPropagation();
     removeImage();
   };
 
   const handleFile = (e) => {
+    if (!isTrainer) return;
     const file = e.target.files?.[0];
     e.target.value = ""; // allow re-selecting the same file later
     if (!file) return;
@@ -92,27 +98,29 @@ export default function ImageSlot({
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFile}
-        onClick={(e) => e.stopPropagation()}
-      />
+      {isTrainer && (
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFile}
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
 
       {imageUrl ? (
         <>
-          {cornerControlsOnly ? (
-            // eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets
-            <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
-          ) : (
+          {isTrainer && !cornerControlsOnly ? (
             <button type="button" onClick={openPicker} aria-label="Replace image" className="block h-full w-full">
               {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets */}
               <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
             </button>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets
+            <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
           )}
-          {!compact && (
+          {isTrainer && !compact && (
             <button
               type="button"
               onClick={openPicker}
@@ -122,17 +130,23 @@ export default function ImageSlot({
               <PencilIcon />
             </button>
           )}
-          <button
-            type="button"
-            onClick={handleRemove}
-            aria-label="Remove image"
-            className={`absolute flex items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black ${
-              compact ? "right-1 top-1 h-4 w-4" : "right-1.5 top-9 h-6 w-6"
-            }`}
-          >
-            <XIcon />
-          </button>
+          {isTrainer && (
+            <button
+              type="button"
+              onClick={handleRemove}
+              aria-label="Remove image"
+              className={`absolute flex items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black ${
+                compact ? "right-1 top-1 h-4 w-4" : "right-1.5 top-9 h-6 w-6"
+              }`}
+            >
+              <XIcon />
+            </button>
+          )}
         </>
+      ) : !isTrainer ? (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500">
+          <ImageIcon size={compact ? 15 : 20} />
+        </div>
       ) : cornerControlsOnly ? (
         <>
           <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500">
@@ -160,7 +174,7 @@ export default function ImageSlot({
         </button>
       )}
 
-      {error && (
+      {isTrainer && error && (
         <p className="absolute inset-x-0 bottom-0 bg-black/80 px-1 py-0.5 text-center text-[9px] text-rival-red">
           {error}
         </p>
