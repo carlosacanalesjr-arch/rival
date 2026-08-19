@@ -44,7 +44,11 @@ export default function TopBar() {
           </Link>
         )}
         {isBusiness && (
-          <Link href="/business" aria-label="Business dashboard" className="text-zinc-300 hover:text-white">
+          <Link
+            href="/business"
+            aria-label="Business dashboard"
+            className="-my-1.5 flex h-11 w-11 items-center justify-center text-zinc-300 hover:text-white"
+          >
             <BusinessIcon />
           </Link>
         )}
