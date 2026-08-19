@@ -51,7 +51,7 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
             e.stopPropagation();
             onToggleJoin(challenge.id);
           }}
-          className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+          className={`flex min-h-11 items-center rounded-full px-4 text-xs font-bold transition ${
             challenge.joined
               ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
               : "bg-rival-red text-white hover:bg-red-600"

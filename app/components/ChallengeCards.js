@@ -59,7 +59,7 @@ export default function ChallengeCards() {
                   e.stopPropagation();
                   toggleJoin(c.id);
                 }}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                className={`flex min-h-11 items-center rounded-full px-4 text-xs font-bold transition ${
                   c.joined
                     ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
                     : "bg-rival-red text-white hover:bg-red-600"

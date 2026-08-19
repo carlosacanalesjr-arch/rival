@@ -144,7 +144,7 @@ function WorkoutPost({ post }) {
             />
             <button
               type="submit"
-              className="shrink-0 rounded-full bg-rival-red px-3 py-2 text-xs font-bold text-white disabled:opacity-40"
+              className="flex min-h-11 shrink-0 items-center rounded-full bg-rival-red px-4 text-xs font-bold text-white disabled:opacity-40"
               disabled={!draft.trim()}
             >
               Post

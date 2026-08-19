@@ -113,7 +113,7 @@ function ProfilePostCard({ post }) {
             />
             <button
               type="submit"
-              className="shrink-0 rounded-full bg-rival-red px-3 py-2 text-xs font-bold text-white disabled:opacity-40"
+              className="flex min-h-11 shrink-0 items-center rounded-full bg-rival-red px-4 text-xs font-bold text-white disabled:opacity-40"
               disabled={!draft.trim()}
             >
               Post
@@ -226,7 +226,7 @@ export default function ProfileScreen({ id }) {
 
           <button
             onClick={() => !isSelf && setFollowing((v) => !v)}
-            className={`mt-4 w-full rounded-full py-2.5 text-sm font-extrabold tracking-wide transition ${
+            className={`mt-4 flex min-h-11 w-full items-center justify-center rounded-full text-sm font-extrabold tracking-wide transition ${
               isSelf
                 ? "border border-border-subtle text-white hover:bg-surface-raised"
                 : following
