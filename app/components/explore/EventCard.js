@@ -120,14 +120,20 @@ export default function EventCard({ event, onOpen, onReport }) {
       </div>
 
       {showReport && (
-        <ReportModal
-          targetLabel={event.title}
-          onClose={() => setShowReport(false)}
-          onSubmit={(reason, note) => {
-            onReport(event.id, reason, note);
-            setShowReport(false);
-          }}
-        />
+        // stopPropagation here too — ReportModal is a JSX child of this card's clickable
+        // root, and being position:fixed doesn't change that: without this, any click inside
+        // the modal (a reason chip, the textarea, even Submit) bubbles up through the actual
+        // DOM tree to the card's onClick and navigates to the event before the report lands.
+        <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+          <ReportModal
+            targetLabel={event.title}
+            onClose={() => setShowReport(false)}
+            onSubmit={(reason, note) => {
+              onReport(event.id, reason, note);
+              setShowReport(false);
+            }}
+          />
+        </div>
       )}
     </div>
   );

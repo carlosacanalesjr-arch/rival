@@ -120,14 +120,19 @@ export default function DealCard({ deal, onOpen, onReport }) {
       </div>
 
       {showReport && (
-        <ReportModal
-          targetLabel={deal.title}
-          onClose={() => setShowReport(false)}
-          onSubmit={(reason, note) => {
-            onReport(deal.id, reason, note);
-            setShowReport(false);
-          }}
-        />
+        // stopPropagation here too — see EventCard.js's identical wrapper for why: this
+        // modal is a JSX child of the card's clickable root, so without it any click inside
+        // (a reason chip, the textarea, even Submit) bubbles up and navigates to the deal.
+        <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+          <ReportModal
+            targetLabel={deal.title}
+            onClose={() => setShowReport(false)}
+            onSubmit={(reason, note) => {
+              onReport(deal.id, reason, note);
+              setShowReport(false);
+            }}
+          />
+        </div>
       )}
     </div>
   );
