@@ -39,7 +39,11 @@ export default function TopBar() {
       </h1>
       <div className="flex items-center gap-4">
         {isTrainer && (
-          <Link href="/admin" aria-label="Admin" className="text-zinc-300 hover:text-white">
+          <Link
+            href="/admin"
+            aria-label="Admin"
+            className="-my-1.5 flex h-11 w-11 items-center justify-center text-zinc-300 hover:text-white"
+          >
             <AdminIcon />
           </Link>
         )}
