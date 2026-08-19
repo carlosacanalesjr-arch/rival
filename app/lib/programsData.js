@@ -2481,7 +2481,12 @@ export function getCompletionAction(program, allPrograms) {
     const sibling = allPrograms.find(
       (p) => p.category === program.category && p.difficulty === nextLevel && p.id !== program.id
     );
-    return sibling ? { kind: "level-up", type: "different-program", programId: sibling.id, nextLevel } : null;
+    // Once the athlete has already enrolled in the sibling program (whether they're mid-way
+    // through it or have since completed it too), the prompt has served its purpose — nothing
+    // left to act on from this completed lower-level card.
+    return sibling && !sibling.joined
+      ? { kind: "level-up", type: "different-program", programId: sibling.id, nextLevel }
+      : null;
   }
 
   const rounds = program.roundsCompletedAtLevel || 0;

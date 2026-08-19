@@ -191,6 +191,11 @@ function MyProgramRow({ program, onOpen, allPrograms, onCompletionAction }) {
   const badgeStatus = getCardStatus(program);
   const liveStatus = getEnrollmentStatus(program);
   const completionAction = liveStatus === "completed" ? getCompletionAction(program, allPrograms) : null;
+  // enrolledLevel covers categories with a level selector (DEKA, Running, S&C, Public Safety
+  // Prep — one program record, level tracked separately); difficulty covers HYROX, where each
+  // level is its own program record. Either way, the row's title alone doesn't always say which
+  // level was completed (e.g. "5K" or "DEKA MILE" give no clue), so the badge spells it out.
+  const completedLevel = program.enrolledLevel || program.difficulty || null;
 
   return (
     <div
@@ -216,7 +221,7 @@ function MyProgramRow({ program, onOpen, allPrograms, onCompletionAction }) {
         {badgeStatus === "completed" ? (
           <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-zinc-200">
             <TrophyIcon className="text-yellow-400" />
-            Completed ✓
+            {completedLevel ? `${completedLevel} Completed ✓` : "Completed ✓"}
           </span>
         ) : (
           <span className="shrink-0 rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">

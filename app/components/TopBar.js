@@ -22,8 +22,10 @@ export default function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-      <h1 className="text-xl font-extrabold tracking-tight text-white">
-        RIVAL<span className="text-rival-red">.</span>
+      <h1 className="text-xl font-extrabold tracking-tight">
+        <Link href="/" className="text-white">
+          KAIROS<span className="text-rival-red">.</span>
+        </Link>
       </h1>
       <div className="flex items-center gap-4">
         {isTrainer && (

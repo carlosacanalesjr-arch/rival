@@ -47,9 +47,9 @@ export default function WelcomeScreen() {
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-10">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white">
-            RIVAL<span className="text-rival-red">.</span>
+            KAIROS<span className="text-rival-red">.</span>
           </h1>
-          <p className="mt-2 text-sm text-zinc-400">Train. Compete. Rival.</p>
+          <p className="mt-2 text-sm text-zinc-400">Train. Compete. Conquer.</p>
         </div>
 
         <div className="mt-10 space-y-3">

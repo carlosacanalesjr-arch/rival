@@ -26,7 +26,7 @@ export const challenges = [
       "Log 100 kilometers of running before the month is out. Tempo runs, long runs, easy shakeouts — every logged run counts toward your total distance.",
     startDate: "Aug 1, 2026",
     endDate: "Aug 31, 2026",
-    prize: "Rival Finisher Badge + $50 Gear Credit",
+    prize: "Kairos Finisher Badge + $50 Gear Credit",
     participants: 4821,
     progress: 62,
     joined: true,

@@ -2,7 +2,7 @@ export const athletes = {
   you: {
     id: "you",
     name: "You",
-    handle: "@you.rival",
+    handle: "@you.kairos",
     initials: "YO",
     homeGym: "Iron Peak Athletics",
     followers: 342,

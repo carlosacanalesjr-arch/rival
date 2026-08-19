@@ -25,7 +25,7 @@ export default function AuthHeader({ showBack = false, onBack }) {
         </button>
       )}
       <h1 className="text-xl font-extrabold tracking-tight text-white">
-        RIVAL<span className="text-rival-red">.</span>
+        KAIROS<span className="text-rival-red">.</span>
       </h1>
     </header>
   );

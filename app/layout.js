@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Rival",
-  description: "Train. Compete. Rival.",
+  title: "Kairos",
+  description: "Train. Compete. Conquer.",
 };
 
 export const viewport = {

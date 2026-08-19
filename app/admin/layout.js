@@ -39,7 +39,7 @@ export default function AdminLayout({ children }) {
     <div className="flex min-h-screen flex-col bg-black">
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
         <Link href="/admin" className="text-sm font-extrabold text-white">
-          Admin <span className="text-rival-red">·</span> Rival
+          Admin <span className="text-rival-red">·</span> Kairos
         </Link>
         <Link href="/" className="ml-auto text-xs font-semibold text-zinc-400 hover:text-white">
           Back to app
