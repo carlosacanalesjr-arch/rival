@@ -20,6 +20,7 @@ const items = [
   {
     key: "challenges",
     label: "Challenges",
+    href: "/challenges",
     icon: <path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4ZM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3" strokeLinecap="round" strokeLinejoin="round" />,
   },
   {

@@ -11,7 +11,9 @@ export default function ChallengeCards() {
     <section className="mt-6">
       <div className="flex items-center justify-between px-4">
         <h2 className="text-base font-bold text-white">Active Challenges</h2>
-        <button className="text-xs font-semibold text-rival-red">See all</button>
+        <button onClick={() => router.push("/challenges")} className="text-xs font-semibold text-rival-red">
+          See all
+        </button>
       </div>
       <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto px-4 pb-1">
         {challenges.map((c) => (
