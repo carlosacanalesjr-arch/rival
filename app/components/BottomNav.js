@@ -32,6 +32,7 @@ const items = [
   {
     key: "board",
     label: "Board",
+    href: "/board",
     icon: <path d="M4 21V10M12 21V3M20 21v-7" strokeLinecap="round" strokeLinejoin="round" />,
   },
   {

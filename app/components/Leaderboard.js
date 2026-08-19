@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { leaderboard } from "@/app/lib/mockData";
 
 const trendIcon = {
@@ -7,6 +10,8 @@ const trendIcon = {
 };
 
 export default function Leaderboard() {
+  const router = useRouter();
+
   return (
     <section className="mx-4 mt-6 overflow-hidden rounded-2xl border border-border-subtle bg-surface">
       <div className="flex items-center justify-between px-4 pt-4">
@@ -17,7 +22,9 @@ export default function Leaderboard() {
             LIVE
           </span>
         </div>
-        <button className="text-xs font-semibold text-rival-red">Full board</button>
+        <button onClick={() => router.push("/board")} className="text-xs font-semibold text-rival-red">
+          Full board
+        </button>
       </div>
 
       <ul className="mt-2 divide-y divide-border-subtle">
