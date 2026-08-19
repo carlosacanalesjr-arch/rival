@@ -15,6 +15,7 @@ const items = [
   {
     key: "explore",
     label: "Explore",
+    href: "/explore",
     icon: <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm3.5-13.5-2 5.5-5.5 2 2-5.5 5.5-2Z" strokeLinecap="round" strokeLinejoin="round" />,
   },
   {

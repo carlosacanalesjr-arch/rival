@@ -4,6 +4,8 @@ import { ProgramsProvider } from "@/app/lib/ProgramsContext";
 import { AuthProvider } from "@/app/lib/AuthContext";
 import { MediaProvider } from "@/app/lib/MediaContext";
 import { ExerciseContentProvider } from "@/app/lib/ExerciseContentContext";
+import { EventsProvider } from "@/app/lib/EventsContext";
+import { DealsProvider } from "@/app/lib/DealsContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,7 +40,11 @@ export default function RootLayout({ children }) {
           <ChallengesProvider>
             <ProgramsProvider>
               <MediaProvider>
-                <ExerciseContentProvider>{children}</ExerciseContentProvider>
+                <ExerciseContentProvider>
+                  <EventsProvider>
+                    <DealsProvider>{children}</DealsProvider>
+                  </EventsProvider>
+                </ExerciseContentProvider>
               </MediaProvider>
             </ProgramsProvider>
           </ChallengesProvider>

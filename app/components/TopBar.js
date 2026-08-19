@@ -16,9 +16,19 @@ function AdminIcon() {
   );
 }
 
+function BusinessIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 21h18M5 21V7l7-4 7 4v14" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 21v-6h6v6M9 10h.01M15 10h.01M9 14h.01M15 14h.01" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function TopBar() {
   const { user } = useAuth();
   const isTrainer = Boolean(user?.isTrainer);
+  const isBusiness = Boolean(user?.isBusiness);
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
@@ -31,6 +41,11 @@ export default function TopBar() {
         {isTrainer && (
           <Link href="/admin" aria-label="Admin" className="text-zinc-300 hover:text-white">
             <AdminIcon />
+          </Link>
+        )}
+        {isBusiness && (
+          <Link href="/business" aria-label="Business dashboard" className="text-zinc-300 hover:text-white">
+            <BusinessIcon />
           </Link>
         )}
         <button

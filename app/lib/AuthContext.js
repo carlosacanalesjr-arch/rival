@@ -33,7 +33,9 @@ function getSnapshot() {
     cachedRaw = raw;
     try {
       const parsed = raw ? JSON.parse(raw) : null;
-      cachedUser = parsed ? { ...parsed, isTrainer: computeIsTrainer(parsed.email) } : null;
+      cachedUser = parsed
+        ? { ...parsed, isTrainer: computeIsTrainer(parsed.email), isBusiness: parsed.accountType === "business" }
+        : null;
     } catch {
       cachedUser = null;
     }
