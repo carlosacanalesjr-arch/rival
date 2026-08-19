@@ -111,9 +111,10 @@ function ProgramCard({ program, onOpen, onChangeLevel, onChangeFocus, allProgram
   // enrolledLevel lives on the program record itself (via context), not local state,
   // so the picked/enrolled level survives card remounts (collapsing a category,
   // navigating away and back, etc.) instead of resetting to "Select Level".
+  const levelBadgeShown = showLevelSelector && badgeStatus === "completed" && Boolean(program.enrolledLevel);
   let levelControl = null;
   if (showLevelSelector) {
-    if (badgeStatus === "completed" && program.enrolledLevel) {
+    if (levelBadgeShown) {
       levelControl = <LevelBadge level={program.enrolledLevel} />;
     } else {
       levelControl = (
@@ -161,16 +162,21 @@ function ProgramCard({ program, onOpen, onChangeLevel, onChangeFocus, allProgram
         </div>
       )}
 
-      <div className="mt-3 flex items-center justify-end">
-        <EnrollButton
-          status={badgeStatus}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onOpen(program.id);
-          }}
-        />
-      </div>
+      {/* Skipped when the LevelBadge above is already showing "{level} · Completed ✓" —
+          otherwise the card ends up with two separate "Completed" pills saying the same
+          thing, one with the level and one without. */}
+      {!levelBadgeShown && (
+        <div className="mt-3 flex items-center justify-end">
+          <EnrollButton
+            status={badgeStatus}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onOpen(program.id);
+            }}
+          />
+        </div>
+      )}
 
       {completionAction && (
         <CompletionActionButton
