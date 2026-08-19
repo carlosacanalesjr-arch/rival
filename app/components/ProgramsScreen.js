@@ -13,6 +13,8 @@ import {
   getCompletionAction,
 } from "@/app/lib/programsData";
 import { LEVEL_STYLES, LevelSelector, FocusSelector } from "@/app/components/LevelFocusSelectors";
+import ImageSlot from "@/app/components/ImageSlot";
+import { getSectionSlug } from "@/app/components/ExerciseBreakdown";
 
 function TrophyIcon({ className }) {
   return (
@@ -265,31 +267,58 @@ function CategoryDropdown({
 }) {
   return (
     // No overflow-hidden here — it would clip the LevelSelector / FocusSelector popovers
-    // inside each ProgramCard whenever they extend past this section's bottom edge.
+    // inside each ProgramCard whenever they extend past this section's bottom edge. The
+    // header below gets its own overflow-hidden instead, scoped just to the background image.
     <section className="rounded-2xl border border-border-subtle bg-surface">
-      <button
+      {/* A div, not a button, since ImageSlot's own corner button (trainer-only) can't nest
+          inside a <button>. Sits above the collapsible list as a sibling, so expanding never
+          touches it — the background image stays put regardless of isOpen. */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
         aria-expanded={isOpen}
-        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+        className="relative flex min-h-24 cursor-pointer flex-col justify-end overflow-hidden rounded-t-2xl"
       >
-        <div className="min-w-0">
-          <p className="text-base font-bold text-white">{category}</p>
-          <p className="mt-0.5 text-xs text-zinc-500">
-            {programsInCategory.length} program{programsInCategory.length === 1 ? "" : "s"}
-          </p>
+        <div className="absolute inset-0">
+          <ImageSlot
+            mediaKey={`category-bg:${getSectionSlug(category)}`}
+            alt={`${category} background`}
+            label="Add image"
+            cornerControlsOnly
+            className="h-full w-full"
+          />
         </div>
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className={`shrink-0 text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-        >
-          <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent"
+          aria-hidden
+        />
+        <div className="relative z-10 flex items-end justify-between gap-3 p-4">
+          <div className="min-w-0">
+            <p className="text-base font-bold text-white">{category}</p>
+            <p className="mt-0.5 text-xs text-white/80">
+              {programsInCategory.length} program{programsInCategory.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className={`shrink-0 text-white/80 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          >
+            <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
 
       {isOpen && (
         <div className="space-y-3 border-t border-border-subtle p-3">
