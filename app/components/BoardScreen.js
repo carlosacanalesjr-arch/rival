@@ -19,7 +19,7 @@ export default function BoardScreen() {
     <div className="flex min-h-screen flex-1 flex-col bg-black">
       <TopBar />
 
-      <main className="mx-auto w-full max-w-md flex-1 pb-6">
+      <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <div className="px-4 pt-5">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-extrabold text-white">Leaderboard</h1>
@@ -71,9 +71,7 @@ export default function BoardScreen() {
         </div>
       </main>
 
-      <div className="mx-auto w-full max-w-md">
-        <BottomNav />
-      </div>
+      <BottomNav />
     </div>
   );
 }

@@ -54,7 +54,12 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="sticky bottom-0 z-30 flex items-center justify-around border-t border-border-subtle bg-black/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
+    // fixed, not sticky: sticky only "sticks" within the extra height of its own containing
+    // block, and every caller wraps this in a div sized exactly to the nav's own height (no
+    // slack for it to stick within) — so it just scrolled away with the page. fixed pins it
+    // to the viewport outright; mx-auto + max-w-md keeps it aligned with the app's centered
+    // mobile-width column instead of spanning the full viewport on wider screens.
+    <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto flex w-full max-w-md items-center justify-around border-t border-border-subtle bg-black/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
       {items.map((item) => {
         const isActive = isItemActive(item);
         return (

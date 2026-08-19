@@ -9,7 +9,16 @@ export default function DealsFilterBar({ filters, onChange }) {
 
   return (
     <div className="space-y-2.5 px-4 pb-3">
-      <div className="no-scrollbar flex gap-2 overflow-x-auto">
+      {/* See EventsFilterBar.js's identical wrapper for why this is a mask-image, not a
+          scroll-position-tracked overlay: it fades both edges with zero JS. */}
+      <div
+        className="no-scrollbar flex gap-2 overflow-x-auto"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)",
+        }}
+      >
         {CATEGORY_OPTIONS.map((category) => {
           const selected = filters.category === category;
           return (

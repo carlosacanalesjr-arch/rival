@@ -10,16 +10,14 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-black">
       <TopBar />
-      <main className="mx-auto w-full max-w-md flex-1 pb-6">
+      <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <StoriesRow />
         <SponsoredBanner />
         <ChallengeCards />
         <Leaderboard />
         <ActivityFeed />
       </main>
-      <div className="mx-auto w-full max-w-md">
-        <BottomNav />
-      </div>
+      <BottomNav />
     </div>
   );
 }
