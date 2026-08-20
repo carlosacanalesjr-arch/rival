@@ -24,7 +24,7 @@ function formatTimestamp(iso) {
 }
 
 export default function AdminReportsList() {
-  const { reports, markReviewed } = useReports();
+  const { reports, loading, markReviewed } = useReports();
 
   const active = reports
     .filter((r) => !r.reviewed)
@@ -36,7 +36,11 @@ export default function AdminReportsList() {
       <p className="mt-1 text-sm text-zinc-500">Event/deal reports and app feedback from athletes.</p>
 
       <div className="mt-4 space-y-3">
-        {active.length === 0 && (
+        {loading && (
+          <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-zinc-500">Loading…</p>
+        )}
+
+        {!loading && active.length === 0 && (
           <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-zinc-500">
             No active reports.
           </p>

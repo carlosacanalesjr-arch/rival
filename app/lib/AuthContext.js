@@ -1,18 +1,16 @@
 "use client";
 
 import { createContext, useContext, useSyncExternalStore } from "react";
+import { isTrainerEmail } from "@/app/lib/trainerAccess";
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = "rival_auth_user";
 
-// Hardcoded trainer allowlist — this app has no backend/user database, so admin
-// status is purely a client-side flag, not real server-side security. Derived at
-// read time (not at each signUp*/logIn* call site) so it's the one place to
-// maintain and re-derives live if the allowlist ever grows.
-const TRAINER_EMAILS = new Set(["carlosa.canalesjr@gmail.com"]);
-
+// Hardcoded trainer allowlist (see trainerAccess.js) — this app has no backend/user database,
+// so admin status is purely a client-side flag, not real server-side security. Derived at read
+// time (not at each signUp*/logIn* call site) so it's the one place to maintain.
 function computeIsTrainer(email) {
-  return Boolean(email) && TRAINER_EMAILS.has(email.trim().toLowerCase());
+  return isTrainerEmail(email);
 }
 
 let cachedRaw;

@@ -1,103 +1,70 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/app/lib/AuthContext";
 
-// Centralized store for everything the admin "Reports" section needs to show: event/deal
-// reports (Spam/Inappropriate/Misleading/Other, from ReportModal) and general app-feedback
-// submissions (from ReportIssueModal), normalized into one shape so they can share one list.
-// Kept separate from EventsContext/DealsContext's embedded per-item `reports[]` (which drives
-// the existing "hide reported items from Explore" behavior) — this store is purely for admin
-// visibility and doesn't affect what athletes see in Explore.
-const ReportsContext = createContext(null);
-const STORAGE_KEY = "rival_reports_v1";
-
-const EMPTY_REPORTS = [];
-let cachedRaw;
-let cachedReports = EMPTY_REPORTS;
-const listeners = new Set();
-
-function readRaw() {
+// Backed by /api/reports (Upstash Redis via app/lib/kv.js) instead of localStorage, since
+// admin reports need to be visible across every device/browser a report was submitted from —
+// see app/lib/kv.js and the two route handlers for the actual storage. No Context/Provider is
+// needed here anymore: submitReport is a plain function usable from anywhere (submitting a
+// report never required being an admin), and useReports is a self-contained hook used only by
+// AdminReportsList, which is already gated behind the trainer-only /admin route.
+export async function submitReport(data) {
   try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
+    const res = await fetch("/api/reports", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`submitReport failed: ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    // Best-effort — every call site fires this alongside a local UI update (report modal
+    // closing, "submitted" message) that shouldn't block or fail just because the network did.
+    console.error(err);
     return null;
   }
 }
 
-function getSnapshot() {
-  const raw = readRaw();
-  if (raw !== cachedRaw) {
-    cachedRaw = raw;
-    try {
-      cachedReports = raw ? JSON.parse(raw) : EMPTY_REPORTS;
-    } catch {
-      cachedReports = EMPTY_REPORTS;
-    }
-  }
-  return cachedReports;
-}
-
-function getServerSnapshot() {
-  return EMPTY_REPORTS;
-}
-
-function subscribe(callback) {
-  listeners.add(callback);
-  window.addEventListener("storage", callback);
-  return () => {
-    listeners.delete(callback);
-    window.removeEventListener("storage", callback);
-  };
-}
-
-function writeReports(next) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // Storage full or unavailable — the report just won't survive a reload.
-  }
-  cachedRaw = undefined;
-  listeners.forEach((listener) => listener());
-}
-
-// Plain function (not a hook) so it can be called from DealDetailScreen/EventDetailScreen/
-// ExploreScreen right alongside reportDeal/reportEvent, with no need to wrap those trees in
-// a ReportsProvider — it reads/writes the same localStorage key the hook-based provider does.
-// `kind` is "event" | "deal" | "app_feedback"; `reason`/`itemId`/`itemLabel` are null for
-// app_feedback, `screenshotUrl` is only ever set for app_feedback.
-export function submitReport({ kind, itemId = null, itemLabel = null, reason = null, details = null, screenshotUrl = null, reporterEmail = null }) {
-  const report = {
-    id: `rp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    kind,
-    itemId,
-    itemLabel,
-    reason,
-    details,
-    screenshotUrl,
-    reporterEmail,
-    reviewed: false,
-    createdAt: new Date().toISOString(),
-  };
-  writeReports([report, ...getSnapshot()]);
-  return report;
-}
-
-export function ReportsProvider({ children }) {
-  const reports = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-
-  const markReviewed = (id) => {
-    writeReports(reports.map((r) => (r.id === id ? { ...r, reviewed: true } : r)));
-  };
-
-  const value = { reports, addReport: submitReport, markReviewed };
-
-  return <ReportsContext.Provider value={value}>{children}</ReportsContext.Provider>;
-}
-
 export function useReports() {
-  const ctx = useContext(ReportsContext);
-  if (!ctx) {
-    throw new Error("useReports must be used within a ReportsProvider");
-  }
-  return ctx;
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    let cancelled = false;
+
+    fetch("/api/reports", { headers: { "x-user-email": user.email } })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (cancelled) return;
+        setReports(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email]);
+
+  const markReviewed = async (id) => {
+    if (!user?.email) return;
+    // Optimistic — the admin queue should feel instant, and the PATCH below confirms it server-side.
+    setReports((prev) => prev.map((r) => (r.id === id ? { ...r, reviewed: true } : r)));
+    try {
+      await fetch(`/api/reports/${id}`, {
+        method: "PATCH",
+        headers: { "x-user-email": user.email },
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return { reports, loading, markReviewed };
 }
