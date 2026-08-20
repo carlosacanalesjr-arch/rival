@@ -1,6 +1,7 @@
 "use client";
 
 import { eventTypes } from "@/app/lib/exploreSeedData";
+import ScrollFadeRow from "@/app/components/explore/ScrollFadeRow";
 
 const TYPE_OPTIONS = ["All", ...eventTypes];
 
@@ -12,17 +13,7 @@ export default function EventsFilterBar({ filters, onChange }) {
 
   return (
     <div className="space-y-2.5 px-4 pb-3">
-      {/* mask-image fades both edges of the scroll container itself, not the content — so it
-          stays correct at any scroll position with zero JS: no scrollLeft tracking, no
-          conditional show/hide. Standard iOS pattern for "there's more, swipe" affordance. */}
-      <div
-        className="no-scrollbar flex gap-2 overflow-x-auto"
-        style={{
-          maskImage: "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)",
-        }}
-      >
+      <ScrollFadeRow>
         {TYPE_OPTIONS.map((type) => {
           const selected = filters.type === type;
           return (
@@ -40,7 +31,7 @@ export default function EventsFilterBar({ filters, onChange }) {
             </button>
           );
         })}
-      </div>
+      </ScrollFadeRow>
 
       <div className="grid grid-cols-2 gap-2">
         <input
