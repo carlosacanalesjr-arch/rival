@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/lib/AuthContext";
 import { useDeals } from "@/app/lib/DealsContext";
+import { submitReport } from "@/app/lib/ReportsContext";
 import ReportModal from "@/app/components/explore/ReportModal";
 
 function BackIcon() {
@@ -24,10 +26,12 @@ function InfoTile({ label, value }) {
 
 export default function DealDetailScreen({ id }) {
   const router = useRouter();
-  const { getDeal, reportDeal, blockBusiness } = useDeals();
+  const { user } = useAuth();
+  const { getDeal, reportDeal, hideDeal } = useDeals();
   const deal = getDeal(id);
   const [showReport, setShowReport] = useState(false);
   const [reported, setReported] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!deal) {
     return (
@@ -43,10 +47,19 @@ export default function DealDetailScreen({ id }) {
     );
   }
 
-  const handleBlock = () => {
-    if (!window.confirm(`Block ${deal.businessName}? You won't see their deals in Explore anymore.`)) return;
-    blockBusiness(deal.businessEmail);
+  const handleNotInterested = () => {
+    hideDeal(deal.id, user?.email);
     router.push("/explore");
+  };
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(deal.promoCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard unavailable — the code is still visible on-screen to copy manually.
+    }
   };
 
   return (
@@ -86,6 +99,32 @@ export default function DealDetailScreen({ id }) {
             <InfoTile label="Category" value={deal.category} />
             <InfoTile label="Expires" value={deal.expiry} />
           </div>
+
+          {deal.promoCode && (
+            <div className="mt-4">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Promo Code</p>
+              <div className="mt-1.5 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="flex min-h-11 flex-1 items-center justify-between rounded-xl border border-dashed border-emerald-500/50 bg-emerald-500/10 px-3 text-sm font-bold text-emerald-400"
+                >
+                  <span className="tracking-wider">{deal.promoCode}</span>
+                  <span className="text-xs font-semibold">{copied ? "Copied!" : "Tap to copy"}</span>
+                </button>
+                {deal.redeemUrl && (
+                  <a
+                    href={deal.redeemUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-11 shrink-0 items-center rounded-xl bg-rival-red px-4 text-sm font-extrabold text-white hover:bg-red-600"
+                  >
+                    Redeem
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <section className="mt-6 px-4">
@@ -113,10 +152,10 @@ export default function DealDetailScreen({ id }) {
               Report deal
             </button>
             <button
-              onClick={handleBlock}
+              onClick={handleNotInterested}
               className="min-h-11 flex-1 rounded-full border border-border-subtle bg-black text-xs font-bold text-zinc-300 transition hover:bg-surface-raised"
             >
-              Block this business
+              Not interested
             </button>
           </div>
 
@@ -130,6 +169,14 @@ export default function DealDetailScreen({ id }) {
           onClose={() => setShowReport(false)}
           onSubmit={(reason, note) => {
             reportDeal(deal.id, reason, note);
+            submitReport({
+              kind: "deal",
+              itemId: deal.id,
+              itemLabel: deal.title,
+              reason,
+              details: note || null,
+              reporterEmail: user?.email || null,
+            });
             setShowReport(false);
             setReported(true);
           }}

@@ -8,7 +8,7 @@ import ContentGuidelinesModal, { acknowledgeGuidelines, hasAcknowledgedGuideline
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
-const EMPTY = { title: "", category: "", discount: "", expiry: "", description: "" };
+const EMPTY = { title: "", category: "", discount: "", expiry: "", description: "", promoCode: "", redeemUrl: "" };
 
 export default function PostDealForm() {
   const { user } = useAuth();
@@ -49,6 +49,8 @@ export default function PostDealForm() {
         discount: form.discount.trim(),
         expiry: form.expiry.trim(),
         description: form.description.trim(),
+        promoCode: form.promoCode.trim() || null,
+        redeemUrl: form.redeemUrl.trim() || null,
         businessName: user.businessName,
         businessEmail: user.email,
         location: `${user.city}, ${user.state}`,
@@ -120,6 +122,22 @@ export default function PostDealForm() {
         rows={3}
         className="w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
       />
+
+      <div className="grid grid-cols-2 gap-2">
+        <input
+          value={form.promoCode}
+          onChange={update("promoCode")}
+          placeholder="Promo code (optional)"
+          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        />
+        <input
+          value={form.redeemUrl}
+          onChange={update("redeemUrl")}
+          placeholder="Redemption URL (optional)"
+          type="url"
+          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        />
+      </div>
 
       <div>
         <label className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-surface text-xs font-semibold text-zinc-400 hover:border-zinc-500">

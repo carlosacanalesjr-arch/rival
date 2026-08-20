@@ -9,8 +9,10 @@ import EventCard from "@/app/components/explore/EventCard";
 import DealCard from "@/app/components/explore/DealCard";
 import EventsFilterBar from "@/app/components/explore/EventsFilterBar";
 import DealsFilterBar from "@/app/components/explore/DealsFilterBar";
+import { useAuth } from "@/app/lib/AuthContext";
 import { useEvents } from "@/app/lib/EventsContext";
 import { useDeals } from "@/app/lib/DealsContext";
+import { submitReport } from "@/app/lib/ReportsContext";
 
 const SEGMENTS = ["Races & Events", "Deals"];
 
@@ -24,38 +26,39 @@ function matchesDateRange(dateStr, fromStr, toStr) {
 
 export default function ExploreScreen() {
   const router = useRouter();
-  const { events, reportEvent, isHostBlocked } = useEvents();
-  const { deals, reportDeal, isBusinessBlocked } = useDeals();
+  const { user } = useAuth();
+  const { events, reportEvent, isEventHidden } = useEvents();
+  const { deals, reportDeal, isDealHidden } = useDeals();
 
   const [segment, setSegment] = useState(SEGMENTS[0]);
   const [eventFilters, setEventFilters] = useState({ type: "All", location: "", dateFrom: "", dateTo: "" });
   const [dealFilters, setDealFilters] = useState({ category: "All", location: "" });
 
   // "Normal browsing" excludes anything reported (hidden pending review, per Apple guideline
-  // 1.2) and anything from a host/business this athlete has personally blocked.
+  // 1.2) and anything this athlete has personally marked "Not interested" in.
   const visibleEvents = useMemo(
     () =>
       events.filter((e) => {
         if (e.status === "reported") return false;
-        if (isHostBlocked(e.hostEmail)) return false;
+        if (isEventHidden(e.id, user?.email)) return false;
         if (eventFilters.type !== "All" && e.type !== eventFilters.type) return false;
         if (eventFilters.location && !e.location.toLowerCase().includes(eventFilters.location.toLowerCase())) return false;
         if (!matchesDateRange(e.date, eventFilters.dateFrom, eventFilters.dateTo)) return false;
         return true;
       }),
-    [events, eventFilters, isHostBlocked]
+    [events, eventFilters, isEventHidden, user?.email]
   );
 
   const visibleDeals = useMemo(
     () =>
       deals.filter((d) => {
         if (d.status === "reported") return false;
-        if (isBusinessBlocked(d.businessEmail)) return false;
+        if (isDealHidden(d.id, user?.email)) return false;
         if (dealFilters.category !== "All" && d.category !== dealFilters.category) return false;
         if (dealFilters.location && !d.location.toLowerCase().includes(dealFilters.location.toLowerCase())) return false;
         return true;
       }),
-    [deals, dealFilters, isBusinessBlocked]
+    [deals, dealFilters, isDealHidden, user?.email]
   );
 
   return (
@@ -86,7 +89,17 @@ export default function ExploreScreen() {
                     key={event.id}
                     event={event}
                     onOpen={(id) => router.push(`/explore/events/${id}`)}
-                    onReport={(id, reason, note) => reportEvent(id, reason, note)}
+                    onReport={(id, reason, note) => {
+                      reportEvent(id, reason, note);
+                      submitReport({
+                        kind: "event",
+                        itemId: id,
+                        itemLabel: event.title,
+                        reason,
+                        details: note || null,
+                        reporterEmail: user?.email || null,
+                      });
+                    }}
                   />
                 ))
               )}
@@ -106,7 +119,17 @@ export default function ExploreScreen() {
                     key={deal.id}
                     deal={deal}
                     onOpen={(id) => router.push(`/explore/deals/${id}`)}
-                    onReport={(id, reason, note) => reportDeal(id, reason, note)}
+                    onReport={(id, reason, note) => {
+                      reportDeal(id, reason, note);
+                      submitReport({
+                        kind: "deal",
+                        itemId: id,
+                        itemLabel: deal.title,
+                        reason,
+                        details: note || null,
+                        reporterEmail: user?.email || null,
+                      });
+                    }}
                   />
                 ))
               )}

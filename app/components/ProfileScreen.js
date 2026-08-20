@@ -5,11 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getAthlete } from "@/app/lib/athletes";
 import { useChallenges } from "@/app/lib/ChallengesContext";
+import ReportIssueModal from "@/app/components/ReportIssueModal";
 
 function BackIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function FlagIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 22V4" strokeLinecap="round" />
     </svg>
   );
 }
@@ -133,6 +143,7 @@ export default function ProfileScreen({ id }) {
   const { challenges } = useChallenges();
   const [activeTab, setActiveTab] = useState("Activity");
   const [following, setFollowing] = useState(false);
+  const [showReportIssue, setShowReportIssue] = useState(false);
 
   if (!athlete) {
     return (
@@ -236,6 +247,16 @@ export default function ProfileScreen({ id }) {
           >
             {isSelf ? "EDIT PROFILE" : following ? "FOLLOWING" : "FOLLOW"}
           </button>
+
+          {isSelf && (
+            <button
+              onClick={() => setShowReportIssue(true)}
+              className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border-subtle text-xs font-bold text-zinc-400 transition hover:bg-surface-raised hover:text-white"
+            >
+              <FlagIcon />
+              Report an issue
+            </button>
+          )}
         </div>
 
         <div className="sticky top-[49px] z-20 flex border-b border-border-subtle bg-black/95 backdrop-blur">
@@ -306,6 +327,8 @@ export default function ProfileScreen({ id }) {
           </div>
         )}
       </main>
+
+      {showReportIssue && <ReportIssueModal onClose={() => setShowReportIssue(false)} />}
     </div>
   );
 }

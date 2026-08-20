@@ -8,7 +8,7 @@ import { seedDeals } from "@/app/lib/exploreSeedData";
 // a shared "listings" context) since the request asked for two distinct Contexts.
 const DealsContext = createContext(null);
 const STORAGE_KEY = "rival_deals_v1";
-const BLOCKED_BUSINESSES_KEY = "rival_deals_blocked_businesses_v1";
+const HIDDEN_DEALS_KEY = "rival_deals_hidden_v1";
 
 let cachedRaw;
 let cachedDeals = seedDeals;
@@ -58,58 +58,61 @@ function writeDeals(nextDeals) {
   listeners.forEach((listener) => listener());
 }
 
-const EMPTY_BLOCKED_BUSINESSES = [];
-let cachedBlockedRaw;
-let cachedBlockedBusinesses = EMPTY_BLOCKED_BUSINESSES;
-const blockedListeners = new Set();
+// "Not interested" is personal and silent (no notification to the business, not a report,
+// not visible to admin) — so it's keyed per-email, same pattern as ContentGuidelinesModal's
+// per-email ack map, rather than a single flat list like the old global block store was.
+const EMPTY_HIDDEN = {};
+let cachedHiddenRaw;
+let cachedHiddenMap = EMPTY_HIDDEN;
+const hiddenListeners = new Set();
 
-function readBlockedRaw() {
+function readHiddenRaw() {
   try {
-    return localStorage.getItem(BLOCKED_BUSINESSES_KEY);
+    return localStorage.getItem(HIDDEN_DEALS_KEY);
   } catch {
     return null;
   }
 }
 
-function getBlockedSnapshot() {
-  const raw = readBlockedRaw();
-  if (raw !== cachedBlockedRaw) {
-    cachedBlockedRaw = raw;
+function getHiddenSnapshot() {
+  const raw = readHiddenRaw();
+  if (raw !== cachedHiddenRaw) {
+    cachedHiddenRaw = raw;
     try {
-      cachedBlockedBusinesses = raw ? JSON.parse(raw) : EMPTY_BLOCKED_BUSINESSES;
+      cachedHiddenMap = raw ? JSON.parse(raw) : EMPTY_HIDDEN;
     } catch {
-      cachedBlockedBusinesses = EMPTY_BLOCKED_BUSINESSES;
+      cachedHiddenMap = EMPTY_HIDDEN;
     }
   }
-  return cachedBlockedBusinesses;
+  return cachedHiddenMap;
 }
 
-function getBlockedServerSnapshot() {
-  return EMPTY_BLOCKED_BUSINESSES;
+function getHiddenServerSnapshot() {
+  return EMPTY_HIDDEN;
 }
 
-function subscribeBlocked(callback) {
-  blockedListeners.add(callback);
+function subscribeHidden(callback) {
+  hiddenListeners.add(callback);
   window.addEventListener("storage", callback);
   return () => {
-    blockedListeners.delete(callback);
+    hiddenListeners.delete(callback);
     window.removeEventListener("storage", callback);
   };
 }
 
-function writeBlockedBusinesses(next) {
+function writeHiddenMap(next) {
   try {
-    localStorage.setItem(BLOCKED_BUSINESSES_KEY, JSON.stringify(next));
+    localStorage.setItem(HIDDEN_DEALS_KEY, JSON.stringify(next));
   } catch {
-    // Storage full or unavailable — the block just won't survive a reload.
+    // Storage full or unavailable — the hide just won't survive a reload.
   }
-  cachedBlockedRaw = undefined;
-  blockedListeners.forEach((listener) => listener());
+  cachedHiddenRaw = undefined;
+  hiddenListeners.forEach((listener) => listener());
 }
 
 export function DealsProvider({ children }) {
   const deals = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const blockedBusinesses = useSyncExternalStore(subscribeBlocked, getBlockedSnapshot, getBlockedServerSnapshot);
+  const hiddenMap = useSyncExternalStore(subscribeHidden, getHiddenSnapshot, getHiddenServerSnapshot);
 
   const addDeal = (data, postedByEmail) => {
     const deal = {
@@ -138,9 +141,11 @@ export function DealsProvider({ children }) {
     );
   };
 
-  const blockBusiness = (businessEmail) => {
-    if (!businessEmail || blockedBusinesses.includes(businessEmail)) return;
-    writeBlockedBusinesses([...blockedBusinesses, businessEmail]);
+  const hideDeal = (dealId, email) => {
+    if (!email || !dealId) return;
+    const current = hiddenMap[email] || [];
+    if (current.includes(dealId)) return;
+    writeHiddenMap({ ...hiddenMap, [email]: [...current, dealId] });
   };
 
   const value = {
@@ -148,9 +153,8 @@ export function DealsProvider({ children }) {
     addDeal,
     reportDeal,
     getDeal: (id) => deals.find((d) => d.id === id),
-    blockedBusinesses,
-    blockBusiness,
-    isBusinessBlocked: (businessEmail) => blockedBusinesses.includes(businessEmail),
+    hideDeal,
+    isDealHidden: (dealId, email) => Boolean(email && (hiddenMap[email] || []).includes(dealId)),
   };
 
   return <DealsContext.Provider value={value}>{children}</DealsContext.Provider>;

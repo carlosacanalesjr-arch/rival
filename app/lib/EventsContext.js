@@ -10,7 +10,7 @@ import { seedEvents } from "@/app/lib/exploreSeedData";
 // the first time it's ever read, then persists everything (seed + posts) from then on.
 const EventsContext = createContext(null);
 const STORAGE_KEY = "rival_events_v1";
-const BLOCKED_HOSTS_KEY = "rival_events_blocked_hosts_v1";
+const HIDDEN_EVENTS_KEY = "rival_events_hidden_v1";
 
 let cachedRaw;
 let cachedEvents = seedEvents;
@@ -60,61 +60,62 @@ function writeEvents(nextEvents) {
   listeners.forEach((listener) => listener());
 }
 
-// Blocking is scoped to this content type only (blocking a host here doesn't touch
-// DealsContext's separate block list) — keeps each store self-contained, since there's no
-// shared "business profile" record anywhere that ties a host's events and deals together.
-const EMPTY_BLOCKED_HOSTS = [];
-let cachedBlockedRaw;
-let cachedBlockedHosts = EMPTY_BLOCKED_HOSTS;
-const blockedListeners = new Set();
+// "Not interested" is personal and silent (no notification to the host, not a report, not
+// visible to admin) — so it's keyed per-email, same pattern as ContentGuidelinesModal's
+// per-email ack map. Scoped to this content type only, same as DealsContext's separate store —
+// there's no shared "business profile" record tying a host's events and deals together.
+const EMPTY_HIDDEN = {};
+let cachedHiddenRaw;
+let cachedHiddenMap = EMPTY_HIDDEN;
+const hiddenListeners = new Set();
 
-function readBlockedRaw() {
+function readHiddenRaw() {
   try {
-    return localStorage.getItem(BLOCKED_HOSTS_KEY);
+    return localStorage.getItem(HIDDEN_EVENTS_KEY);
   } catch {
     return null;
   }
 }
 
-function getBlockedSnapshot() {
-  const raw = readBlockedRaw();
-  if (raw !== cachedBlockedRaw) {
-    cachedBlockedRaw = raw;
+function getHiddenSnapshot() {
+  const raw = readHiddenRaw();
+  if (raw !== cachedHiddenRaw) {
+    cachedHiddenRaw = raw;
     try {
-      cachedBlockedHosts = raw ? JSON.parse(raw) : EMPTY_BLOCKED_HOSTS;
+      cachedHiddenMap = raw ? JSON.parse(raw) : EMPTY_HIDDEN;
     } catch {
-      cachedBlockedHosts = EMPTY_BLOCKED_HOSTS;
+      cachedHiddenMap = EMPTY_HIDDEN;
     }
   }
-  return cachedBlockedHosts;
+  return cachedHiddenMap;
 }
 
-function getBlockedServerSnapshot() {
-  return EMPTY_BLOCKED_HOSTS;
+function getHiddenServerSnapshot() {
+  return EMPTY_HIDDEN;
 }
 
-function subscribeBlocked(callback) {
-  blockedListeners.add(callback);
+function subscribeHidden(callback) {
+  hiddenListeners.add(callback);
   window.addEventListener("storage", callback);
   return () => {
-    blockedListeners.delete(callback);
+    hiddenListeners.delete(callback);
     window.removeEventListener("storage", callback);
   };
 }
 
-function writeBlockedHosts(next) {
+function writeHiddenMap(next) {
   try {
-    localStorage.setItem(BLOCKED_HOSTS_KEY, JSON.stringify(next));
+    localStorage.setItem(HIDDEN_EVENTS_KEY, JSON.stringify(next));
   } catch {
-    // Storage full or unavailable — the block just won't survive a reload.
+    // Storage full or unavailable — the hide just won't survive a reload.
   }
-  cachedBlockedRaw = undefined;
-  blockedListeners.forEach((listener) => listener());
+  cachedHiddenRaw = undefined;
+  hiddenListeners.forEach((listener) => listener());
 }
 
 export function EventsProvider({ children }) {
   const events = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const blockedHosts = useSyncExternalStore(subscribeBlocked, getBlockedSnapshot, getBlockedServerSnapshot);
+  const hiddenMap = useSyncExternalStore(subscribeHidden, getHiddenSnapshot, getHiddenServerSnapshot);
 
   // New posts go live immediately (reactive moderation via reporting, not pre-review — there's
   // no reviewer/admin queue in this app, so requiring pre-approval would leave posts stuck
@@ -147,9 +148,11 @@ export function EventsProvider({ children }) {
     );
   };
 
-  const blockHost = (hostEmail) => {
-    if (!hostEmail || blockedHosts.includes(hostEmail)) return;
-    writeBlockedHosts([...blockedHosts, hostEmail]);
+  const hideEvent = (eventId, email) => {
+    if (!email || !eventId) return;
+    const current = hiddenMap[email] || [];
+    if (current.includes(eventId)) return;
+    writeHiddenMap({ ...hiddenMap, [email]: [...current, eventId] });
   };
 
   const value = {
@@ -157,9 +160,8 @@ export function EventsProvider({ children }) {
     addEvent,
     reportEvent,
     getEvent: (id) => events.find((e) => e.id === id),
-    blockedHosts,
-    blockHost,
-    isHostBlocked: (hostEmail) => blockedHosts.includes(hostEmail),
+    hideEvent,
+    isEventHidden: (eventId, email) => Boolean(email && (hiddenMap[email] || []).includes(eventId)),
   };
 
   return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>;

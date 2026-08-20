@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/lib/AuthContext";
 
 export default function AdminLayout({ children }) {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const isTrainer = Boolean(user?.isTrainer);
 
   // useAuth's getServerSnapshot is always null (auth is client-only, localStorage-backed),
@@ -41,9 +42,23 @@ export default function AdminLayout({ children }) {
         <Link href="/admin" className="text-sm font-extrabold text-white">
           Admin <span className="text-rival-red">·</span> Kairos
         </Link>
-        <Link href="/" className="ml-auto text-xs font-semibold text-zinc-400 hover:text-white">
-          Back to app
-        </Link>
+        <nav className="ml-auto flex items-center gap-4">
+          <Link
+            href="/admin"
+            className={`text-xs font-semibold ${pathname === "/admin" ? "text-white" : "text-zinc-400 hover:text-white"}`}
+          >
+            Programs
+          </Link>
+          <Link
+            href="/admin/reports"
+            className={`text-xs font-semibold ${pathname === "/admin/reports" ? "text-white" : "text-zinc-400 hover:text-white"}`}
+          >
+            Reports
+          </Link>
+          <Link href="/" className="text-xs font-semibold text-zinc-400 hover:text-white">
+            Back to app
+          </Link>
+        </nav>
       </header>
       <main className="mx-auto w-full max-w-md flex-1 px-4 pb-12 pt-4">{children}</main>
     </div>

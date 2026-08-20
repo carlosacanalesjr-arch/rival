@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/lib/AuthContext";
 import { useEvents } from "@/app/lib/EventsContext";
+import { submitReport } from "@/app/lib/ReportsContext";
 import ReportModal from "@/app/components/explore/ReportModal";
 
 function BackIcon() {
@@ -24,7 +26,8 @@ function InfoTile({ label, value }) {
 
 export default function EventDetailScreen({ id }) {
   const router = useRouter();
-  const { getEvent, reportEvent, blockHost } = useEvents();
+  const { user } = useAuth();
+  const { getEvent, reportEvent, hideEvent } = useEvents();
   const event = getEvent(id);
   const [showReport, setShowReport] = useState(false);
   const [reported, setReported] = useState(false);
@@ -43,9 +46,8 @@ export default function EventDetailScreen({ id }) {
     );
   }
 
-  const handleBlock = () => {
-    if (!window.confirm(`Block ${event.hostName}? You won't see their events in Explore anymore.`)) return;
-    blockHost(event.hostEmail);
+  const handleNotInterested = () => {
+    hideEvent(event.id, user?.email);
     router.push("/explore");
   };
 
@@ -113,10 +115,10 @@ export default function EventDetailScreen({ id }) {
               Report event
             </button>
             <button
-              onClick={handleBlock}
+              onClick={handleNotInterested}
               className="min-h-11 flex-1 rounded-full border border-border-subtle bg-black text-xs font-bold text-zinc-300 transition hover:bg-surface-raised"
             >
-              Block this host
+              Not interested
             </button>
           </div>
 
@@ -141,6 +143,14 @@ export default function EventDetailScreen({ id }) {
           onClose={() => setShowReport(false)}
           onSubmit={(reason, note) => {
             reportEvent(event.id, reason, note);
+            submitReport({
+              kind: "event",
+              itemId: event.id,
+              itemLabel: event.title,
+              reason,
+              details: note || null,
+              reporterEmail: user?.email || null,
+            });
             setShowReport(false);
             setReported(true);
           }}
