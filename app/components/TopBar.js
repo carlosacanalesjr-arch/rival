@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/lib/AuthContext";
+import { getInitials } from "@/app/lib/initials";
 
 function AdminIcon() {
   return (
@@ -26,9 +29,29 @@ function BusinessIcon() {
 }
 
 export default function TopBar() {
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
+  const router = useRouter();
   const isTrainer = Boolean(user?.isTrainer);
   const isBusiness = Boolean(user?.isBusiness);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  const handleSignOut = async () => {
+    setMenuOpen(false);
+    await logOut();
+    router.push("/login");
+  };
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
@@ -66,13 +89,44 @@ export default function TopBar() {
           </svg>
           <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-rival-red" />
         </button>
-        <Link
-          href="/profile/you"
-          aria-label="Your profile"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-xs font-bold text-white"
-        >
-          YO
-        </Link>
+        {user ? (
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Account menu"
+              aria-expanded={menuOpen}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-xs font-bold text-white"
+            >
+              {getInitials(user)}
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full z-40 mt-2 w-44 overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-lg">
+                <Link
+                  href="/profile/you"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 text-sm text-zinc-200 hover:bg-black/40"
+                >
+                  View Profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="block w-full px-4 py-2.5 text-left text-sm text-rival-red hover:bg-black/40"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full border border-border-subtle px-3.5 py-1.5 text-xs font-semibold text-zinc-200 hover:border-zinc-500 hover:text-white"
+          >
+            Sign In
+          </Link>
+        )}
       </div>
     </header>
   );

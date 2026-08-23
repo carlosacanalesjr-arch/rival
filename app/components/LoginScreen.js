@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthHeader from "@/app/components/AuthHeader";
 import { useAuth } from "@/app/lib/AuthContext";
+import { supabase } from "@/app/lib/supabase";
 import { inputClass, Field, PasswordField } from "@/app/components/authFormKit";
 
 function AppleIcon() {
@@ -32,14 +33,35 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const isValid = email.trim().length > 0 && password.length > 0;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValid) return;
-    logIn({ email: email.trim(), password });
-    router.push("/");
+    setError("");
+    setSubmitting(true);
+    try {
+      const { user: loggedInUser } = await logIn({ email: email.trim(), password });
+      const accountType = loggedInUser?.user_metadata?.accountType || "athlete";
+      if (accountType === "athlete") {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("sport_interests")
+          .eq("id", loggedInUser.id)
+          .single();
+        const hasInterests = Array.isArray(profile?.sport_interests) && profile.sport_interests.length > 0;
+        router.push(hasInterests ? "/" : "/select-sports");
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      setError(err.message || "Couldn't log in. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleProvider = (provider) => {
@@ -77,12 +99,14 @@ export default function LoginScreen() {
             autoComplete="current-password"
           />
 
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || submitting}
             className="w-full rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white transition hover:bg-red-600 disabled:opacity-40"
           >
-            Log In
+            {submitting ? "Logging in…" : "Log In"}
           </button>
         </form>
 

@@ -25,26 +25,37 @@ export default function BusinessSignupScreen() {
   });
   const [businessType, setBusinessType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const requiredFilled = REQUIRED_FIELDS.every((key) => form[key].trim().length > 0);
   const isValid = requiredFilled && form.password.length >= 8 && Boolean(businessType);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValid) return;
-    signUpBusiness({
-      businessName: form.businessName.trim(),
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      email: form.email.trim(),
-      city: form.city.trim(),
-      state: form.state.trim(),
-      website: form.website.trim() || null,
-      businessType,
-    });
-    router.push("/");
+    setError("");
+    setSubmitting(true);
+    try {
+      await signUpBusiness({
+        businessName: form.businessName.trim(),
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        city: form.city.trim(),
+        state: form.state.trim(),
+        website: form.website.trim() || null,
+        businessType,
+      });
+      router.push(`/verify-email?email=${encodeURIComponent(form.email.trim())}`);
+    } catch (err) {
+      setError(err.message || "Couldn't create your account. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -129,12 +140,14 @@ export default function BusinessSignupScreen() {
             />
           </Field>
 
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || submitting}
             className="w-full rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white transition hover:bg-red-600 disabled:opacity-40"
           >
-            Create Business Account
+            {submitting ? "Creating account…" : "Create Business Account"}
           </button>
         </form>
 

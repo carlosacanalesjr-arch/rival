@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getAthlete } from "@/app/lib/athletes";
 import { useChallenges } from "@/app/lib/ChallengesContext";
+import { useAuth } from "@/app/lib/AuthContext";
+import { supabase } from "@/app/lib/supabase";
+import { getInitials } from "@/app/lib/initials";
 import ReportIssueModal from "@/app/components/ReportIssueModal";
 
 function BackIcon() {
@@ -141,9 +144,37 @@ export default function ProfileScreen({ id }) {
   const router = useRouter();
   const athlete = getAthlete(id);
   const { challenges } = useChallenges();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Activity");
   const [following, setFollowing] = useState(false);
   const [showReportIssue, setShowReportIssue] = useState(false);
+  const [realProfile, setRealProfile] = useState(null);
+
+  const isSelf = id === "you";
+
+  useEffect(() => {
+    if (!isSelf || !user) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username, full_name, home_gym")
+        .eq("id", user.id)
+        .single();
+      if (cancelled) return;
+      if (error) {
+        console.error(error);
+        setRealProfile({});
+      } else {
+        setRealProfile(data || {});
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isSelf, user]);
+
+  const profileLoading = isSelf && Boolean(user) && realProfile === null;
 
   if (!athlete) {
     return (
@@ -156,7 +187,14 @@ export default function ProfileScreen({ id }) {
     );
   }
 
-  const isSelf = athlete.id === "you";
+  const displayName = isSelf ? realProfile?.full_name || user?.firstName || "Athlete" : athlete.name;
+  const displayHandle = isSelf
+    ? realProfile?.username
+      ? `@${realProfile.username}`
+      : "Add a username"
+    : athlete.handle;
+  const displayHomeGym = isSelf ? realProfile?.home_gym || "Add your home gym" : athlete.homeGym;
+  const displayInitials = isSelf ? getInitials({ firstName: displayName, email: user?.email }) : athlete.initials;
 
   const joinedChallenges = athlete.challengeIds
     .map((cid) => {
@@ -173,23 +211,23 @@ export default function ProfileScreen({ id }) {
         <button onClick={() => router.back()} aria-label="Back" className="text-zinc-300 hover:text-white">
           <BackIcon />
         </button>
-        <h1 className="truncate text-base font-bold text-white">{athlete.handle}</h1>
+        <h1 className="truncate text-base font-bold text-white">{profileLoading ? "" : displayHandle}</h1>
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-10">
         <div className="border-b border-border-subtle bg-surface px-4 pb-5 pt-6">
           <div className="flex items-center gap-4">
             <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-2xl font-extrabold text-white">
-              {athlete.initials}
+              {profileLoading ? "" : displayInitials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-extrabold text-white">{athlete.name}</p>
-              <p className="truncate text-sm text-zinc-500">{athlete.handle}</p>
+              <p className="truncate text-lg font-extrabold text-white">{profileLoading ? "Loading…" : displayName}</p>
+              <p className="truncate text-sm text-zinc-500">{profileLoading ? "" : displayHandle}</p>
               <p className="mt-1 flex items-center gap-1 truncate text-xs text-zinc-400">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 21h18M6 21V9l6-5 6 5v12M10 21v-6h4v6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                {athlete.homeGym}
+                {profileLoading ? "" : displayHomeGym}
               </p>
             </div>
           </div>
@@ -236,7 +274,7 @@ export default function ProfileScreen({ id }) {
           </div>
 
           <button
-            onClick={() => !isSelf && setFollowing((v) => !v)}
+            onClick={() => (isSelf ? router.push("/settings") : setFollowing((v) => !v))}
             className={`mt-4 flex min-h-11 w-full items-center justify-center rounded-full text-sm font-extrabold tracking-wide transition ${
               isSelf
                 ? "border border-border-subtle text-white hover:bg-surface-raised"

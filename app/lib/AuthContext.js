@@ -1,124 +1,133 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 import { isTrainerEmail } from "@/app/lib/trainerAccess";
 
 const AuthContext = createContext(null);
-const STORAGE_KEY = "rival_auth_user";
 
-// Hardcoded trainer allowlist (see trainerAccess.js) — this app has no backend/user database,
-// so admin status is purely a client-side flag, not real server-side security. Derived at read
-// time (not at each signUp*/logIn* call site) so it's the one place to maintain.
 function computeIsTrainer(email) {
   return isTrainerEmail(email);
 }
 
-let cachedRaw;
-let cachedUser = null;
-const listeners = new Set();
-
-function readRaw() {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function getSnapshot() {
-  const raw = readRaw();
-  if (raw !== cachedRaw) {
-    cachedRaw = raw;
-    try {
-      const parsed = raw ? JSON.parse(raw) : null;
-      cachedUser = parsed
-        ? { ...parsed, isTrainer: computeIsTrainer(parsed.email), isBusiness: parsed.accountType === "business" }
-        : null;
-    } catch {
-      cachedUser = null;
-    }
-  }
-  return cachedUser;
-}
-
-function getServerSnapshot() {
-  return null;
-}
-
-function subscribe(callback) {
-  listeners.add(callback);
-  window.addEventListener("storage", callback);
-  return () => {
-    listeners.delete(callback);
-    window.removeEventListener("storage", callback);
+function buildUser(session, profile) {
+  if (!session?.user) return null;
+  const email = session.user.email;
+  const accountType = session.user.user_metadata?.accountType || "athlete";
+  return {
+    id: session.user.id,
+    email,
+    accountType,
+    provider: session.user.app_metadata?.provider || "password",
+    firstName:
+      profile?.full_name ||
+      session.user.user_metadata?.firstName ||
+      email?.split("@")[0],
+    createdAt: session.user.created_at,
+    isTrainer: computeIsTrainer(email),
+    isBusiness: accountType === "business",
   };
-}
-
-function writeUser(nextUser) {
-  try {
-    if (nextUser) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  } catch {
-    // ignore unavailable storage
-  }
-  cachedRaw = undefined;
-  listeners.forEach((listener) => listener());
 }
 
 export function AuthProvider({ children }) {
-  const user = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [user, setUser] = useState(null);
 
-  const signUpAthlete = (data) => {
-    const nextUser = {
-      accountType: "athlete",
-      provider: "password",
-      ...data,
-      createdAt: new Date().toISOString(),
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!mounted) return;
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setUser(buildUser(session, profile));
+      } else {
+        setUser(null);
+      }
+    }
+
+    loadSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          setUser(buildUser(session, profile));
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      listener?.subscription?.unsubscribe();
     };
-    writeUser(nextUser);
-    return nextUser;
-  };
+  }, []);
 
-  const signUpBusiness = (data) => {
-    const nextUser = {
-      accountType: "business",
-      provider: "password",
-      ...data,
-      createdAt: new Date().toISOString(),
-    };
-    writeUser(nextUser);
-    return nextUser;
-  };
-
-  const logIn = ({ email }) => {
-    const nextUser = {
-      accountType: "athlete",
-      provider: "password",
+  const signUpAthlete = async (data) => {
+    const { email, password, ...rest } = data;
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
-      firstName: email.split("@")[0],
-    };
-    writeUser(nextUser);
-    return nextUser;
+      password,
+      options: { data: { accountType: "athlete", ...rest } },
+    });
+    if (error) throw error;
+    return signUpData;
   };
 
-  const logInWithProvider = (provider) => {
-    const nextUser = {
-      accountType: "athlete",
+  const signUpBusiness = async (data) => {
+    const { email, password, ...rest } = data;
+    const { data: signUpData, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { accountType: "business", ...rest } },
+    });
+    if (error) throw error;
+    return signUpData;
+  };
+
+  const logIn = async ({ email, password }) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const logInWithProvider = async (provider) => {
+    const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      firstName: provider === "apple" ? "Apple User" : "Google User",
-    };
-    writeUser(nextUser);
-    return nextUser;
+      options: { redirectTo: `${window.location.origin}/` },
+    });
+    if (error) throw error;
   };
 
-  const logOut = () => writeUser(null);
+  const logOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
     <AuthContext.Provider
-      value={{ user, signUpAthlete, signUpBusiness, logIn, logInWithProvider, logOut }}
+      value={{
+        user,
+        signUpAthlete,
+        signUpBusiness,
+        logIn,
+        logInWithProvider,
+        logOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
