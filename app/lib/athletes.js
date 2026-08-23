@@ -1,4 +1,4 @@
-import { computeRunningAchievements } from "@/app/lib/achievements";
+import { computeRunningAchievements, computeProgramAchievements } from "@/app/lib/achievements";
 
 export const athletes = {
   you: {
@@ -16,12 +16,14 @@ export const athletes = {
     ],
     stats: { totalWorkouts: 214 },
     runningStats: { totalRuns: 38, longestRunKm: 12, totalPRsBroken: 3, prsBrokenThisYear: 2, lifetimeMiles: 140 },
-    achievements: computeRunningAchievements({
-      totalRuns: 38,
-      longestRunKm: 12,
-      totalPRsBroken: 3,
-      lifetimeMiles: 140,
-    }),
+    programStats: { hyroxHighestLevel: 2, dekaLevels: { FIT: 1, MILE: 0, STRONG: 0, ATLAS: 0, DOUBLE: 0 } },
+    achievements: [
+      ...computeRunningAchievements({ totalRuns: 38, longestRunKm: 12, totalPRsBroken: 3, lifetimeMiles: 140 }),
+      ...computeProgramAchievements({
+        hyroxHighestLevel: 2,
+        dekaLevels: { FIT: 1, MILE: 0, STRONG: 0, ATLAS: 0, DOUBLE: 0 },
+      }),
+    ],
     challengeIds: ["c1"],
     posts: [
       {
@@ -71,12 +73,14 @@ export const athletes = {
     ],
     stats: { totalWorkouts: 512 },
     runningStats: { totalRuns: 210, longestRunKm: 42.5, totalPRsBroken: 14, prsBrokenThisYear: 5, lifetimeMiles: 1200 },
-    achievements: computeRunningAchievements({
-      totalRuns: 210,
-      longestRunKm: 42.5,
-      totalPRsBroken: 14,
-      lifetimeMiles: 1200,
-    }),
+    programStats: { hyroxHighestLevel: 3, dekaLevels: { FIT: 3, MILE: 2, STRONG: 0, ATLAS: 0, DOUBLE: 0 } },
+    achievements: [
+      ...computeRunningAchievements({ totalRuns: 210, longestRunKm: 42.5, totalPRsBroken: 14, lifetimeMiles: 1200 }),
+      ...computeProgramAchievements({
+        hyroxHighestLevel: 3,
+        dekaLevels: { FIT: 3, MILE: 2, STRONG: 0, ATLAS: 0, DOUBLE: 0 },
+      }),
+    ],
     challengeIds: ["c1", "c2"],
     posts: [
       {
@@ -129,7 +133,14 @@ export const athletes = {
     ],
     stats: { totalWorkouts: 388 },
     runningStats: { totalRuns: 0, longestRunKm: 0, totalPRsBroken: 0, prsBrokenThisYear: 0, lifetimeMiles: 0 },
-    achievements: computeRunningAchievements({ totalRuns: 0, longestRunKm: 0, totalPRsBroken: 0, lifetimeMiles: 0 }),
+    programStats: { hyroxHighestLevel: 0, dekaLevels: { FIT: 0, MILE: 0, STRONG: 0, ATLAS: 0, DOUBLE: 0 } },
+    achievements: [
+      ...computeRunningAchievements({ totalRuns: 0, longestRunKm: 0, totalPRsBroken: 0, lifetimeMiles: 0 }),
+      ...computeProgramAchievements({
+        hyroxHighestLevel: 0,
+        dekaLevels: { FIT: 0, MILE: 0, STRONG: 0, ATLAS: 0, DOUBLE: 0 },
+      }),
+    ],
     challengeIds: ["c3"],
     posts: [
       {
@@ -179,7 +190,14 @@ export const athletes = {
     ],
     stats: { totalWorkouts: 296 },
     runningStats: { totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, prsBrokenThisYear: 1, lifetimeMiles: 25 },
-    achievements: computeRunningAchievements({ totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, lifetimeMiles: 25 }),
+    programStats: { hyroxHighestLevel: 1, dekaLevels: { FIT: 0, MILE: 0, STRONG: 0, ATLAS: 2, DOUBLE: 0 } },
+    achievements: [
+      ...computeRunningAchievements({ totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, lifetimeMiles: 25 }),
+      ...computeProgramAchievements({
+        hyroxHighestLevel: 1,
+        dekaLevels: { FIT: 0, MILE: 0, STRONG: 0, ATLAS: 2, DOUBLE: 0 },
+      }),
+    ],
     challengeIds: ["c4", "c1"],
     posts: [
       {
