@@ -268,8 +268,18 @@ export default function ProfileScreen({ id }) {
               <p className="mt-1 text-xl font-extrabold text-white">{athlete.stats.totalWorkouts}</p>
             </div>
             <div className="rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">PRs</p>
-              <p className="mt-1 text-xl font-extrabold text-white">{athlete.stats.prs}</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Lifetime Miles</p>
+              <p className="mt-1 text-xl font-extrabold text-white">
+                {athlete.runningStats.lifetimeMiles.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl border border-border-subtle bg-black p-3">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">PRs Broken</p>
+              <p className="mt-1 text-xl font-extrabold text-white">{athlete.runningStats.totalPRsBroken}</p>
+            </div>
+            <div className="rounded-xl border border-border-subtle bg-black p-3">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">PRs This Year</p>
+              <p className="mt-1 text-xl font-extrabold text-white">{athlete.runningStats.prsBrokenThisYear}</p>
             </div>
           </div>
 
@@ -360,6 +370,16 @@ export default function ProfileScreen({ id }) {
                 </p>
                 <p className="mt-2 text-sm font-bold text-white">{a.title}</p>
                 <p className="mt-1 text-[11px] text-zinc-500">{a.detail}</p>
+                {a.kind === "tiered" && (
+                  <div className="mt-2 flex items-center justify-center gap-1">
+                    {Array.from({ length: a.tierCount }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 w-1.5 rounded-full ${i < a.tier ? "bg-rival-red" : "bg-zinc-700"}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -1,3 +1,5 @@
+import { computeRunningAchievements } from "@/app/lib/achievements";
+
 export const athletes = {
   you: {
     id: "you",
@@ -12,13 +14,14 @@ export const athletes = {
       { label: "Running", emoji: "🏃" },
       { label: "Strength", emoji: "🏋️" },
     ],
-    stats: { totalWorkouts: 214, prs: 9 },
-    achievements: [
-      { id: "a1", title: "First 10K", emoji: "🥇", detail: "Completed first 10K race", earned: true },
-      { id: "a2", title: "30-Day Streak", emoji: "🔥", detail: "Trained 30 days in a row", earned: false },
-      { id: "a3", title: "PR Machine", emoji: "💪", detail: "5 PRs in one month", earned: true },
-      { id: "a4", title: "Challenge Champion", emoji: "🏆", detail: "Finished top 3 in a challenge", earned: false },
-    ],
+    stats: { totalWorkouts: 214 },
+    runningStats: { totalRuns: 38, longestRunKm: 12, totalPRsBroken: 3, prsBrokenThisYear: 2, lifetimeMiles: 140 },
+    achievements: computeRunningAchievements({
+      totalRuns: 38,
+      longestRunKm: 12,
+      totalPRsBroken: 3,
+      lifetimeMiles: 140,
+    }),
     challengeIds: ["c1"],
     posts: [
       {
@@ -66,13 +69,14 @@ export const athletes = {
       { label: "Running", emoji: "🏃" },
       { label: "Trail", emoji: "⛰️" },
     ],
-    stats: { totalWorkouts: 512, prs: 14 },
-    achievements: [
-      { id: "a1", title: "First 10K", emoji: "🥇", detail: "Completed first 10K race", earned: true },
-      { id: "a2", title: "30-Day Streak", emoji: "🔥", detail: "Trained 30 days in a row", earned: true },
-      { id: "a3", title: "PR Machine", emoji: "💪", detail: "5 PRs in one month", earned: true },
-      { id: "a4", title: "Challenge Champion", emoji: "🏆", detail: "Finished top 3 in a challenge", earned: false },
-    ],
+    stats: { totalWorkouts: 512 },
+    runningStats: { totalRuns: 210, longestRunKm: 42.5, totalPRsBroken: 14, prsBrokenThisYear: 5, lifetimeMiles: 1200 },
+    achievements: computeRunningAchievements({
+      totalRuns: 210,
+      longestRunKm: 42.5,
+      totalPRsBroken: 14,
+      lifetimeMiles: 1200,
+    }),
     challengeIds: ["c1", "c2"],
     posts: [
       {
@@ -123,13 +127,9 @@ export const athletes = {
       { label: "Strength", emoji: "🏋️" },
       { label: "Powerlifting", emoji: "🏆" },
     ],
-    stats: { totalWorkouts: 388, prs: 22 },
-    achievements: [
-      { id: "a1", title: "First 10K", emoji: "🥇", detail: "Completed first 10K race", earned: false },
-      { id: "a2", title: "30-Day Streak", emoji: "🔥", detail: "Trained 30 days in a row", earned: false },
-      { id: "a3", title: "PR Machine", emoji: "💪", detail: "5 PRs in one month", earned: true },
-      { id: "a4", title: "Challenge Champion", emoji: "🏆", detail: "Finished top 3 in a challenge", earned: true },
-    ],
+    stats: { totalWorkouts: 388 },
+    runningStats: { totalRuns: 0, longestRunKm: 0, totalPRsBroken: 0, prsBrokenThisYear: 0, lifetimeMiles: 0 },
+    achievements: computeRunningAchievements({ totalRuns: 0, longestRunKm: 0, totalPRsBroken: 0, lifetimeMiles: 0 }),
     challengeIds: ["c3"],
     posts: [
       {
@@ -177,13 +177,9 @@ export const athletes = {
       { label: "Cycling", emoji: "🚴" },
       { label: "Climbing", emoji: "⛰️" },
     ],
-    stats: { totalWorkouts: 296, prs: 11 },
-    achievements: [
-      { id: "a1", title: "First 10K", emoji: "🥇", detail: "Completed first 10K race", earned: false },
-      { id: "a2", title: "30-Day Streak", emoji: "🔥", detail: "Trained 30 days in a row", earned: false },
-      { id: "a3", title: "PR Machine", emoji: "💪", detail: "5 PRs in one month", earned: false },
-      { id: "a4", title: "Challenge Champion", emoji: "🏆", detail: "Finished top 3 in a challenge", earned: true },
-    ],
+    stats: { totalWorkouts: 296 },
+    runningStats: { totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, prsBrokenThisYear: 1, lifetimeMiles: 25 },
+    achievements: computeRunningAchievements({ totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, lifetimeMiles: 25 }),
     challengeIds: ["c4", "c1"],
     posts: [
       {
