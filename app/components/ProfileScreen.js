@@ -8,6 +8,7 @@ import { useChallenges } from "@/app/lib/ChallengesContext";
 import { useAuth } from "@/app/lib/AuthContext";
 import { supabase } from "@/app/lib/supabase";
 import { getInitials } from "@/app/lib/initials";
+import BadgeIcon from "@/app/components/BadgeIcon";
 import ReportIssueModal from "@/app/components/ReportIssueModal";
 
 function BackIcon() {
@@ -365,9 +366,7 @@ export default function ProfileScreen({ id }) {
                   a.earned ? "border-rival-red/40 bg-rival-red/5" : "border-border-subtle bg-surface opacity-50"
                 }`}
               >
-                <p className="text-2xl" aria-hidden>
-                  {a.emoji}
-                </p>
+                <BadgeIcon id={a.id} earned={a.earned} />
                 <p className="mt-2 text-sm font-bold text-white">{a.title}</p>
                 <p className="mt-1 text-[11px] text-zinc-500">{a.detail}</p>
                 {a.kind === "tiered" && (

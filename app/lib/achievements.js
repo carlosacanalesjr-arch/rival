@@ -19,19 +19,6 @@ export const DISTANCE_MILESTONES = [
   { id: "ultra", title: "Ultra Finisher", emoji: "🌋", thresholdKm: 50, detail: "Completed a run of 50K or more" },
 ];
 
-// Ordered ascending — adding a new tier later is just another entry in this array.
-export const PR_BREAKER_TIERS = [
-  { tier: 1, threshold: 1, label: "PR Breaker", emoji: "🥉" },
-  { tier: 2, threshold: 5, label: "PR Breaker II", emoji: "🥈" },
-  { tier: 3, threshold: 10, label: "PR Breaker III", emoji: "🥇" },
-];
-
-export const MILEAGE_TIERS = [
-  { tier: 1, threshold: 100, label: "Mileage Milestone", emoji: "🥉" },
-  { tier: 2, threshold: 500, label: "Mileage Milestone II", emoji: "🥈" },
-  { tier: 3, threshold: 1000, label: "Mileage Milestone III", emoji: "🥇" },
-];
-
 function computeDistanceBadges({ totalRuns = 0, longestRunKm = 0 } = {}) {
   return DISTANCE_MILESTONES.map((milestone) => ({
     ...milestone,
@@ -41,8 +28,8 @@ function computeDistanceBadges({ totalRuns = 0, longestRunKm = 0 } = {}) {
 }
 
 // Generic threshold walker: finds the highest tier reached and the next one to aim for.
-// Works for any ascending list of { tier, threshold }, so adding e.g. a 25/50 tier later
-// is just adding entries to PR_BREAKER_TIERS/MILEAGE_TIERS — no logic changes needed.
+// Works for any ascending list of { tier, threshold }, so adding a new tier later is just
+// adding another entry to the relevant tiers array — no logic changes needed.
 export function getTierProgress(count, tiers) {
   const sorted = [...tiers].sort((a, b) => a.threshold - b.threshold);
   let earnedTier = null;
@@ -85,39 +72,38 @@ function computeTieredBadge({ id, count, tiers, formatEarned, formatLocked }) {
   };
 }
 
-function computeCounterBadge({ id, count, tiers, unitSingular, unitPlural }) {
-  return computeTieredBadge({
-    id,
-    count,
-    tiers,
-    formatEarned: ({ count: c, tier }) =>
-      `${c.toLocaleString()} ${pluralize(c, unitSingular, unitPlural)} · Tier ${tier.tier} of ${tiers.length}`,
-    formatLocked: ({ tier }) => `${tier.threshold.toLocaleString()} ${pluralize(tier.threshold, unitSingular, unitPlural)} to unlock`,
-  });
+// PR Breaker and Mileage Milestone are plain stat cards, not badges — no tier/earned
+// semantics, just the current lifetime number (and, for PRs, the most recent one).
+function computeStatCards({ totalPRsBroken = 0, lifetimeMiles = 0, mostRecentPR = null } = {}) {
+  return [
+    {
+      id: "pr-breaker",
+      kind: "stat",
+      emoji: "💪",
+      earned: true,
+      title: `${totalPRsBroken.toLocaleString()} ${pluralize(totalPRsBroken, "PR", "PRs")} Broken`,
+      detail: mostRecentPR ? `Most recent: ${mostRecentPR.distance} — ${mostRecentPR.time}` : "No PRs broken yet",
+    },
+    {
+      id: "mileage-milestone",
+      kind: "stat",
+      emoji: "🛣️",
+      earned: true,
+      title: `${lifetimeMiles.toLocaleString()} Lifetime ${pluralize(lifetimeMiles, "Mile", "Miles")}`,
+      detail: "Total distance run to date",
+    },
+  ];
 }
 
 // Entry point: takes raw lifetime counters (the kind of numbers that will eventually come
 // from aggregating real Supabase workout rows) and returns the fully computed badge list.
 // None of the tier/earned state is stored directly — it's always derived from these counts.
 export function computeRunningAchievements(rawStats = {}) {
-  const { totalRuns = 0, longestRunKm = 0, totalPRsBroken = 0, lifetimeMiles = 0 } = rawStats;
+  const { totalRuns = 0, longestRunKm = 0, totalPRsBroken = 0, lifetimeMiles = 0, mostRecentPR = null } = rawStats;
 
   return [
     ...computeDistanceBadges({ totalRuns, longestRunKm }),
-    computeCounterBadge({
-      id: "pr-breaker",
-      count: totalPRsBroken,
-      tiers: PR_BREAKER_TIERS,
-      unitSingular: "PR broken",
-      unitPlural: "PRs broken",
-    }),
-    computeCounterBadge({
-      id: "mileage-milestone",
-      count: lifetimeMiles,
-      tiers: MILEAGE_TIERS,
-      unitSingular: "lifetime mile",
-      unitPlural: "lifetime miles",
-    }),
+    ...computeStatCards({ totalPRsBroken, lifetimeMiles, mostRecentPR }),
   ];
 }
 

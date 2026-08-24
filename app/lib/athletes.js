@@ -26,7 +26,13 @@ export const athletes = {
       lawEnforcementCycle: 0,
     },
     achievements: [
-      ...computeRunningAchievements({ totalRuns: 38, longestRunKm: 12, totalPRsBroken: 3, lifetimeMiles: 140 }),
+      ...computeRunningAchievements({
+        totalRuns: 38,
+        longestRunKm: 12,
+        totalPRsBroken: 3,
+        lifetimeMiles: 140,
+        mostRecentPR: { distance: "5K", time: "22:14" },
+      }),
       ...computeProgramAchievements({
         hyroxHighestLevel: 2,
         dekaLevels: { FIT: 1, MILE: 0, STRONG: 0, ATLAS: 0, DOUBLE: 0 },
@@ -96,7 +102,13 @@ export const athletes = {
       lawEnforcementCycle: 0,
     },
     achievements: [
-      ...computeRunningAchievements({ totalRuns: 210, longestRunKm: 42.5, totalPRsBroken: 14, lifetimeMiles: 1200 }),
+      ...computeRunningAchievements({
+        totalRuns: 210,
+        longestRunKm: 42.5,
+        totalPRsBroken: 14,
+        lifetimeMiles: 1200,
+        mostRecentPR: { distance: "Half Marathon", time: "1:28:10" },
+      }),
       ...computeProgramAchievements({
         hyroxHighestLevel: 3,
         dekaLevels: { FIT: 3, MILE: 2, STRONG: 0, ATLAS: 0, DOUBLE: 0 },
@@ -239,7 +251,13 @@ export const athletes = {
       lawEnforcementCycle: 2,
     },
     achievements: [
-      ...computeRunningAchievements({ totalRuns: 3, longestRunKm: 6, totalPRsBroken: 1, lifetimeMiles: 25 }),
+      ...computeRunningAchievements({
+        totalRuns: 3,
+        longestRunKm: 6,
+        totalPRsBroken: 1,
+        lifetimeMiles: 25,
+        mostRecentPR: { distance: "10K", time: "58:32" },
+      }),
       ...computeProgramAchievements({
         hyroxHighestLevel: 1,
         dekaLevels: { FIT: 0, MILE: 0, STRONG: 0, ATLAS: 2, DOUBLE: 0 },
