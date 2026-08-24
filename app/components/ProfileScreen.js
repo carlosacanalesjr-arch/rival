@@ -28,6 +28,18 @@ function FlagIcon() {
   );
 }
 
+function PencilIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const typeStyles = {
   Run: "bg-rival-red/15 text-rival-red",
   Strength: "bg-orange-500/15 text-orange-400",
@@ -217,7 +229,7 @@ export default function ProfileScreen({ id }) {
 
       <main className="mx-auto w-full max-w-md flex-1 pb-10">
         <div className="border-b border-border-subtle bg-surface px-4 pb-5 pt-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-2xl font-extrabold text-white">
               {profileLoading ? "" : displayInitials}
             </span>
@@ -231,6 +243,24 @@ export default function ProfileScreen({ id }) {
                 {profileLoading ? "" : displayHomeGym}
               </p>
             </div>
+            {isSelf && (
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  onClick={() => router.push("/settings")}
+                  aria-label="Edit profile"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-zinc-300 transition hover:bg-surface-raised hover:text-white"
+                >
+                  <PencilIcon />
+                </button>
+                <button
+                  onClick={() => setShowReportIssue(true)}
+                  aria-label="Report an issue"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-zinc-400 transition hover:bg-surface-raised hover:text-white"
+                >
+                  <FlagIcon />
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="mt-5 grid grid-cols-3 divide-x divide-border-subtle rounded-xl border border-border-subtle">
@@ -284,26 +314,16 @@ export default function ProfileScreen({ id }) {
             </div>
           </div>
 
-          <button
-            onClick={() => (isSelf ? router.push("/settings") : setFollowing((v) => !v))}
-            className={`mt-4 flex min-h-11 w-full items-center justify-center rounded-full text-sm font-extrabold tracking-wide transition ${
-              isSelf
-                ? "border border-border-subtle text-white hover:bg-surface-raised"
-                : following
-                ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
-                : "bg-rival-red text-white hover:bg-red-600"
-            }`}
-          >
-            {isSelf ? "EDIT PROFILE" : following ? "FOLLOWING" : "FOLLOW"}
-          </button>
-
-          {isSelf && (
+          {!isSelf && (
             <button
-              onClick={() => setShowReportIssue(true)}
-              className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border-subtle text-xs font-bold text-zinc-400 transition hover:bg-surface-raised hover:text-white"
+              onClick={() => setFollowing((v) => !v)}
+              className={`mt-4 flex min-h-11 w-full items-center justify-center rounded-full text-sm font-extrabold tracking-wide transition ${
+                following
+                  ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
+                  : "bg-rival-red text-white hover:bg-red-600"
+              }`}
             >
-              <FlagIcon />
-              Report an issue
+              {following ? "FOLLOWING" : "FOLLOW"}
             </button>
           )}
         </div>

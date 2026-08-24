@@ -82,7 +82,7 @@ function computeStatCards({ totalPRsBroken = 0, lifetimeMiles = 0, mostRecentPR 
       emoji: "💪",
       earned: true,
       title: `${totalPRsBroken.toLocaleString()} ${pluralize(totalPRsBroken, "PR", "PRs")} Broken`,
-      detail: mostRecentPR ? `Most recent: ${mostRecentPR.distance} — ${mostRecentPR.time}` : "No PRs broken yet",
+      detail: mostRecentPR ? `Most recent: ${mostRecentPR.distance}: ${mostRecentPR.time}` : "No PRs broken yet",
     },
     {
       id: "mileage-milestone",
@@ -112,9 +112,12 @@ export function computeRunningAchievements(rawStats = {}) {
 // counter, but it plugs into the exact same getTierProgress/computeTieredBadge machinery —
 // the rank just stands in for "count" against threshold 1/2/3.
 
-// Pattern A: a single badge that's always visible, locked at rank 0 (HYROX, Olympic
-// Weightlifting, CrossFit, Fire Dept Prep, Law Enforcement Prep).
-function computeCompletionBadge(id, level, tiers, { verb = "Completed", verbLocked = "Complete" } = {}) {
+// Pattern A: a single badge that only appears once the athlete has joined the program at
+// all. Once joined it's always visible — greyed out until the first tier lands, colored
+// once it has — but an athlete who's never joined sees no card, not a locked one (HYROX,
+// Olympic Weightlifting, CrossFit, Fire Dept Prep, Law Enforcement Prep).
+function computeCompletionBadge(id, joined, level, tiers, { verb = "Completed", verbLocked = "Complete" } = {}) {
+  if (!joined) return null;
   return computeTieredBadge({
     id,
     count: level,
@@ -132,7 +135,7 @@ function computeStartedTypeBadges(types, levels, buildTiers, idPrefix, { verb = 
   return types
     .filter((type) => (levels[type] || 0) > 0)
     .map((type) =>
-      computeCompletionBadge(`${idPrefix}-${type.toLowerCase().replace(/\s+/g, "-")}`, levels[type], buildTiers(type), {
+      computeCompletionBadge(`${idPrefix}-${type.toLowerCase().replace(/\s+/g, "-")}`, true, levels[type], buildTiers(type), {
         verb,
         verbLocked,
       })
@@ -161,24 +164,24 @@ export const CROSSFIT_TIERS = [
 // Law Enforcement Prep is ONE badge regardless of agency focus (Police/DPS Trooper/Border
 // Patrol) — the underlying rank is just cycle progress, with no per-agency state at all.
 export const FIRE_DEPT_PREP_TIERS = [
-  { tier: 1, threshold: 1, label: "Fire Dept Prep — Foundation", emoji: "🥉" },
-  { tier: 2, threshold: 2, label: "Fire Dept Prep — Build", emoji: "🥈" },
-  { tier: 3, threshold: 3, label: "Fire Dept Prep — Peak", emoji: "🥇" },
+  { tier: 1, threshold: 1, label: "Fire Dept Prep: Foundation", emoji: "🥉" },
+  { tier: 2, threshold: 2, label: "Fire Dept Prep: Build", emoji: "🥈" },
+  { tier: 3, threshold: 3, label: "Fire Dept Prep: Peak", emoji: "🥇" },
 ];
 
 export const LAW_ENFORCEMENT_PREP_TIERS = [
-  { tier: 1, threshold: 1, label: "Law Enforcement Prep — Foundation", emoji: "🥉" },
-  { tier: 2, threshold: 2, label: "Law Enforcement Prep — Build", emoji: "🥈" },
-  { tier: 3, threshold: 3, label: "Law Enforcement Prep — Peak", emoji: "🥇" },
+  { tier: 1, threshold: 1, label: "Law Enforcement Prep: Foundation", emoji: "🥉" },
+  { tier: 2, threshold: 2, label: "Law Enforcement Prep: Build", emoji: "🥈" },
+  { tier: 3, threshold: 3, label: "Law Enforcement Prep: Peak", emoji: "🥇" },
 ];
 
 export const DEKA_TYPES = ["FIT", "MILE", "STRONG", "ATLAS", "DOUBLE"];
 
 function buildDekaTiers(type) {
   return [
-    { tier: 1, threshold: 1, label: `DEKA ${type} — Level 1`, emoji: "🥉" },
-    { tier: 2, threshold: 2, label: `DEKA ${type} — Level 2`, emoji: "🥈" },
-    { tier: 3, threshold: 3, label: `DEKA ${type} — Level 3`, emoji: "🥇" },
+    { tier: 1, threshold: 1, label: `DEKA ${type}: Level 1`, emoji: "🥉" },
+    { tier: 2, threshold: 2, label: `DEKA ${type}: Level 2`, emoji: "🥈" },
+    { tier: 3, threshold: 3, label: `DEKA ${type}: Level 3`, emoji: "🥇" },
   ];
 }
 
@@ -186,9 +189,9 @@ export const STRENGTH_TYPES = ["General", "Bodybuilding", "Glute Focus"];
 
 function buildStrengthTiers(type) {
   return [
-    { tier: 1, threshold: 1, label: `S&C ${type} — Level 1`, emoji: "🥉" },
-    { tier: 2, threshold: 2, label: `S&C ${type} — Level 2`, emoji: "🥈" },
-    { tier: 3, threshold: 3, label: `S&C ${type} — Level 3`, emoji: "🥇" },
+    { tier: 1, threshold: 1, label: `S&C ${type}: Level 1`, emoji: "🥉" },
+    { tier: 2, threshold: 2, label: `S&C ${type}: Level 2`, emoji: "🥈" },
+    { tier: 3, threshold: 3, label: `S&C ${type}: Level 3`, emoji: "🥇" },
   ];
 }
 
@@ -196,22 +199,27 @@ function buildStrengthTiers(type) {
 // their own program categories, not running. Both feed the same flat Achievements list.
 export function computeProgramAchievements(rawStats = {}) {
   const {
+    hyroxJoined = false,
     hyroxHighestLevel = 0,
     dekaLevels = {},
     strengthLevels = {},
+    olyJoined = false,
     olyHighestLevel = 0,
+    crossfitJoined = false,
     crossfitHighestLevel = 0,
+    fireDeptJoined = false,
     fireDeptCycle = 0,
+    lawEnforcementJoined = false,
     lawEnforcementCycle = 0,
   } = rawStats;
 
   return [
-    computeCompletionBadge("hyrox-completion", hyroxHighestLevel, HYROX_TIERS),
+    computeCompletionBadge("hyrox-completion", hyroxJoined, hyroxHighestLevel, HYROX_TIERS),
     ...computeStartedTypeBadges(DEKA_TYPES, dekaLevels, buildDekaTiers, "deka"),
     ...computeStartedTypeBadges(STRENGTH_TYPES, strengthLevels, buildStrengthTiers, "strength"),
-    computeCompletionBadge("oly-weightlifting-completion", olyHighestLevel, OLY_WEIGHTLIFTING_TIERS),
-    computeCompletionBadge("crossfit-completion", crossfitHighestLevel, CROSSFIT_TIERS),
-    computeCompletionBadge("fire-dept-prep", fireDeptCycle, FIRE_DEPT_PREP_TIERS),
-    computeCompletionBadge("law-enforcement-prep", lawEnforcementCycle, LAW_ENFORCEMENT_PREP_TIERS),
-  ];
+    computeCompletionBadge("oly-weightlifting-completion", olyJoined, olyHighestLevel, OLY_WEIGHTLIFTING_TIERS),
+    computeCompletionBadge("crossfit-completion", crossfitJoined, crossfitHighestLevel, CROSSFIT_TIERS),
+    computeCompletionBadge("fire-dept-prep", fireDeptJoined, fireDeptCycle, FIRE_DEPT_PREP_TIERS),
+    computeCompletionBadge("law-enforcement-prep", lawEnforcementJoined, lawEnforcementCycle, LAW_ENFORCEMENT_PREP_TIERS),
+  ].filter(Boolean);
 }
