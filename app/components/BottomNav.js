@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const items = [
@@ -39,19 +38,16 @@ const items = [
   {
     key: "profile",
     label: "Profile",
+    href: "/profile/you",
     icon: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0" strokeLinecap="round" strokeLinejoin="round" />,
   },
 ];
 
 export default function BottomNav() {
-  const [active, setActive] = useState("home");
   const router = useRouter();
   const pathname = usePathname();
 
-  const isItemActive = (item) => {
-    if (!item.href) return active === item.key;
-    return item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-  };
+  const isItemActive = (item) => (item.href === "/" ? pathname === "/" : pathname.startsWith(item.href));
 
   return (
     // fixed, not sticky: sticky only "sticks" within the extra height of its own containing
@@ -65,7 +61,7 @@ export default function BottomNav() {
         return (
           <button
             key={item.key}
-            onClick={() => (item.href ? router.push(item.href) : setActive(item.key))}
+            onClick={() => router.push(item.href)}
             className="flex flex-col items-center gap-1 px-3 py-1"
           >
             <svg
