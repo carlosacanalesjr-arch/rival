@@ -122,7 +122,7 @@ function computeCompletionBadge(id, joined, level, tiers, { verb = "Completed", 
     id,
     count: level,
     tiers,
-    formatEarned: ({ tier, tierCount }) => `${verb} ${tier.label} · Tier ${tier.tier} of ${tierCount}`,
+    formatEarned: ({ tier }) => `${verb} ${tier.label}`,
     formatLocked: ({ tier }) => `${verbLocked} ${tier.label} to unlock`,
   });
 }
