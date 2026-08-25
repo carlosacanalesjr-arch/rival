@@ -14,8 +14,18 @@ export default function AdminProgramList() {
 
   return (
     <div>
-      <h1 className="text-xl font-extrabold text-white">Programs</h1>
-      <p className="mt-1 text-sm text-zinc-500">Pick a program to edit its exercises.</p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-extrabold text-white">Programs</h1>
+          <p className="mt-1 text-sm text-zinc-500">Pick a program to edit its exercises.</p>
+        </div>
+        <Link
+          href="/admin/import"
+          className="shrink-0 rounded-full bg-rival-red px-3.5 py-2 text-xs font-bold text-white hover:bg-red-600"
+        >
+          Import Spreadsheet
+        </Link>
+      </div>
       <div className="mt-4 space-y-6">
         {Object.entries(byCategory).map(([category, list]) => (
           <div key={category}>

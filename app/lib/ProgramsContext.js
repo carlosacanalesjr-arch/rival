@@ -101,6 +101,19 @@ export function ProgramsProvider({ children }) {
     );
   };
 
+  // Adds a brand-new program (e.g. from a spreadsheet import) wholesale — the caller is
+  // responsible for the full shape (see app/lib/programsData.js), same as the seed data.
+  const createProgram = (program) => {
+    setPrograms((prev) => [...prev, program]);
+  };
+
+  // Overwrites an existing program's weeks/duration/sessionsPerWeek in place — used when a
+  // trainer re-uploads a revised spreadsheet for a program that already exists. Everything
+  // else about the program (title, category, coach, enrollment state) is untouched.
+  const overwriteProgramWeeks = (id, { weeks, duration, sessionsPerWeek }) => {
+    setPrograms((prev) => prev.map((p) => (p.id === id ? { ...p, weeks, duration, sessionsPerWeek } : p)));
+  };
+
   return (
     <ProgramsContext.Provider
       value={{
@@ -111,6 +124,8 @@ export function ProgramsProvider({ children }) {
         levelUpProgram,
         continueProgram,
         toggleDayComplete,
+        createProgram,
+        overwriteProgramWeeks,
       }}
     >
       {children}
