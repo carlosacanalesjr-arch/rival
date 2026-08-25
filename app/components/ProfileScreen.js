@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getAthlete } from "@/app/lib/athletes";
 import { useChallenges } from "@/app/lib/ChallengesContext";
+import { computeCompletionBadges } from "@/app/lib/challengeBadges";
+import { computeStreakBadges } from "@/app/lib/streaks";
 import { useAuth } from "@/app/lib/AuthContext";
 import { supabase } from "@/app/lib/supabase";
 import { getInitials } from "@/app/lib/initials";
@@ -218,6 +220,16 @@ export default function ProfileScreen({ id }) {
     })
     .filter(Boolean);
 
+  // Placement (1st/2nd/3rd) badges are deliberately not wired in here — deferred along with
+  // community/competitive leaderboard challenges; see computePlacementBadges in
+  // challengeBadges.js, which is kept but unused for now. Only completion + streak badges
+  // are active for this individual-only pass.
+  const challengeBadges = [
+    ...computeCompletionBadges({ challenges, completedChallengeIds: athlete.completedChallengeIds }),
+    ...computeStreakBadges(athlete.streaks),
+  ];
+  const allAchievements = [...athlete.achievements, ...challengeBadges];
+
   return (
     <div className="flex min-h-screen flex-col bg-black">
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
@@ -379,14 +391,14 @@ export default function ProfileScreen({ id }) {
 
         {activeTab === "Achievements" && (
           <div className="grid grid-cols-2 gap-3 p-4">
-            {athlete.achievements.map((a) => (
+            {allAchievements.map((a) => (
               <div
                 key={a.id}
                 className={`rounded-xl border p-4 text-center ${
                   a.earned ? "border-rival-red/40 bg-rival-red/5" : "border-border-subtle bg-surface opacity-50"
                 }`}
               >
-                <BadgeIcon id={a.id} earned={a.earned} />
+                <BadgeIcon id={a.iconId ?? a.id} earned={a.earned} />
                 <p className="mt-2 text-sm font-bold text-white">{a.title}</p>
                 <p className="mt-1 text-[11px] text-zinc-500">{a.detail}</p>
                 {a.kind === "tiered" && (

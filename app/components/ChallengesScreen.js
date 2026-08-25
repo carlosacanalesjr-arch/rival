@@ -6,6 +6,7 @@ import TopBar from "@/app/components/TopBar";
 import BottomNav from "@/app/components/BottomNav";
 import { useChallenges } from "@/app/lib/ChallengesContext";
 import { CHALLENGE_CATEGORIES } from "@/app/lib/mockData";
+import { formatCompactDistance } from "@/app/lib/formatDistance";
 
 function ChevronIcon({ open }) {
   return (
@@ -60,6 +61,17 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
           />
         </div>
         <p className="mt-1 text-[11px] text-zinc-500">{challenge.progress}% complete</p>
+        {challenge.components && (
+          <p className="mt-1 truncate text-[11px] text-zinc-500">
+            {challenge.components
+              .map((c) =>
+                c.goal != null
+                  ? `${c.label} ${formatCompactDistance(c.current)}/${formatCompactDistance(c.goal)}`
+                  : `${c.label} ${formatCompactDistance(c.current)}`
+              )
+              .join(" · ")}
+          </p>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-between">

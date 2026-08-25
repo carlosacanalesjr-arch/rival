@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useChallenges } from "@/app/lib/ChallengesContext";
 import { analyzePhoto, valuesMatch } from "@/app/lib/photoVerification";
+import { formatCompactDistance } from "@/app/lib/formatDistance";
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
@@ -312,6 +313,34 @@ export default function ChallengeDetail({ id }) {
               anything that doesn&apos;t match (or can&apos;t be read) is flagged for manual review instead of rejected.
             </p>
           </div>
+
+          {challenge.components && (
+            <div className="mt-4 rounded-xl border border-border-subtle bg-black p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">By Discipline</p>
+              <div className="mt-2 space-y-2.5">
+                {challenge.components.map((c) => (
+                  <div key={c.label}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300">{c.label}</span>
+                      <span className="font-semibold text-white">
+                        {formatCompactDistance(c.current)}
+                        {c.goal != null && <span className="text-zinc-500">/{formatCompactDistance(c.goal)}</span>}
+                        <span className="ml-1 text-[10px] font-normal text-zinc-500">{c.unit}</span>
+                      </span>
+                    </div>
+                    {c.goal != null && (
+                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
+                          style={{ width: `${Math.min(100, Math.round((c.current / c.goal) * 100))}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {challenge.joined && (
             <div className="mt-4">

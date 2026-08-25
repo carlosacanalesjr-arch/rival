@@ -53,7 +53,15 @@ export const athletes = {
         lawEnforcementCycle: 0,
       }),
     ],
-    challengeIds: ["c1"],
+    // Every id here is a challenge where "You" is joined with progress 100 in mockData.js —
+    // i.e. already hit the goal through the existing photo-proof submit flow — one from each
+    // of the four consolidated distance sports plus HYROX's single-discipline 8K.
+    challengeIds: ["wk-hyrox-8k", "wk-run-5", "wk-row-5", "wk-skierg-5", "wk-bike-10", "mo-bike-50"],
+    completedChallengeIds: ["wk-hyrox-8k", "wk-run-5", "wk-row-5", "wk-skierg-5", "wk-bike-10", "mo-bike-50"],
+    // Current consecutive-week streak per sport — see streaks.js. Spans all three tiers
+    // (Running: past tier 1, Biking: past tier 2, SkiErg: past tier 3) plus one still building
+    // toward its first tier (Rowing) for a good demo spread.
+    streaks: { Running: 5, Biking: 9, Rowing: 2, SkiErg: 13 },
     posts: [
       {
         id: "you-1",
@@ -139,7 +147,13 @@ export const athletes = {
         lawEnforcementCycle: 0,
       }),
     ],
-    challengeIds: ["c1", "c2"],
+    // Maya's cleared both Run 10 and Monthly 20 (completion badges); mo-row-50 she's active on
+    // but hasn't hit the 50km goal yet (her score is 42km) — no completion badge for that one.
+    challengeIds: ["wk-run-10", "mo-run-20", "mo-row-50"],
+    completedChallengeIds: ["wk-run-10", "mo-run-20"],
+    // Strong, long-running Running streak (past the 12-week top tier); a modest Rowing
+    // streak just past its first tier; no Biking/SkiErg engagement.
+    streaks: { Running: 12, Biking: 0, Rowing: 4, SkiErg: 0 },
     posts: [
       {
         id: "maya-1",
@@ -222,7 +236,13 @@ export const athletes = {
         lawEnforcementCycle: 3,
       }),
     ],
-    challengeIds: ["c3"],
+    // wk-hyrox-8k: Deshawn clears the 8,000m goal (9,400m) — completion badge earned.
+    challengeIds: ["c3", "wk-hyrox-8k"],
+    completedChallengeIds: ["wk-hyrox-8k"],
+    // Deshawn is the broken/reset-streak demo: he was on a 6-week Running streak but missed
+    // a week, so it's back to 0 across the board — a strength/HYROX athlete, not big on the
+    // distance sports' weekly cadence.
+    streaks: { Running: 0, Biking: 0, Rowing: 0, SkiErg: 0 },
     posts: [
       {
         id: "deshawn-1",
@@ -308,7 +328,13 @@ export const athletes = {
         lawEnforcementCycle: 2,
       }),
     ],
-    challengeIds: ["c4", "c1"],
+    // Priya's cleared Bike 10K and Bike 50K Monthly (completion badges); she's active on
+    // Bike 25K and Bike 100K but hasn't hit those goals yet (21km of 25km, 82km of 100km).
+    challengeIds: ["wk-bike-10", "wk-bike-25", "mo-bike-50", "mo-bike-100"],
+    completedChallengeIds: ["wk-bike-10", "mo-bike-50"],
+    // Solid Biking streak past its 8-week tier; a SkiErg streak just getting started (below
+    // the first tier); no Running/Rowing engagement.
+    streaks: { Running: 0, Biking: 8, Rowing: 0, SkiErg: 3 },
     posts: [
       {
         id: "priya-1",

@@ -50,7 +50,7 @@ function pluralize(count, singular, plural = `${singular}s`) {
 // for PR Breaker/Mileage, or a highest-level-completed rank for HYROX/DEKA. The tier
 // math (getTierProgress) doesn't care which; only the detail copy differs per family,
 // which callers control via formatEarned/formatLocked.
-function computeTieredBadge({ id, count, tiers, formatEarned, formatLocked }) {
+export function computeTieredBadge({ id, count, tiers, formatEarned, formatLocked }) {
   const sorted = [...tiers].sort((a, b) => a.threshold - b.threshold);
   const { earnedTier, nextTier, earned } = getTierProgress(count, sorted);
   const display = earnedTier || sorted[0];
