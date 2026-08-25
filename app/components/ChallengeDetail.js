@@ -3,11 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useChallenges } from "@/app/lib/ChallengesContext";
+import { analyzePhoto, valuesMatch } from "@/app/lib/photoVerification";
+
+const MAX_BYTES = 4 * 1024 * 1024;
 
 function BackIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="14" r="3.5" />
     </svg>
   );
 }
@@ -21,14 +37,91 @@ function InfoTile({ label, value }) {
   );
 }
 
-function SubmitResultModal({ challenge, onClose, onSubmit }) {
-  const [value, setValue] = useState("");
+function StatusPill({ verification }) {
+  if (verification === "confirmed") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+        ✓ Confirmed
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+      ⚠ Needs Review
+    </span>
+  );
+}
 
-  const handleSubmit = (e) => {
+// Full-screen tap-to-view for a submission's attached proof photo.
+function PhotoLightbox({ photoUrl, onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
+    >
+      <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 text-white">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
+        </svg>
+      </button>
+      {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URL, not a static asset */}
+      <img src={photoUrl} alt="Submission proof" className="max-h-full max-w-full rounded-lg object-contain" />
+    </div>
+  );
+}
+
+function SubmitResultModal({ challenge, onClose, onSubmit }) {
+  const [step, setStep] = useState("form"); // "form" | "analyzing" | "result"
+  const [value, setValue] = useState("");
+  const [photoUrl, setPhotoUrl] = useState(null);
+  const [photoError, setPhotoError] = useState(null);
+  const [analysis, setAnalysis] = useState(null); // { detectedValue, verification }
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Choose an image file.");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setPhotoError("Image is too large (max 4MB).");
+      return;
+    }
+    setPhotoError(null);
+    const reader = new FileReader();
+    reader.onload = () => setPhotoUrl(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const canSubmit = value.trim().length > 0 && !Number.isNaN(parseFloat(value)) && Boolean(photoUrl);
+
+  const runAnalysis = async (e) => {
     e.preventDefault();
-    const num = parseFloat(value);
-    if (Number.isNaN(num)) return;
-    onSubmit(num);
+    if (!canSubmit) return;
+    setStep("analyzing");
+    // TODO(real API): analyzePhoto is a mock — see app/lib/photoVerification.js for what a
+    // real vision/OCR integration needs to replace here.
+    const { detectedValue } = await analyzePhoto(photoUrl);
+    const entered = parseFloat(value);
+    const verification = valuesMatch(entered, detectedValue) ? "confirmed" : "needs_review";
+    setAnalysis({ detectedValue, verification });
+    setStep("result");
+  };
+
+  const finalize = () => {
+    const entered = parseFloat(value);
+    onSubmit(entered, { photoUrl, verification: analysis.verification, detectedValue: analysis.detectedValue });
+  };
+
+  const tryAgain = () => {
+    setPhotoUrl(null);
+    setAnalysis(null);
+    setStep("form");
   };
 
   return (
@@ -44,27 +137,107 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
         </div>
         <p className="mt-1 text-xs text-zinc-500">{challenge.title}</p>
 
-        <form onSubmit={handleSubmit} className="mt-4">
-          <label className="text-xs font-medium text-zinc-400" htmlFor="result-value">
-            Your result ({challenge.unit})
-          </label>
-          <input
-            id="result-value"
-            autoFocus
-            inputMode="decimal"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder={`e.g. 12.4`}
-            className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
-          />
-          <button
-            type="submit"
-            disabled={!value.trim()}
-            className="mt-4 w-full rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white disabled:opacity-40"
-          >
-            SUBMIT
-          </button>
-        </form>
+        {step === "form" && (
+          <form onSubmit={runAnalysis} className="mt-4 space-y-4">
+            <div>
+              <label className="text-xs font-medium text-zinc-400" htmlFor="result-value">
+                Your result ({challenge.unit})
+              </label>
+              <input
+                id="result-value"
+                autoFocus
+                inputMode="decimal"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="e.g. 12.4"
+                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-zinc-400">
+                Proof photo <span className="text-zinc-600">(required)</span>
+              </p>
+              <p className="mt-0.5 text-[11px] text-zinc-500">
+                A screenshot of your run app or watch showing your distance and time.
+              </p>
+              <input type="file" accept="image/*" id="proof-photo" className="hidden" onChange={handleFile} />
+              {photoUrl ? (
+                <label
+                  htmlFor="proof-photo"
+                  className="mt-2 block cursor-pointer overflow-hidden rounded-xl border border-border-subtle"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URL, not a static asset */}
+                  <img src={photoUrl} alt="Proof preview" className="h-40 w-full object-cover" />
+                </label>
+              ) : (
+                <label
+                  htmlFor="proof-photo"
+                  className="mt-2 flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-zinc-700 bg-black text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
+                >
+                  <CameraIcon />
+                  <span className="text-[11px] font-semibold uppercase tracking-wide">Add photo</span>
+                </label>
+              )}
+              {photoError && <p className="mt-1 text-xs text-rival-red">{photoError}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="w-full rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white disabled:opacity-40"
+            >
+              SUBMIT
+            </button>
+          </form>
+        )}
+
+        {step === "analyzing" && (
+          <div className="mt-8 flex flex-col items-center gap-3 pb-4 text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-rival-red" />
+            <p className="text-sm text-zinc-400">Analyzing your photo…</p>
+          </div>
+        )}
+
+        {step === "result" && analysis && (
+          <div className="mt-4">
+            {analysis.verification === "confirmed" ? (
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
+                <p className="text-sm font-bold text-emerald-400">✓ Confirmed</p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Your photo shows about {analysis.detectedValue} {challenge.unit}, matching your entry of {value}{" "}
+                  {challenge.unit}.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+                <p className="text-sm font-bold text-amber-400">⚠ Needs Review</p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  {analysis.detectedValue == null
+                    ? "We couldn't read a distance from this photo. It'll be flagged for manual review."
+                    : `We couldn't confirm this matches your photo. You entered ${value} ${challenge.unit}, but the photo appears to show about ${analysis.detectedValue} ${challenge.unit}.`}
+                </p>
+              </div>
+            )}
+
+            <div className="mt-4 flex gap-2">
+              {analysis.verification !== "confirmed" && (
+                <button
+                  onClick={tryAgain}
+                  className="flex-1 rounded-full border border-border-subtle py-3 text-sm font-bold text-white hover:bg-surface-raised"
+                >
+                  Try Again
+                </button>
+              )}
+              <button
+                onClick={finalize}
+                className="flex-1 rounded-full bg-rival-red py-3 text-sm font-extrabold tracking-wide text-white hover:bg-red-600"
+              >
+                {analysis.verification === "confirmed" ? "Done" : "Submit for Review"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -75,6 +248,7 @@ export default function ChallengeDetail({ id }) {
   const { challenges, toggleJoin, submitResult } = useChallenges();
   const [showModal, setShowModal] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState(null);
 
   const challenge = challenges.find((c) => c.id === id);
 
@@ -92,8 +266,8 @@ export default function ChallengeDetail({ id }) {
     );
   }
 
-  const handleSubmitResult = (value) => {
-    submitResult(challenge.id, value);
+  const handleSubmitResult = (value, proof) => {
+    submitResult(challenge.id, value, proof);
     setShowModal(false);
     setConfirmed(true);
     setTimeout(() => setConfirmed(false), 2500);
@@ -116,16 +290,27 @@ export default function ChallengeDetail({ id }) {
         <div className="relative overflow-hidden border-b border-border-subtle bg-surface px-4 pb-5 pt-5">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rival-red to-orange-500" aria-hidden />
           <span className="inline-block rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
-            {challenge.sport}
+            {challenge.category}
           </span>
           <h2 className="mt-3 text-2xl font-extrabold text-white">{challenge.title}</h2>
+          <p className="mt-1 text-sm font-semibold text-zinc-300">Goal: {challenge.goal}</p>
           <p className="mt-2 text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
+            <InfoTile label="Duration" value={challenge.duration} />
+            <InfoTile label="Prize" value={challenge.prize} />
             <InfoTile label="Start Date" value={challenge.startDate} />
             <InfoTile label="End Date" value={challenge.endDate} />
-            <InfoTile label="Prize" value={challenge.prize} />
             <InfoTile label="Participants" value={challenge.participants.toLocaleString()} />
+          </div>
+
+          <div className="mt-4 rounded-xl border border-border-subtle bg-black p-3">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">Requirements</p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+              Submit a photo of your run app or watch showing your result — no submission is accepted without one.
+              We automatically check the photo against what you enter: matches are confirmed right away, and
+              anything that doesn&apos;t match (or can&apos;t be read) is flagged for manual review instead of rejected.
+            </p>
           </div>
 
           {challenge.joined && (
@@ -177,10 +362,24 @@ export default function ChallengeDetail({ id }) {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-white">
                   {entry.initials}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
-                  {entry.name}
-                  {entry.isSelf && (
-                    <span className="ml-1.5 text-[10px] font-bold text-rival-red">YOU</span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-1.5 truncate text-sm font-medium text-white">
+                    {entry.name}
+                    {entry.isSelf && <span className="text-[10px] font-bold text-rival-red">YOU</span>}
+                  </span>
+                  {entry.proof && (
+                    <span className="mt-1 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setLightboxUrl(entry.proof.photoUrl)}
+                        className="overflow-hidden rounded-md border border-border-subtle"
+                        aria-label="View proof photo"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- runtime data URL, not a static asset */}
+                        <img src={entry.proof.photoUrl} alt="" className="h-8 w-8 object-cover" />
+                      </button>
+                      <StatusPill verification={entry.proof.verification} />
+                    </span>
                   )}
                 </span>
                 <span className="shrink-0 text-right text-sm font-bold text-white">
@@ -229,6 +428,8 @@ export default function ChallengeDetail({ id }) {
           onSubmit={handleSubmitResult}
         />
       )}
+
+      {lightboxUrl && <PhotoLightbox photoUrl={lightboxUrl} onClose={() => setLightboxUrl(null)} />}
     </div>
   );
 }

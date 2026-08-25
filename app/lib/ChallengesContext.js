@@ -23,11 +23,11 @@ function withSelfRemoved(list) {
   return recalcRanks(list.filter((e) => !e.isSelf));
 }
 
-function withSelfScore(list, score) {
+function withSelfScore(list, score, proof) {
   const exists = list.some((e) => e.isSelf);
   const next = exists
-    ? list.map((e) => (e.isSelf ? { ...e, score } : e))
-    : [...list, { id: "self", name: "You", initials: "YO", score, isSelf: true }];
+    ? list.map((e) => (e.isSelf ? { ...e, score, proof } : e))
+    : [...list, { id: "self", name: "You", initials: "YO", score, isSelf: true, proof }];
   return recalcRanks(next);
 }
 
@@ -51,9 +51,11 @@ export function ChallengesProvider({ children }) {
     );
   };
 
-  const submitResult = (id, score) => {
+  // `proof` is { photoUrl, verification: "confirmed" | "needs_review", detectedValue } —
+  // the photo attached to this submission and what the (mock) image analysis made of it.
+  const submitResult = (id, score, proof) => {
     setChallenges((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, leaderboard: withSelfScore(c.leaderboard, score) } : c))
+      prev.map((c) => (c.id === id ? { ...c, leaderboard: withSelfScore(c.leaderboard, score, proof) } : c))
     );
   };
 

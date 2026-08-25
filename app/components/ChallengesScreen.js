@@ -1,12 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "@/app/components/TopBar";
 import BottomNav from "@/app/components/BottomNav";
 import { useChallenges } from "@/app/lib/ChallengesContext";
+import { CHALLENGE_CATEGORIES } from "@/app/lib/mockData";
+
+function ChevronIcon({ open }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+    >
+      <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 // Full-width version of the card ChallengeCards.js shows in a horizontal scroller on the
-// home feed — same fields, same Join toggle, just laid out for a vertical list here.
+// home feed — same fields, same Join toggle, just laid out for a vertical list here, now
+// nested inside a category's expanded accordion panel instead of one long flat list.
 function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
   return (
     <div
@@ -26,10 +45,10 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold text-white">{challenge.title}</p>
-          <p className="mt-0.5 text-xs text-zinc-400">{challenge.sub}</p>
+          <p className="mt-0.5 text-xs text-zinc-400">{challenge.goal}</p>
         </div>
         <span className="shrink-0 rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
-          {challenge.sport}
+          {challenge.duration}
         </span>
       </div>
 
@@ -67,6 +86,21 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
 export default function ChallengesScreen() {
   const router = useRouter();
   const { challenges, toggleJoin } = useChallenges();
+  const [expanded, setExpanded] = useState(() => new Set());
+
+  const toggleCategory = (category) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return next;
+    });
+  };
+
+  const groups = CHALLENGE_CATEGORIES.map((category) => ({
+    category,
+    items: challenges.filter((c) => c.category === category),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-black">
@@ -79,14 +113,36 @@ export default function ChallengesScreen() {
         </div>
 
         <div className="mt-4 space-y-3 p-4">
-          {challenges.map((challenge) => (
-            <ChallengeRow
-              key={challenge.id}
-              challenge={challenge}
-              onOpen={(id) => router.push(`/challenges/${id}`)}
-              onToggleJoin={toggleJoin}
-            />
-          ))}
+          {groups.map(({ category, items }) => {
+            const isOpen = expanded.has(category);
+            return (
+              <div key={category} className="overflow-hidden rounded-2xl border border-border-subtle bg-surface">
+                <button
+                  onClick={() => toggleCategory(category)}
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between px-4 py-3.5 text-left"
+                >
+                  <span className="text-sm font-bold text-white">{category}</span>
+                  <span className="flex items-center gap-2 text-zinc-400">
+                    <span className="text-xs text-zinc-500">{items.length}</span>
+                    <ChevronIcon open={isOpen} />
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="space-y-3 border-t border-border-subtle p-3">
+                    {items.map((challenge) => (
+                      <ChallengeRow
+                        key={challenge.id}
+                        challenge={challenge}
+                        onOpen={(id) => router.push(`/challenges/${id}`)}
+                        onToggleJoin={toggleJoin}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </main>
 
