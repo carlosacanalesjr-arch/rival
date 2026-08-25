@@ -1,34 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/lib/AuthContext";
 
 export default function AdminLayout({ children }) {
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const isTrainer = Boolean(user?.isTrainer);
 
-  // useAuth's getServerSnapshot is always null (auth is client-only, localStorage-backed),
-  // so a fresh full page load briefly renders with user=null before React corrects to the
-  // real client value. Without this guard, that transient null reads as "not a trainer" and
-  // fires the redirect before the correction lands. Deferring via setTimeout (rather than
-  // setting state directly in the effect body) pushes past the current commit's synchronous
-  // work into a new macrotask, so any same-tick correction has already landed by the time
-  // this flips true — only a genuinely non-trainer user gets redirected.
-  const [hasMounted, setHasMounted] = useState(false);
+  // `initializing` tracks the real supabase.auth.getSession() round trip (see
+  // AuthContext.js) rather than guessing at how long client hydration takes — a hard page
+  // load or refresh on an /admin/* URL needs to actually wait for that session check before
+  // it's safe to conclude "not a trainer" and redirect, since until it resolves `user` is
+  // indistinguishable from a genuinely logged-out visitor.
   useEffect(() => {
-    const id = setTimeout(() => setHasMounted(true), 0);
-    return () => clearTimeout(id);
-  }, []);
+    if (!initializing && !isTrainer) router.replace("/");
+  }, [initializing, isTrainer, router]);
 
-  useEffect(() => {
-    if (hasMounted && !isTrainer) router.replace("/");
-  }, [hasMounted, isTrainer, router]);
-
-  if (!hasMounted || !isTrainer) {
+  if (initializing || !isTrainer) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
         <p className="text-sm text-zinc-500">Checking access…</p>

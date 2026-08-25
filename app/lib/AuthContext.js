@@ -31,6 +31,10 @@ function buildUser(session, profile) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  // Distinguishes "checked, logged out" from "haven't checked yet" — both look like
+  // user === null otherwise, which is exactly what let AdminLayout's old setTimeout(0)
+  // guess race with the real supabase.auth.getSession() round trip on a hard page load.
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -46,10 +50,12 @@ export function AuthProvider({ children }) {
           .select("*")
           .eq("id", session.user.id)
           .single();
+        if (!mounted) return;
         setUser(buildUser(session, profile));
       } else {
         setUser(null);
       }
+      setInitializing(false);
     }
 
     loadSession();
@@ -122,6 +128,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
+        initializing,
         signUpAthlete,
         signUpBusiness,
         logIn,
