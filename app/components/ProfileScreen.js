@@ -12,6 +12,7 @@ import { supabase } from "@/app/lib/supabase";
 import { getInitials } from "@/app/lib/initials";
 import BadgeIcon from "@/app/components/BadgeIcon";
 import ReportIssueModal from "@/app/components/ReportIssueModal";
+import BottomNav from "@/app/components/BottomNav";
 
 function BackIcon() {
   return (
@@ -239,7 +240,7 @@ export default function ProfileScreen({ id }) {
         <h1 className="truncate text-base font-bold text-white">{profileLoading ? "" : displayHandle}</h1>
       </header>
 
-      <main className="mx-auto w-full max-w-md flex-1 pb-10">
+      <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <div className="border-b border-border-subtle bg-surface px-4 pb-5 pt-6">
           <div className="flex items-start gap-4">
             <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-2xl font-extrabold text-white">
@@ -418,6 +419,8 @@ export default function ProfileScreen({ id }) {
       </main>
 
       {showReportIssue && <ReportIssueModal onClose={() => setShowReportIssue(false)} />}
+
+      <BottomNav />
     </div>
   );
 }

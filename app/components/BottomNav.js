@@ -47,7 +47,14 @@ export default function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isItemActive = (item) => (item.href === "/" ? pathname === "/" : pathname.startsWith(item.href));
+  // Profile's href points at "/profile/you" (there's no separate "my profile" route in this
+  // mock app), but the tab should still read as active on any athlete's profile page —
+  // otherwise viewing someone else's profile (e.g. /profile/maya) left no tab highlighted.
+  const isItemActive = (item) => {
+    if (item.href === "/") return pathname === "/";
+    if (item.key === "profile") return pathname.startsWith("/profile");
+    return pathname.startsWith(item.href);
+  };
 
   return (
     // fixed, not sticky: sticky only "sticks" within the extra height of its own containing
