@@ -115,7 +115,7 @@ export function computeRunningAchievements(rawStats = {}) {
 // Pattern A: a single badge that only appears once the athlete has joined the program at
 // all. Once joined it's always visible — greyed out until the first tier lands, colored
 // once it has — but an athlete who's never joined sees no card, not a locked one (HYROX,
-// Olympic Weightlifting, CrossFit, Fire Dept Prep, Law Enforcement Prep).
+// Olympic Weightlifting, Fire Dept Prep, Law Enforcement Prep).
 function computeCompletionBadge(id, joined, level, tiers, { verb = "Completed", verbLocked = "Complete" } = {}) {
   if (!joined) return null;
   return computeTieredBadge({
@@ -152,12 +152,6 @@ export const OLY_WEIGHTLIFTING_TIERS = [
   { tier: 1, threshold: 1, label: "Olympic Weightlifting Beginner", emoji: "🥉" },
   { tier: 2, threshold: 2, label: "Olympic Weightlifting Intermediate", emoji: "🥈" },
   { tier: 3, threshold: 3, label: "Olympic Weightlifting Advanced", emoji: "🥇" },
-];
-
-export const CROSSFIT_TIERS = [
-  { tier: 1, threshold: 1, label: "CrossFit Beginner", emoji: "🥉" },
-  { tier: 2, threshold: 2, label: "CrossFit Intermediate", emoji: "🥈" },
-  { tier: 3, threshold: 3, label: "CrossFit Advanced", emoji: "🥇" },
 ];
 
 // Public Safety Prep tracks a 3-cycle structure (Foundation -> Build -> Peak/Test-Ready).
@@ -205,8 +199,6 @@ export function computeProgramAchievements(rawStats = {}) {
     strengthLevels = {},
     olyJoined = false,
     olyHighestLevel = 0,
-    crossfitJoined = false,
-    crossfitHighestLevel = 0,
     fireDeptJoined = false,
     fireDeptCycle = 0,
     lawEnforcementJoined = false,
@@ -218,7 +210,6 @@ export function computeProgramAchievements(rawStats = {}) {
     ...computeStartedTypeBadges(DEKA_TYPES, dekaLevels, buildDekaTiers, "deka"),
     ...computeStartedTypeBadges(STRENGTH_TYPES, strengthLevels, buildStrengthTiers, "strength"),
     computeCompletionBadge("oly-weightlifting-completion", olyJoined, olyHighestLevel, OLY_WEIGHTLIFTING_TIERS),
-    computeCompletionBadge("crossfit-completion", crossfitJoined, crossfitHighestLevel, CROSSFIT_TIERS),
     computeCompletionBadge("fire-dept-prep", fireDeptJoined, fireDeptCycle, FIRE_DEPT_PREP_TIERS),
     computeCompletionBadge("law-enforcement-prep", lawEnforcementJoined, lawEnforcementCycle, LAW_ENFORCEMENT_PREP_TIERS),
   ].filter(Boolean);

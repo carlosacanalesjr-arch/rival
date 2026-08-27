@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "@/app/components/TopBar";
 import BottomNav from "@/app/components/BottomNav";
+import ScrollFadeRow from "@/app/components/explore/ScrollFadeRow";
 import { useChallenges } from "@/app/lib/ChallengesContext";
 import { CHALLENGE_CATEGORIES } from "@/app/lib/mockData";
-import { formatCompactDistance } from "@/app/lib/formatDistance";
+
+const CATEGORY_EMOJI = {
+  Running: "🏃",
+  Biking: "🚴",
+  SkiErg: "🎿",
+  Rowing: "🚣",
+  "Olympic Weightlifting": "🏋️",
+  HYROX: "🔥",
+  DEKA: "⚡",
+  "Strength & Conditioning": "💪",
+  "Public Safety Prep": "🚒",
+};
 
 function ChevronIcon({ open }) {
   return (
@@ -24,10 +36,83 @@ function ChevronIcon({ open }) {
   );
 }
 
-// Full-width version of the card ChallengeCards.js shows in a horizontal scroller on the
-// home feed — same fields, same Join toggle, just laid out for a vertical list here, now
-// nested inside a category's expanded accordion panel instead of one long flat list.
-function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
+// "Aug 1, 2026" + "Aug 31, 2026" -> "Aug 1 – Aug 31, 2026"; different years keep both in full.
+function formatDateRange(startDate, endDate) {
+  const [startMonthDay, startYear] = startDate.split(", ");
+  const [endMonthDay, endYear] = endDate.split(", ");
+  if (startYear === endYear) return `${startMonthDay} – ${endMonthDay}, ${endYear}`;
+  return `${startDate} – ${endDate}`;
+}
+
+// Garmin-style "select a category" dropdown — same trigger/menu/outside-click pattern as
+// LevelSelector and FocusSelector in LevelFocusSelectors.js, sized full-width for the top of
+// the Challenges page instead of an inline chip.
+function CategoryDropdown({ categories, counts, selected, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleOutsideClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex min-h-11 w-full items-center justify-between rounded-2xl border border-border-subtle bg-surface px-4 py-3.5 text-left"
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="text-xl" aria-hidden>
+            {CATEGORY_EMOJI[selected]}
+          </span>
+          <span className="truncate text-sm font-bold text-white">{selected}</span>
+          <span className="shrink-0 text-xs text-zinc-500">{counts[selected] ?? 0}</span>
+        </span>
+        <ChevronIcon open={open} />
+      </button>
+
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-20 mt-1 max-h-80 overflow-y-auto rounded-2xl border border-border-subtle bg-surface-raised shadow-lg"
+        >
+          {categories.map((category) => (
+            <button
+              key={category}
+              role="option"
+              aria-selected={category === selected}
+              onClick={() => {
+                setOpen(false);
+                onSelect(category);
+              }}
+              className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition ${
+                category === selected ? "bg-rival-red/15 text-rival-red" : "text-zinc-300 hover:bg-black/40"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <span aria-hidden>{CATEGORY_EMOJI[category]}</span>
+                {category}
+              </span>
+              <span className="text-xs text-zinc-500">{counts[category] ?? 0}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// One card in the horizontal "Join a Challenge" row — image/banner (a gradient standing in
+// for a photo, since challenges have no imagery in the data model), title, date range, and a
+// Join button, matching Garmin Connect's Challenges card layout.
+function ChallengeCard({ challenge, onOpen, onToggleJoin }) {
   return (
     <div
       role="link"
@@ -39,57 +124,38 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
           onOpen(challenge.id);
         }
       }}
-      className="relative cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface p-4"
+      className="w-64 shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface"
     >
-      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rival-red to-orange-500" aria-hidden />
-
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-white">{challenge.title}</p>
-          <p className="mt-0.5 text-xs text-zinc-400">{challenge.goal}</p>
-        </div>
-        <span className="shrink-0 rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
+      <div className={`relative flex h-28 items-center justify-center bg-gradient-to-br ${challenge.accent}`}>
+        <span className="text-4xl" aria-hidden>
+          {CATEGORY_EMOJI[challenge.category]}
+        </span>
+        <span className="absolute right-2 top-2 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
           {challenge.duration}
         </span>
       </div>
 
-      <div className="mt-3">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
-            style={{ width: `${challenge.progress}%` }}
-          />
-        </div>
-        <p className="mt-1 text-[11px] text-zinc-500">{challenge.progress}% complete</p>
-        {challenge.components && (
-          <p className="mt-1 truncate text-[11px] text-zinc-500">
-            {challenge.components
-              .map((c) =>
-                c.goal != null
-                  ? `${c.label} ${formatCompactDistance(c.current)}/${formatCompactDistance(c.goal)}`
-                  : `${c.label} ${formatCompactDistance(c.current)}`
-              )
-              .join(" · ")}
-          </p>
-        )}
-      </div>
+      <div className="p-4">
+        <p className="truncate text-sm font-bold text-white">{challenge.title}</p>
+        <p className="mt-0.5 text-xs text-zinc-400">{formatDateRange(challenge.startDate, challenge.endDate)}</p>
 
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-[11px] text-zinc-500">{challenge.participants.toLocaleString()} joined</span>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onToggleJoin(challenge.id);
-          }}
-          className={`flex min-h-11 items-center rounded-full px-4 text-xs font-bold transition ${
-            challenge.joined
-              ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
-              : "bg-rival-red text-white hover:bg-red-600"
-          }`}
-        >
-          {challenge.joined ? "Joined" : "Join"}
-        </button>
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span className="truncate text-[11px] text-zinc-500">{challenge.participants.toLocaleString()} joined</span>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleJoin(challenge.id);
+            }}
+            className={`flex min-h-11 shrink-0 items-center rounded-full px-4 text-xs font-bold transition ${
+              challenge.joined
+                ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
+                : "bg-rival-red text-white hover:bg-red-600"
+            }`}
+          >
+            {challenge.joined ? "Joined" : "Join"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -98,21 +164,16 @@ function ChallengeRow({ challenge, onOpen, onToggleJoin }) {
 export default function ChallengesScreen() {
   const router = useRouter();
   const { challenges, toggleJoin } = useChallenges();
-  const [expanded, setExpanded] = useState(() => new Set());
 
-  const toggleCategory = (category) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) next.delete(category);
-      else next.add(category);
-      return next;
-    });
-  };
+  const categoriesWithItems = CHALLENGE_CATEGORIES.filter((category) =>
+    challenges.some((c) => c.category === category)
+  );
+  const [selectedCategory, setSelectedCategory] = useState(categoriesWithItems[0] ?? CHALLENGE_CATEGORIES[0]);
 
-  const groups = CHALLENGE_CATEGORIES.map((category) => ({
-    category,
-    items: challenges.filter((c) => c.category === category),
-  })).filter((g) => g.items.length > 0);
+  const counts = Object.fromEntries(
+    categoriesWithItems.map((category) => [category, challenges.filter((c) => c.category === category).length])
+  );
+  const items = challenges.filter((c) => c.category === selectedCategory);
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-black">
@@ -124,38 +185,35 @@ export default function ChallengesScreen() {
           <p className="mt-1 text-sm text-zinc-400">Join a challenge and climb the leaderboard.</p>
         </div>
 
-        <div className="mt-4 space-y-3 p-4">
-          {groups.map(({ category, items }) => {
-            const isOpen = expanded.has(category);
-            return (
-              <div key={category} className="overflow-hidden rounded-2xl border border-border-subtle bg-surface">
-                <button
-                  onClick={() => toggleCategory(category)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-                >
-                  <span className="text-sm font-bold text-white">{category}</span>
-                  <span className="flex items-center gap-2 text-zinc-400">
-                    <span className="text-xs text-zinc-500">{items.length}</span>
-                    <ChevronIcon open={isOpen} />
-                  </span>
-                </button>
-                {isOpen && (
-                  <div className="space-y-3 border-t border-border-subtle p-3">
-                    {items.map((challenge) => (
-                      <ChallengeRow
-                        key={challenge.id}
-                        challenge={challenge}
-                        onOpen={(id) => router.push(`/challenges/${id}`)}
-                        onToggleJoin={toggleJoin}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="px-4 pt-4">
+          <CategoryDropdown
+            categories={categoriesWithItems}
+            counts={counts}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
         </div>
+
+        <section className="mt-5">
+          <div className="flex items-center justify-between px-4">
+            <h2 className="text-base font-bold text-white">Join a Challenge</h2>
+            <span className="text-xs text-zinc-500">
+              {items.length} {items.length === 1 ? "challenge" : "challenges"}
+            </span>
+          </div>
+          <div className="mt-3 px-4">
+            <ScrollFadeRow>
+              {items.map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  challenge={challenge}
+                  onOpen={(id) => router.push(`/challenges/${id}`)}
+                  onToggleJoin={toggleJoin}
+                />
+              ))}
+            </ScrollFadeRow>
+          </div>
+        </section>
       </main>
 
       <BottomNav />
