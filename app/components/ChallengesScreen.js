@@ -36,6 +36,19 @@ function ChevronIcon({ open }) {
   );
 }
 
+function DiceIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="3" width="18" height="18" rx="4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 // "Aug 1, 2026" + "Aug 31, 2026" -> "Aug 1 – Aug 31, 2026"; different years keep both in full.
 function formatDateRange(startDate, endDate) {
   const [startMonthDay, startYear] = startDate.split(", ");
@@ -111,8 +124,9 @@ function CategoryDropdown({ categories, counts, selected, onSelect }) {
 
 // One card in the horizontal "Join a Challenge" row — image/banner (a gradient standing in
 // for a photo, since challenges have no imagery in the data model), title, date range, and a
-// Join button, matching Garmin Connect's Challenges card layout.
-function ChallengeCard({ challenge, onOpen, onToggleJoin }) {
+// Join button, matching Garmin Connect's Challenges card layout. `wide` swaps the fixed
+// scroll-row width for a full-width layout, used by the HYROX randomizer's spotlight card.
+function ChallengeCard({ challenge, onOpen, onToggleJoin, wide = false }) {
   return (
     <div
       role="link"
@@ -124,7 +138,9 @@ function ChallengeCard({ challenge, onOpen, onToggleJoin }) {
           onOpen(challenge.id);
         }
       }}
-      className="w-64 shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface"
+      className={`cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface ${
+        wide ? "w-full" : "w-64 shrink-0"
+      }`}
     >
       <div className={`relative flex h-28 items-center justify-center bg-gradient-to-br ${challenge.accent}`}>
         <span className="text-4xl" aria-hidden>
@@ -169,11 +185,27 @@ export default function ChallengesScreen() {
     challenges.some((c) => c.category === category)
   );
   const [selectedCategory, setSelectedCategory] = useState(categoriesWithItems[0] ?? CHALLENGE_CATEGORIES[0]);
+  const [randomPick, setRandomPick] = useState(null);
 
   const counts = Object.fromEntries(
     categoriesWithItems.map((category) => [category, challenges.filter((c) => c.category === category).length])
   );
   const items = challenges.filter((c) => c.category === selectedCategory);
+  // The randomizer only pulls from the HYROX combo set (hyrox-combo-* ids), not the
+  // single-discipline HYROX challenges (HYROX 8K/Ski/Row/Simulation) also in this category.
+  const combos = selectedCategory === "HYROX" ? items.filter((c) => c.id.startsWith("hyrox-combo-")) : [];
+
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    setRandomPick(null);
+  };
+
+  const handleRandomize = () => {
+    if (combos.length === 0) return;
+    // Reroll to a different combo than whatever's already showing, when there's a choice.
+    const pool = combos.length > 1 ? combos.filter((c) => c.id !== randomPick?.id) : combos;
+    setRandomPick(pool[Math.floor(Math.random() * pool.length)]);
+  };
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-black">
@@ -190,9 +222,46 @@ export default function ChallengesScreen() {
             categories={categoriesWithItems}
             counts={counts}
             selected={selectedCategory}
-            onSelect={setSelectedCategory}
+            onSelect={handleSelectCategory}
           />
         </div>
+
+        {combos.length > 0 && (
+          <div className="px-4 pt-4">
+            <button
+              onClick={handleRandomize}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-rival-red/50 bg-rival-red/10 text-sm font-bold text-rival-red transition hover:bg-rival-red/15"
+            >
+              <DiceIcon />
+              {randomPick ? "Randomize Again" : "Randomize a HYROX Combo"}
+            </button>
+
+            {randomPick && (
+              <div aria-live="polite" className="mt-3 rounded-2xl border-2 border-rival-red/60 bg-rival-red/5 p-3">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-rival-red">
+                    🎲 Your Random Combo
+                  </span>
+                  <button
+                    onClick={() => setRandomPick(null)}
+                    aria-label="Dismiss random pick"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-black/40 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="mt-2">
+                  <ChallengeCard
+                    wide
+                    challenge={randomPick}
+                    onOpen={(id) => router.push(`/challenges/${id}`)}
+                    onToggleJoin={toggleJoin}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <section className="mt-5">
           <div className="flex items-center justify-between px-4">
