@@ -233,14 +233,14 @@ export default function ChallengesScreen() {
               className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-rival-red/50 bg-rival-red/10 text-sm font-bold text-rival-red transition hover:bg-rival-red/15"
             >
               <DiceIcon />
-              {randomPick ? "Randomize Again" : "Randomize a HYROX Combo"}
+              {randomPick ? "Mix It Up Again" : "Mix It Up"}
             </button>
 
             {randomPick && (
               <div aria-live="polite" className="mt-3 rounded-2xl border-2 border-rival-red/60 bg-rival-red/5 p-3">
                 <div className="flex items-center justify-between px-1">
                   <span className="text-[11px] font-bold uppercase tracking-wide text-rival-red">
-                    🎲 Your Random Combo
+                    🎲 Mix It Up Pick
                   </span>
                   <button
                     onClick={() => setRandomPick(null)}
