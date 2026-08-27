@@ -20,6 +20,24 @@ const CATEGORY_EMOJI = {
   "Public Safety Prep": "🚒",
 };
 
+// Single-session "do it once and log it" challenges — everything else (weekly or monthly
+// accumulation toward a distance/volume number, same progress-bar/leaderboard mechanic either
+// way) is a Monthly challenge regardless of its actual 1-week/1-month `duration` field. The
+// HYROX combos are matched by id prefix since there are 17 of them; the rest are one-offs
+// named explicitly since there's exactly one per category today.
+const DAILY_CHALLENGE_IDS = new Set([
+  "c3", // Iron Grip
+  "hyrox-simulation",
+  "oly-new-snatch-pr",
+  "deka-fit-finisher",
+  "public-safety-foundation-finisher",
+]);
+
+function getCadence(challenge) {
+  if (DAILY_CHALLENGE_IDS.has(challenge.id) || challenge.id.startsWith("hyrox-combo-")) return "daily";
+  return "monthly";
+}
+
 function ChevronIcon({ open }) {
   return (
     <svg
@@ -32,19 +50,6 @@ function ChevronIcon({ open }) {
       className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
     >
       <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function DiceIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="3" width="18" height="18" rx="4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -122,11 +127,10 @@ function CategoryDropdown({ categories, counts, selected, onSelect }) {
   );
 }
 
-// One card in the horizontal "Join a Challenge" row — image/banner (a gradient standing in
-// for a photo, since challenges have no imagery in the data model), title, date range, and a
-// Join button, matching Garmin Connect's Challenges card layout. `wide` swaps the fixed
-// scroll-row width for a full-width layout, used by the HYROX randomizer's spotlight card.
-function ChallengeCard({ challenge, onOpen, onToggleJoin, wide = false }) {
+// One card in a horizontal challenge row — image/banner (a gradient standing in for a photo,
+// since challenges have no imagery in the data model), title, date range, joined count, and a
+// wide pill Join button, matching Garmin Connect's Challenges card layout.
+function ChallengeCard({ challenge, onOpen, onToggleJoin }) {
   return (
     <div
       role="link"
@@ -138,12 +142,10 @@ function ChallengeCard({ challenge, onOpen, onToggleJoin, wide = false }) {
           onOpen(challenge.id);
         }
       }}
-      className={`cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface ${
-        wide ? "w-full" : "w-64 shrink-0"
-      }`}
+      className="w-64 shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface"
     >
-      <div className={`relative flex h-28 items-center justify-center bg-gradient-to-br ${challenge.accent}`}>
-        <span className="text-4xl" aria-hidden>
+      <div className={`relative flex h-32 items-center justify-center bg-gradient-to-br ${challenge.accent}`}>
+        <span className="text-5xl" aria-hidden>
           {CATEGORY_EMOJI[challenge.category]}
         </span>
         <span className="absolute right-2 top-2 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
@@ -151,29 +153,55 @@ function ChallengeCard({ challenge, onOpen, onToggleJoin, wide = false }) {
         </span>
       </div>
 
-      <div className="p-4">
+      <div className="p-3.5">
         <p className="truncate text-sm font-bold text-white">{challenge.title}</p>
         <p className="mt-0.5 text-xs text-zinc-400">{formatDateRange(challenge.startDate, challenge.endDate)}</p>
+        <p className="mt-1.5 text-[11px] text-zinc-500">{challenge.participants.toLocaleString()} joined</p>
 
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="truncate text-[11px] text-zinc-500">{challenge.participants.toLocaleString()} joined</span>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onToggleJoin(challenge.id);
-            }}
-            className={`flex min-h-11 shrink-0 items-center rounded-full px-4 text-xs font-bold transition ${
-              challenge.joined
-                ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
-                : "bg-rival-red text-white hover:bg-red-600"
-            }`}
-          >
-            {challenge.joined ? "Joined" : "Join"}
-          </button>
-        </div>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleJoin(challenge.id);
+          }}
+          className={`mt-2.5 flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-bold transition ${
+            challenge.joined
+              ? "border border-rival-red text-rival-red hover:bg-rival-red/10"
+              : "bg-rival-red text-white hover:bg-red-600"
+          }`}
+        >
+          {challenge.joined ? "Joined" : "Join"}
+        </button>
       </div>
     </div>
+  );
+}
+
+// One cadence row — "Daily Challenges" or "Monthly Challenges" — either a swipeable card row
+// or a "Coming soon" placeholder when this category has nothing in that bucket yet.
+function ChallengeRow({ title, items, onOpen, onToggleJoin }) {
+  return (
+    <section className="mt-5">
+      <div className="flex items-center justify-between px-4">
+        <h2 className="text-base font-bold text-white">{title}</h2>
+        <span className="text-xs text-zinc-500">
+          {items.length} {items.length === 1 ? "challenge" : "challenges"}
+        </span>
+      </div>
+      <div className="mt-3 px-4">
+        {items.length > 0 ? (
+          <ScrollFadeRow>
+            {items.map((challenge) => (
+              <ChallengeCard key={challenge.id} challenge={challenge} onOpen={onOpen} onToggleJoin={onToggleJoin} />
+            ))}
+          </ScrollFadeRow>
+        ) : (
+          <div className="flex h-32 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-zinc-500">
+            Coming soon
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -185,27 +213,15 @@ export default function ChallengesScreen() {
     challenges.some((c) => c.category === category)
   );
   const [selectedCategory, setSelectedCategory] = useState(categoriesWithItems[0] ?? CHALLENGE_CATEGORIES[0]);
-  const [randomPick, setRandomPick] = useState(null);
 
   const counts = Object.fromEntries(
     categoriesWithItems.map((category) => [category, challenges.filter((c) => c.category === category).length])
   );
   const items = challenges.filter((c) => c.category === selectedCategory);
-  // The randomizer only pulls from the HYROX combo set (hyrox-combo-* ids), not the
-  // single-discipline HYROX challenges (HYROX 8K/Ski/Row/Simulation) also in this category.
-  const combos = selectedCategory === "HYROX" ? items.filter((c) => c.id.startsWith("hyrox-combo-")) : [];
+  const dailyItems = items.filter((c) => getCadence(c) === "daily");
+  const monthlyItems = items.filter((c) => getCadence(c) === "monthly");
 
-  const handleSelectCategory = (category) => {
-    setSelectedCategory(category);
-    setRandomPick(null);
-  };
-
-  const handleRandomize = () => {
-    if (combos.length === 0) return;
-    // Reroll to a different combo than whatever's already showing, when there's a choice.
-    const pool = combos.length > 1 ? combos.filter((c) => c.id !== randomPick?.id) : combos;
-    setRandomPick(pool[Math.floor(Math.random() * pool.length)]);
-  };
+  const openChallenge = (id) => router.push(`/challenges/${id}`);
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-black">
@@ -222,67 +238,17 @@ export default function ChallengesScreen() {
             categories={categoriesWithItems}
             counts={counts}
             selected={selectedCategory}
-            onSelect={handleSelectCategory}
+            onSelect={setSelectedCategory}
           />
         </div>
 
-        {combos.length > 0 && (
-          <div className="px-4 pt-4">
-            <button
-              onClick={handleRandomize}
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-rival-red/50 bg-rival-red/10 text-sm font-bold text-rival-red transition hover:bg-rival-red/15"
-            >
-              <DiceIcon />
-              {randomPick ? "Mix It Up Again" : "Mix It Up"}
-            </button>
-
-            {randomPick && (
-              <div aria-live="polite" className="mt-3 rounded-2xl border-2 border-rival-red/60 bg-rival-red/5 p-3">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-rival-red">
-                    🎲 Mix It Up Pick
-                  </span>
-                  <button
-                    onClick={() => setRandomPick(null)}
-                    aria-label="Dismiss random pick"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-black/40 hover:text-white"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="mt-2">
-                  <ChallengeCard
-                    wide
-                    challenge={randomPick}
-                    onOpen={(id) => router.push(`/challenges/${id}`)}
-                    onToggleJoin={toggleJoin}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        <section className="mt-5">
-          <div className="flex items-center justify-between px-4">
-            <h2 className="text-base font-bold text-white">Join a Challenge</h2>
-            <span className="text-xs text-zinc-500">
-              {items.length} {items.length === 1 ? "challenge" : "challenges"}
-            </span>
-          </div>
-          <div className="mt-3 px-4">
-            <ScrollFadeRow>
-              {items.map((challenge) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={challenge}
-                  onOpen={(id) => router.push(`/challenges/${id}`)}
-                  onToggleJoin={toggleJoin}
-                />
-              ))}
-            </ScrollFadeRow>
-          </div>
-        </section>
+        <ChallengeRow title="Daily Challenges" items={dailyItems} onOpen={openChallenge} onToggleJoin={toggleJoin} />
+        <ChallengeRow
+          title="Monthly Challenges"
+          items={monthlyItems}
+          onOpen={openChallenge}
+          onToggleJoin={toggleJoin}
+        />
       </main>
 
       <BottomNav />
