@@ -7,6 +7,8 @@ import { getAthlete } from "@/app/lib/athletes";
 import { useChallenges } from "@/app/lib/ChallengesContext";
 import { computeCompletionBadges } from "@/app/lib/challengeBadges";
 import { computeStreakBadges } from "@/app/lib/streaks";
+import { computeFoundationCompleteBadge } from "@/app/lib/achievements";
+import { useFoundation } from "@/app/lib/FoundationContext";
 import { useAuth } from "@/app/lib/AuthContext";
 import { supabase } from "@/app/lib/supabase";
 import { getInitials } from "@/app/lib/initials";
@@ -161,6 +163,7 @@ export default function ProfileScreen({ id }) {
   const athlete = getAthlete(id);
   const { challenges } = useChallenges();
   const { user } = useAuth();
+  const { completedIds: foundationCompletedIds, isFoundationComplete } = useFoundation();
   const [activeTab, setActiveTab] = useState("Activity");
   const [following, setFollowing] = useState(false);
   const [showReportIssue, setShowReportIssue] = useState(false);
@@ -225,9 +228,16 @@ export default function ProfileScreen({ id }) {
   // community/competitive leaderboard challenges; see computePlacementBadges in
   // challengeBadges.js, which is kept but unused for now. Only completion + streak badges
   // are active for this individual-only pass.
+  // Foundation Complete is only meaningful for "you" — other mock athletes have no live
+  // Foundation state to check against.
+  const foundationBadge = isSelf
+    ? computeFoundationCompleteBadge({ started: foundationCompletedIds.size > 0, complete: isFoundationComplete })
+    : null;
+
   const challengeBadges = [
     ...computeCompletionBadges({ challenges, completedChallengeIds: athlete.completedChallengeIds }),
     ...computeStreakBadges(athlete.streaks),
+    ...(foundationBadge ? [foundationBadge] : []),
   ];
   const allAchievements = [...athlete.achievements, ...challengeBadges];
 

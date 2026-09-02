@@ -7,6 +7,7 @@ import BottomNav from "@/app/components/BottomNav";
 import ScrollFadeRow from "@/app/components/explore/ScrollFadeRow";
 import { useChallenges } from "@/app/lib/ChallengesContext";
 import { CHALLENGE_CATEGORIES } from "@/app/lib/mockData";
+import FoundationScreen from "@/app/components/FoundationScreen";
 
 const CATEGORY_EMOJI = {
   Running: "🏃",
@@ -214,12 +215,18 @@ export default function ChallengesScreen() {
   );
   const [selectedCategory, setSelectedCategory] = useState(categoriesWithItems[0] ?? CHALLENGE_CATEGORIES[0]);
 
+  // Running no longer browses a list of challenges — it's a single locked daily calendar
+  // (see FoundationScreen) — so its dropdown row reads "Foundation" instead of an item count.
   const counts = Object.fromEntries(
-    categoriesWithItems.map((category) => [category, challenges.filter((c) => c.category === category).length])
+    categoriesWithItems.map((category) => [
+      category,
+      category === "Running" ? "Foundation" : challenges.filter((c) => c.category === category).length,
+    ])
   );
   const items = challenges.filter((c) => c.category === selectedCategory);
   const dailyItems = items.filter((c) => getCadence(c) === "daily");
   const monthlyItems = items.filter((c) => getCadence(c) === "monthly");
+  const isRunning = selectedCategory === "Running";
 
   const openChallenge = (id) => router.push(`/challenges/${id}`);
 
@@ -242,13 +249,19 @@ export default function ChallengesScreen() {
           />
         </div>
 
-        <ChallengeRow title="Daily Challenges" items={dailyItems} onOpen={openChallenge} onToggleJoin={toggleJoin} />
-        <ChallengeRow
-          title="Monthly Challenges"
-          items={monthlyItems}
-          onOpen={openChallenge}
-          onToggleJoin={toggleJoin}
-        />
+        {isRunning ? (
+          <FoundationScreen />
+        ) : (
+          <>
+            <ChallengeRow title="Daily Challenges" items={dailyItems} onOpen={openChallenge} onToggleJoin={toggleJoin} />
+            <ChallengeRow
+              title="Monthly Challenges"
+              items={monthlyItems}
+              onOpen={openChallenge}
+              onToggleJoin={toggleJoin}
+            />
+          </>
+        )}
       </main>
 
       <BottomNav />

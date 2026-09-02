@@ -59,6 +59,10 @@ export const challenges = [
   },
   // Weekly Running mileage challenges — 1-week window, progress tracked toward each
   // challenge's mile goal the same way every other challenge tracks its own unit.
+  // No longer browsable from the Challenges tab: selecting "Running" now renders the locked
+  // Foundation calendar (see FoundationScreen.js) instead of these. Left in place because
+  // other athletes' profiles (athletes.js) still reference these ids for their Challenges
+  // tab / completion badges.
   {
     id: "wk-run-5",
     title: "Run 5",

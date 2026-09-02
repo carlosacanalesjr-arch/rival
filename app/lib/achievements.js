@@ -142,6 +142,27 @@ function computeStartedTypeBadges(types, levels, buildTiers, idPrefix, { verb = 
     );
 }
 
+// Foundation Complete: a one-time badge, separate from the per-race achievements above and
+// from the program-completion badges below. Only appears once the athlete has logged at
+// least one Foundation submission (so athletes who've never touched Running -> Foundation
+// don't see a locked card for a feature they haven't started), and only shows as earned once
+// every required challenge — including everything that was ever in the missed-challenge
+// backlog — is done. See FoundationContext/foundationRunningData.js for how completion is
+// actually computed.
+export function computeFoundationCompleteBadge({ started, complete }) {
+  if (!started) return null;
+  return {
+    id: "foundation-complete",
+    kind: "single",
+    emoji: "🎖️",
+    title: "Foundation Complete",
+    detail: complete
+      ? "Completed every required Foundation challenge, including your full missed-challenge backlog."
+      : "Clear your Missed Challenges backlog to earn this.",
+    earned: complete,
+  };
+}
+
 export const HYROX_TIERS = [
   { tier: 1, threshold: 1, label: "HYROX Beginner", emoji: "🥉" },
   { tier: 2, threshold: 2, label: "HYROX Intermediate", emoji: "🥈" },

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { ChallengesProvider } from "@/app/lib/ChallengesContext";
+import { FoundationProvider } from "@/app/lib/FoundationContext";
 import { ProgramsProvider } from "@/app/lib/ProgramsContext";
 import { AuthProvider } from "@/app/lib/AuthContext";
 import { MediaProvider } from "@/app/lib/MediaContext";
@@ -38,15 +39,17 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col bg-black">
         <AuthProvider>
           <ChallengesProvider>
-            <ProgramsProvider>
-              <MediaProvider>
-                <ExerciseContentProvider>
-                  <EventsProvider>
-                    <DealsProvider>{children}</DealsProvider>
-                  </EventsProvider>
-                </ExerciseContentProvider>
-              </MediaProvider>
-            </ProgramsProvider>
+            <FoundationProvider>
+              <ProgramsProvider>
+                <MediaProvider>
+                  <ExerciseContentProvider>
+                    <EventsProvider>
+                      <DealsProvider>{children}</DealsProvider>
+                    </EventsProvider>
+                  </ExerciseContentProvider>
+                </MediaProvider>
+              </ProgramsProvider>
+            </FoundationProvider>
           </ChallengesProvider>
         </AuthProvider>
       </body>
