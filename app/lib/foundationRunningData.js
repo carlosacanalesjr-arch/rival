@@ -1,8 +1,11 @@
 // Running -> Foundation: a fully locked, day-based calendar. Every athlete sees the exact
 // same challenge on the exact same calendar date (see Section "CORE PRINCIPLE" in the spec) —
-// there is no per-athlete rolling schedule and nothing here is browsable. Only Month 1
-// (Weeks 1-4) is seeded; Weeks 5+ intentionally don't exist yet (see WEEKS_DATA below) so the
-// UI must degrade gracefully once the calendar runs past what's defined.
+// there is no per-athlete rolling schedule and nothing here is browsable. All 12 weeks (Months
+// 1-3) are seeded, except the Weeks 5-12 weekend Recovery Stretch body-focus/duration, which
+// the spec's Section 4 note flags as not yet decided — those stay `active: false` placeholders
+// (see WEEKS_DATA) until real values are supplied, rather than inventing content for them. The
+// UI still degrades gracefully (getChallengeForDate/getRequiredFoundationChallenges skip
+// inactive entries) in case the calendar is ever asked about a date past what's seeded.
 
 export const RUN_TYPES = {
   BASE: "BASE",
@@ -61,13 +64,21 @@ const FOUNDATION_START = new Date(Date.UTC(ANCHOR_Y, ANCHOR_M - 1, ANCHOR_D));
 const FOUNDATION_WINDOW_WEEKS = 12;
 export const FOUNDATION_WINDOW_END = new Date(FOUNDATION_START.getTime() + FOUNDATION_WINDOW_WEEKS * 7 * 86400000);
 
+// Reads a Date's LOCAL calendar fields (so "today" always means the athlete's own local
+// calendar day, not UTC's) and re-expresses them as a UTC-midnight instant purely so calendar
+// days can be diffed with plain integer math below.
 function toUTCDateOnly(date) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }
 
+// Returns a local-midnight Date for the given week/day slot. Deliberately built by reading
+// FOUNDATION_START's UTC calendar fields and re-constructing a *local* Date (rather than doing
+// raw epoch-ms arithmetic) so this round-trips correctly through getWeekDayForDate's
+// local-getter-based toUTCDateOnly in every timezone, including ones behind UTC.
 export function dateForWeekDay(weekNumber, dayOfWeek) {
   const offsetDays = (weekNumber - 1) * 7 + (dayOfWeek - 1);
-  return new Date(FOUNDATION_START.getTime() + offsetDays * 86400000);
+  const utcMarker = new Date(FOUNDATION_START.getTime() + offsetDays * 86400000);
+  return new Date(utcMarker.getUTCFullYear(), utcMarker.getUTCMonth(), utcMarker.getUTCDate());
 }
 
 // Resolves any real-world date to its slot on the shared calendar. Returns null for dates
@@ -84,15 +95,25 @@ export function formatAssignedDate(weekNumber, dayOfWeek) {
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
   });
 }
 
+// A TBD weekend Recovery Stretch (Weeks 5-12) — body focus/duration not yet decided per the
+// spec's Section 4 note. `active: false` keeps it out of "today", the missed-challenge
+// backlog, and the Foundation-complete check entirely until real values replace it.
+const RECOVERY_STRETCH_TBD = {
+  run_type: RUN_TYPES.RECOVERY_STRETCH,
+  name: "Recovery Stretch (TBD)",
+  measurement_type: "Stretch",
+  duration: null,
+  bodyFocus: null,
+  active: false,
+};
+
 // ---------------------------------------------------------------------------
-// MONTH 1 CALENDAR (WEEKS 1-4) — the exact, specific content from the spec. Weekend Long
-// Run/Recovery Stretch alternates every week (odd weeks = Week A: Sat Long Run/Sun Recovery
-// Stretch; even weeks = Week B, flipped). Do not add Week 5+ here until that content is
-// actually written — see the spec's "Months 2-3" section.
+// FULL CALENDAR (WEEKS 1-12 / MONTHS 1-3) — the exact, specific content from the spec.
+// Weekend Long Run/Recovery Stretch alternates every week (odd weeks = Week A: Sat Long
+// Run/Sun Recovery Stretch; even weeks = Week B, flipped).
 // ---------------------------------------------------------------------------
 
 const WEEKS_DATA = [
@@ -240,6 +261,250 @@ const WEEKS_DATA = [
       7: { run_type: RUN_TYPES.LONG_RUN, name: "32-Minute Long Run", measurement_type: "Time", duration: "32 min" },
     },
   },
+  {
+    week: 5,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "25-Minute Base Run", measurement_type: "Time", duration: "25 min" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "1 × 800m + 2 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 400m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 3,
+        bonus: { name: "6 × 20 sec Strides", measurement_type: "Time Intervals", work_interval: "20 sec", repetitions: 6 },
+      },
+      3: { run_type: RUN_TYPES.RECOVERY, name: "25-Minute Recovery Walk", measurement_type: "Time", duration: "25 min" },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "6 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 6,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "14-Minute Shakeout", measurement_type: "Time", duration: "14 min" },
+      6: { run_type: RUN_TYPES.LONG_RUN, name: "3-Mile Long Run", measurement_type: "Distance", distance: "3 mi" },
+      7: RECOVERY_STRETCH_TBD,
+    },
+  },
+  {
+    week: 6,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "1.75-Mile Base Run", measurement_type: "Distance", distance: "1.75 mi" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "1 × 600m + 2 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "600m, 400m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 3,
+        bonus: { name: "6 × 60m Strides", measurement_type: "Distance Intervals", work_interval: "60m", repetitions: 6 },
+      },
+      3: {
+        run_type: RUN_TYPES.RECOVERY,
+        name: "Full-Body Mobility, 15 min",
+        measurement_type: "Stretch",
+        duration: "15 min",
+        bodyFocus: "Full-Body",
+      },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "8 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 8,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "1.5-Mile Shakeout", measurement_type: "Distance", distance: "1.5 mi" },
+      6: RECOVERY_STRETCH_TBD,
+      7: { run_type: RUN_TYPES.LONG_RUN, name: "36-Minute Long Run", measurement_type: "Time", duration: "36 min" },
+    },
+  },
+  {
+    week: 7,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "30-Minute Base Run", measurement_type: "Time", duration: "30 min" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "2 × 800m + 2 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 800m, 400m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 4,
+        bonus: { name: "6 × 20 sec Strides", measurement_type: "Time Intervals", work_interval: "20 sec", repetitions: 6 },
+      },
+      3: { run_type: RUN_TYPES.RECOVERY, name: "30-Minute Recovery Walk", measurement_type: "Time", duration: "30 min" },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "6 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 6,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "16-Minute Shakeout", measurement_type: "Time", duration: "16 min" },
+      6: { run_type: RUN_TYPES.LONG_RUN, name: "3.5-Mile Long Run", measurement_type: "Distance", distance: "3.5 mi" },
+      7: RECOVERY_STRETCH_TBD,
+    },
+  },
+  {
+    week: 8,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "2.0-Mile Base Run", measurement_type: "Distance", distance: "2 mi" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "1 × 800m + 1 × 600m + 2 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 600m, 400m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 4,
+        bonus: { name: "6 × 60m Strides", measurement_type: "Distance Intervals", work_interval: "60m", repetitions: 6 },
+      },
+      3: {
+        run_type: RUN_TYPES.RECOVERY,
+        name: "Full-Body Mobility, 15 min",
+        measurement_type: "Stretch",
+        duration: "15 min",
+        bodyFocus: "Full-Body",
+      },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "8 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 8,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "1.75-Mile Shakeout", measurement_type: "Distance", distance: "1.75 mi" },
+      6: RECOVERY_STRETCH_TBD,
+      7: { run_type: RUN_TYPES.LONG_RUN, name: "40-Minute Long Run", measurement_type: "Time", duration: "40 min" },
+    },
+  },
+  {
+    week: 9,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "32-Minute Base Run", measurement_type: "Time", duration: "32 min" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "2 × 800m + 2 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 800m, 400m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 4,
+        bonus: { name: "6 × 20 sec Strides", measurement_type: "Time Intervals", work_interval: "20 sec", repetitions: 6 },
+      },
+      3: { run_type: RUN_TYPES.RECOVERY, name: "35-Minute Recovery Walk", measurement_type: "Time", duration: "35 min" },
+      4: {
+        // Holds at 7x for Weeks 9-10, then 8x for Weeks 11-12 — a deliberate two-week hold,
+        // not the odd/even-week alternation Months 1-2 used. See the spec's Section 5 note.
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "7 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 7,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "18-Minute Shakeout", measurement_type: "Time", duration: "18 min" },
+      // Hits the Foundation 4-mile cap (see the "not exceed 4 miles" rule at the top of the spec).
+      6: { run_type: RUN_TYPES.LONG_RUN, name: "4-Mile Long Run", measurement_type: "Distance", distance: "4 mi" },
+      7: RECOVERY_STRETCH_TBD,
+    },
+  },
+  {
+    week: 10,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "2.25-Mile Base Run", measurement_type: "Distance", distance: "2.25 mi" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "2 × 800m + 1 × 600m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 800m, 600m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 3,
+        bonus: { name: "6 × 60m Strides", measurement_type: "Distance Intervals", work_interval: "60m", repetitions: 6 },
+      },
+      3: {
+        run_type: RUN_TYPES.RECOVERY,
+        name: "Full-Body Mobility, 20 min",
+        measurement_type: "Stretch",
+        duration: "20 min",
+        bodyFocus: "Full-Body",
+      },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "7 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 7,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "2-Mile Shakeout", measurement_type: "Distance", distance: "2 mi" },
+      6: RECOVERY_STRETCH_TBD,
+      7: { run_type: RUN_TYPES.LONG_RUN, name: "44-Minute Long Run", measurement_type: "Time", duration: "44 min" },
+    },
+  },
+  {
+    week: 11,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "37-Minute Base Run", measurement_type: "Time", duration: "37 min" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "3 × 800m + 1 × 400m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 800m, 800m, 400m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 4,
+        bonus: { name: "6 × 20 sec Strides", measurement_type: "Time Intervals", work_interval: "20 sec", repetitions: 6 },
+      },
+      3: { run_type: RUN_TYPES.RECOVERY, name: "40-Minute Recovery Walk", measurement_type: "Time", duration: "40 min" },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "8 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 8,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "20-Minute Shakeout", measurement_type: "Time", duration: "20 min" },
+      // Holds at the Foundation 4-mile cap rather than exceeding it (see Section 5 note).
+      6: { run_type: RUN_TYPES.LONG_RUN, name: "4-Mile Long Run", measurement_type: "Distance", distance: "4 mi" },
+      7: RECOVERY_STRETCH_TBD,
+    },
+  },
+  {
+    week: 12,
+    days: {
+      1: { run_type: RUN_TYPES.BASE, name: "2.5-Mile Base Run", measurement_type: "Distance", distance: "2.5 mi" },
+      2: {
+        run_type: RUN_TYPES.SPEED_REPEATS,
+        name: "3 × 800m + 1 × 600m, Recovery: 1 min",
+        measurement_type: "Distance Intervals",
+        work_interval: "800m, 800m, 800m, 600m (mixed set)",
+        recovery_interval: "1 min",
+        repetitions: 4,
+        bonus: { name: "6 × 60m Strides", measurement_type: "Distance Intervals", work_interval: "60m", repetitions: 6 },
+      },
+      3: {
+        run_type: RUN_TYPES.RECOVERY,
+        name: "Full-Body Mobility, 20 min",
+        measurement_type: "Stretch",
+        duration: "20 min",
+        bodyFocus: "Full-Body",
+      },
+      4: {
+        run_type: RUN_TYPES.SPEED_INTERVALS,
+        name: "8 × 1 min Fast / 1 min Easy",
+        measurement_type: "Interval",
+        work_interval: "1 min Fast",
+        recovery_interval: "1 min Easy",
+        repetitions: 8,
+      },
+      5: { run_type: RUN_TYPES.SHAKEOUT, name: "2.25-Mile Shakeout", measurement_type: "Distance", distance: "2.25 mi" },
+      6: RECOVERY_STRETCH_TBD,
+      7: { run_type: RUN_TYPES.LONG_RUN, name: "48-Minute Long Run", measurement_type: "Time", duration: "48 min" },
+    },
+  },
 ];
 
 function buildChallenge({ week, dayOfWeek, def, isBonus }) {
@@ -248,7 +513,10 @@ function buildChallenge({ week, dayOfWeek, def, isBonus }) {
     id: `foundation-w${week}-${abbr}${isBonus ? "-bonus" : ""}`,
     sport: "Running",
     level: "Foundation",
-    run_type: def.run_type,
+    // Bonus (Strides) entries never set their own run_type in WEEKS_DATA since every bonus so
+    // far rides along with that day's Speed – Repeats — default to it here so the UI's
+    // RUN_TYPE_LABELS lookup never renders blank.
+    run_type: def.run_type ?? (isBonus ? RUN_TYPES.SPEED_REPEATS : undefined),
     name: def.name,
     description: isBonus ? BONUS_DESCRIPTION : RUN_TYPE_DESCRIPTIONS[def.run_type],
     measurement_type: def.measurement_type,
@@ -263,11 +531,11 @@ function buildChallenge({ week, dayOfWeek, def, isBonus }) {
     is_bonus: isBonus,
     week_number: week,
     day_of_week: dayOfWeek,
-    active: true,
+    active: def.active ?? true,
   };
 }
 
-// Flat list of every seeded Foundation challenge (required + bonus), Month 1 only.
+// Flat list of every seeded Foundation challenge (required + bonus), Months 1-3.
 export const FOUNDATION_CHALLENGES = WEEKS_DATA.flatMap(({ week, days }) =>
   Object.entries(days).flatMap(([dayOfWeek, def]) => {
     const day = Number(dayOfWeek);
@@ -277,8 +545,11 @@ export const FOUNDATION_CHALLENGES = WEEKS_DATA.flatMap(({ week, days }) =>
   })
 );
 
+// Excludes `active: false` placeholders (currently the Weeks 5-12 weekend Recovery Stretch
+// TBDs) — they aren't real assignments yet, so they can't be "today", can't be missed, and
+// don't block the Foundation-complete badge.
 export function getRequiredFoundationChallenges() {
-  return FOUNDATION_CHALLENGES.filter((c) => !c.is_bonus);
+  return FOUNDATION_CHALLENGES.filter((c) => !c.is_bonus && c.active);
 }
 
 export function getChallengeForDate(date) {
@@ -286,7 +557,7 @@ export function getChallengeForDate(date) {
   if (!slot) return null;
   return (
     FOUNDATION_CHALLENGES.find(
-      (c) => !c.is_bonus && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
+      (c) => !c.is_bonus && c.active && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
     ) || null
   );
 }
@@ -296,7 +567,7 @@ export function getBonusForDate(date) {
   if (!slot) return null;
   return (
     FOUNDATION_CHALLENGES.find(
-      (c) => c.is_bonus && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
+      (c) => c.is_bonus && c.active && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
     ) || null
   );
 }
@@ -316,10 +587,10 @@ export function getMissedFoundationChallenges(date, completedIds) {
   });
 }
 
-// Whether every required challenge that has come due so far (out of what's currently seeded)
-// has been completed. NOTE: this can only fully match the spec's "every required challenge in
-// the 3-month window" once Weeks 5-52 are seeded — until then it evaluates completeness
-// against Month 1 only, by design (see Section 4/7 of the spec: months 2-3 aren't built yet).
+// Whether every required challenge that has come due so far (out of what's currently active —
+// see getRequiredFoundationChallenges) has been completed. The Weeks 5-12 weekend Recovery
+// Stretch TBDs are `active: false` and so are excluded from "required" entirely; once real
+// values replace them and they're flipped to active, they start counting here too.
 export function isFoundationComplete(date, completedIds) {
   const required = getRequiredFoundationChallenges();
   const slot = getWeekDayForDate(date);

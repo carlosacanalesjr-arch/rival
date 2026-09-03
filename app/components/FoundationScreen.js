@@ -21,9 +21,15 @@ function CameraIcon() {
 }
 
 // The prescription line under a challenge's title — e.g. "18 min", "2 mi", or
-// "4 × 200m, 1 min recovery" for interval work.
+// "4 × 200m, 1 min recovery" for uniform interval work. Mixed-distance sets (e.g. Week 5's
+// "1 × 800m + 2 × 400m") store work_interval as a comma-separated "800m, 400m, 400m (mixed
+// set)" string with repetitions as the total rep count — the name field already spells out
+// the per-rep breakdown, so this just adds the recovery note instead of a garbled "N × ...".
 function formatPrescription(challenge) {
   if (challenge.repetitions && challenge.work_interval) {
+    if (challenge.work_interval.includes(",")) {
+      return challenge.recovery_interval ? `${challenge.recovery_interval} recovery between reps` : null;
+    }
     const recovery = challenge.recovery_interval ? `, ${challenge.recovery_interval} recovery` : "";
     return `${challenge.repetitions} × ${challenge.work_interval}${recovery}`;
   }
