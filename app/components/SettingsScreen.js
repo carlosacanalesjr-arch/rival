@@ -3,10 +3,46 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/lib/AuthContext";
+import { useTheme } from "@/app/lib/ThemeContext";
 import { supabase } from "@/app/lib/supabase";
 import SportInterestsChecklist from "@/app/components/SportInterestsChecklist";
 import { Field, ChipGroup } from "@/app/components/authFormKit";
 import { PRIMARY_SPORT_OPTIONS, SKILL_LEVEL_OPTIONS } from "@/app/lib/sportOptions";
+
+const THEME_OPTIONS = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
+// Always visible regardless of auth state (appearance isn't tied to an account) — placed above
+// the login-gated Sport Profile/Interests sections below.
+function AppearanceSection() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <section>
+      <h2 className="text-lg font-extrabold text-foreground">Appearance</h2>
+      <p className="mt-1 text-sm text-muted-2">Choose how Kairos looks on this device.</p>
+      <div className="mt-3 flex gap-2">
+        {THEME_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setTheme(opt.value)}
+            aria-pressed={theme === opt.value}
+            className={`min-h-11 flex-1 rounded-full border text-sm font-bold transition ${
+              theme === opt.value
+                ? "border-rival-red bg-rival-red/15 text-rival-red"
+                : "border-border-subtle text-muted hover:border-border-strong"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function BackIcon() {
   return (
@@ -94,13 +130,16 @@ export default function SettingsScreen() {
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-6">
-        {!user ? (
-          <p className="text-sm text-muted-2">You need to be logged in to view settings.</p>
-        ) : user.isBusiness ? (
-          <p className="text-sm text-muted-2">There&apos;s nothing to configure here yet for business accounts.</p>
-        ) : loading ? (
-          <p className="text-sm text-muted-2">Loading…</p>
-        ) : (
+        <AppearanceSection />
+
+        <div className="mt-8">
+          {!user ? (
+            <p className="text-sm text-muted-2">You need to be logged in to view the rest of your settings.</p>
+          ) : user.isBusiness ? (
+            <p className="text-sm text-muted-2">There&apos;s nothing else to configure here yet for business accounts.</p>
+          ) : loading ? (
+            <p className="text-sm text-muted-2">Loading…</p>
+          ) : (
           <section>
             <h2 className="text-lg font-extrabold text-foreground">Sport Profile</h2>
             <p className="mt-1 text-sm text-muted-2">Your primary sport and skill level.</p>
@@ -136,7 +175,8 @@ export default function SettingsScreen() {
               {saving ? "Saving…" : "Save"}
             </button>
           </section>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );
