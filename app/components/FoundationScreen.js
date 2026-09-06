@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useFoundation } from "@/app/lib/FoundationContext";
 import { analyzePhoto, valuesMatch } from "@/app/lib/photoVerification";
-import { DAY_LABELS, MEASUREMENT_UNITS, RUN_TYPE_LABELS } from "@/app/lib/foundationRunningData";
+import { DAY_LABELS, MEASUREMENT_UNITS, RUN_TYPE_LABELS, challengeHasLeaderboard } from "@/app/lib/foundationRunningData";
+import { getLeaderboardUnit, getMockLeaderboardEntries, rankLeaderboard } from "@/app/lib/runningLeaderboard";
+import { FirstLevelPicker, LevelSwitchConfirmModal, RunningLevelDropdown } from "@/app/components/RunningLevelPicker";
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
@@ -41,11 +43,17 @@ function formatPrescription(challenge) {
 function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
   const [step, setStep] = useState("form"); // "form" | "analyzing" | "result"
   const [value, setValue] = useState("");
+  const [leaderboardValue, setLeaderboardValue] = useState("");
   const [photoUrl, setPhotoUrl] = useState(null);
   const [photoError, setPhotoError] = useState(null);
   const [analysis, setAnalysis] = useState(null);
 
   const unit = MEASUREMENT_UNITS[challenge.measurement_type] || "";
+  // The leaderboard always ranks by the measurement the challenge *doesn't* fix (Section 14) —
+  // e.g. a fixed-duration Base Run ranks by distance covered — so eligible challenges collect
+  // that as a second number, separate from the primary result the photo verifies against.
+  const leaderboardEligible = challengeHasLeaderboard(challenge);
+  const leaderboardUnit = leaderboardEligible ? getLeaderboardUnit(challenge) : null;
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
@@ -65,7 +73,11 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
     reader.readAsDataURL(file);
   };
 
-  const canSubmit = value.trim().length > 0 && !Number.isNaN(parseFloat(value)) && Boolean(photoUrl);
+  const canSubmit =
+    value.trim().length > 0 &&
+    !Number.isNaN(parseFloat(value)) &&
+    Boolean(photoUrl) &&
+    (!leaderboardEligible || (leaderboardValue.trim().length > 0 && !Number.isNaN(parseFloat(leaderboardValue))));
 
   const runAnalysis = async (e) => {
     e.preventDefault();
@@ -80,7 +92,11 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
 
   const finalize = () => {
     const entered = parseFloat(value);
-    onSubmit(entered, { photoUrl, verification: analysis.verification, detectedValue: analysis.detectedValue });
+    onSubmit(
+      entered,
+      { photoUrl, verification: analysis.verification, detectedValue: analysis.detectedValue },
+      leaderboardEligible ? parseFloat(leaderboardValue) : null
+    );
   };
 
   const tryAgain = () => {
@@ -118,6 +134,23 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
                 className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
               />
             </div>
+
+            {leaderboardEligible && (
+              <div>
+                <label className="text-xs font-medium text-zinc-400" htmlFor="foundation-leaderboard-value">
+                  {leaderboardUnit === "mi" ? "Distance covered" : "Finish time"} ({leaderboardUnit})
+                  <span className="ml-1 text-zinc-600">— for today&apos;s leaderboard</span>
+                </label>
+                <input
+                  id="foundation-leaderboard-value"
+                  inputMode="decimal"
+                  value={leaderboardValue}
+                  onChange={(e) => setLeaderboardValue(e.target.value)}
+                  placeholder={leaderboardUnit === "mi" ? "e.g. 1.8" : "e.g. 16.5"}
+                  className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+                />
+              </div>
+            )}
 
             <div>
               <p className="text-xs font-medium text-zinc-400">
@@ -254,6 +287,62 @@ function ChallengeCard({ challenge, isBonus, isDone, onSubmit }) {
   );
 }
 
+// Section 14 — today's challenge only, never mixed across levels, no leaderboard at all for
+// Recovery/Recovery Stretch or interval-shaped run types (see challengeHasLeaderboard). Since
+// this component only ever renders for `todayChallenge`, it's structurally the *live, still-open*
+// board for today — there's no historical view here, so "locks at end of day" is enforced simply
+// by this board disappearing (replaced by tomorrow's) the moment the calendar day rolls over.
+function DailyLeaderboard({ challenge, selfCompletion }) {
+  const unit = getLeaderboardUnit(challenge);
+  const entries = getMockLeaderboardEntries(challenge);
+  if (selfCompletion?.leaderboardValue != null) {
+    entries.push({ id: "self", name: "You", initials: "YO", score: selfCompletion.leaderboardValue, isSelf: true });
+  }
+  const ranked = rankLeaderboard(challenge, entries);
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-2xl border border-border-subtle bg-surface">
+      <div className="flex items-center justify-between px-4 pt-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold text-white">Today&apos;s Leaderboard</h3>
+          <span className="flex items-center gap-1 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
+            <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-rival-red" />
+            LIVE
+          </span>
+        </div>
+        <span className="text-[10px] text-zinc-500">Locks at midnight</span>
+      </div>
+      <ul className="mt-2 divide-y divide-border-subtle">
+        {ranked.map((entry) => (
+          <li
+            key={entry.id}
+            className={`flex items-center gap-3 px-4 py-2.5 ${entry.isSelf ? "bg-rival-red/5" : ""}`}
+          >
+            <span
+              className={`w-5 shrink-0 text-sm font-extrabold ${
+                entry.rank === 1 ? "text-yellow-400" : entry.rank === 2 ? "text-zinc-300" : entry.rank === 3 ? "text-orange-400" : "text-zinc-500"
+              }`}
+            >
+              {entry.rank}
+            </span>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-raised text-[11px] font-bold text-white">
+              {entry.initials}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+              {entry.name}
+              {entry.isSelf && <span className="ml-1.5 text-[10px] font-bold text-rival-red">YOU</span>}
+            </span>
+            <span className="shrink-0 text-right text-sm font-bold text-white">
+              {entry.score}
+              <span className="ml-1 text-[10px] font-normal text-zinc-500">{unit}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function MissedChallengeRow({ challenge, onSubmit }) {
   const prescription = formatPrescription(challenge);
   return (
@@ -274,91 +363,141 @@ function MissedChallengeRow({ challenge, onSubmit }) {
 }
 
 export default function FoundationScreen() {
-  const { todayChallenge, bonusChallenge, missedChallenges, completedIds, markComplete, windowEnded, isReady } =
-    useFoundation();
+  const {
+    levels,
+    activeLevel,
+    hasChosenLevel,
+    selectLevel,
+    hasContent,
+    todayChallenge,
+    bonusChallenge,
+    missedChallenges,
+    completions,
+    completedIds,
+    markComplete,
+    windowEnded,
+    isReady,
+  } = useFoundation();
   const [activeChallenge, setActiveChallenge] = useState(null);
   const [confirmedName, setConfirmedName] = useState(null);
   const [missedOpen, setMissedOpen] = useState(false);
+  const [pendingLevel, setPendingLevel] = useState(null); // level awaiting switch confirmation
 
-  const handleSubmit = (value, proof) => {
-    markComplete(activeChallenge.id, value, proof);
+  const handleSubmit = (value, proof, leaderboardValue) => {
+    markComplete(activeChallenge.id, value, proof, leaderboardValue);
     setConfirmedName(activeChallenge.name);
     setActiveChallenge(null);
     setTimeout(() => setConfirmedName(null), 2500);
   };
 
+  const levelHasContent = activeLevel ? hasContent(activeLevel) : false;
+
   return (
     <div>
       <div className="px-4 pt-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-rival-red">Foundation</p>
-        <p className="mt-1 text-sm text-zinc-400">
-          One locked challenge a day, on a shared calendar — everyone sees the same thing on the same date.
+        <div className="flex items-center gap-2">
+          {isReady && hasChosenLevel ? (
+            <RunningLevelDropdown levels={levels} activeLevel={activeLevel} onRequestSwitch={setPendingLevel} />
+          ) : (
+            <p className="text-xs font-bold uppercase tracking-wide text-rival-red">Running</p>
+          )}
+        </div>
+        <p className="mt-2 text-sm text-zinc-400">
+          One locked challenge a day, on a shared calendar — everyone on a level sees the same thing on the same date.
         </p>
       </div>
 
-      {windowEnded && missedChallenges.length > 0 && (
-        <div className="mx-4 mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
-          Your 3-month Foundation window has ended with {missedChallenges.length} challenge
-          {missedChallenges.length === 1 ? "" : "s"} still outstanding. Finish them below to complete Foundation.
+      {isReady && !hasChosenLevel && (
+        <FirstLevelPicker levels={levels} hasContent={hasContent} onChoose={selectLevel} />
+      )}
+
+      {isReady && hasChosenLevel && !levelHasContent && (
+        <div className="mx-4 mt-4 flex flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border-subtle p-8 text-center">
+          <p className="text-sm font-bold text-white">{activeLevel} is coming soon</p>
+          <p className="text-xs text-zinc-500">
+            This level&apos;s calendar hasn&apos;t been built yet — check back once it launches.
+          </p>
         </div>
       )}
 
-      <div className="mt-4 space-y-3 px-4">
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">Today</p>
-          {!isReady ? (
-            <div className="h-28 animate-pulse rounded-2xl border border-border-subtle bg-surface" />
-          ) : todayChallenge ? (
-            <ChallengeCard
-              challenge={todayChallenge}
-              isDone={completedIds.has(todayChallenge.id)}
-              onSubmit={setActiveChallenge}
-            />
-          ) : (
-            <div className="flex h-28 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-zinc-500">
-              Nothing scheduled yet — check back soon.
+      {isReady && hasChosenLevel && levelHasContent && (
+        <>
+          {windowEnded && missedChallenges.length > 0 && (
+            <div className="mx-4 mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+              Your 3-month {activeLevel} window has ended with {missedChallenges.length} challenge
+              {missedChallenges.length === 1 ? "" : "s"} still outstanding. Finish them below to complete {activeLevel}.
             </div>
           )}
-        </div>
 
-        {isReady && bonusChallenge && (
-          <ChallengeCard
-            challenge={bonusChallenge}
-            isBonus
-            isDone={completedIds.has(bonusChallenge.id)}
-            onSubmit={setActiveChallenge}
-          />
-        )}
-      </div>
+          <div className="mt-4 space-y-3 px-4">
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">Today</p>
+              {todayChallenge ? (
+                <>
+                  <ChallengeCard
+                    challenge={todayChallenge}
+                    isDone={completedIds.has(todayChallenge.id)}
+                    onSubmit={setActiveChallenge}
+                  />
+                  {challengeHasLeaderboard(todayChallenge) && (
+                    <DailyLeaderboard challenge={todayChallenge} selfCompletion={completions[todayChallenge.id]} />
+                  )}
+                </>
+              ) : (
+                <div className="flex h-28 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-zinc-500">
+                  Nothing scheduled yet — check back soon.
+                </div>
+              )}
+            </div>
 
-      <section className="mt-6 px-4 pb-2">
-        <button
-          onClick={() => setMissedOpen((v) => !v)}
-          className="flex w-full items-center justify-between rounded-2xl border border-border-subtle bg-surface px-4 py-3.5"
-        >
-          <span className="text-sm font-bold text-white">Missed Challenges ({missedChallenges.length})</span>
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className={`text-zinc-400 transition-transform ${missedOpen ? "rotate-180" : ""}`}
-          >
-            <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        {missedOpen && (
-          <div className="mt-2 space-y-2">
-            {missedChallenges.length === 0 ? (
-              <p className="px-1 py-2 text-xs text-zinc-500">Nothing missed — you&apos;re caught up.</p>
-            ) : (
-              missedChallenges.map((c) => <MissedChallengeRow key={c.id} challenge={c} onSubmit={setActiveChallenge} />)
+            {bonusChallenge && (
+              <ChallengeCard
+                challenge={bonusChallenge}
+                isBonus
+                isDone={completedIds.has(bonusChallenge.id)}
+                onSubmit={setActiveChallenge}
+              />
             )}
           </div>
-        )}
-      </section>
+        </>
+      )}
+
+      {!isReady && (
+        <div className="mt-4 px-4">
+          <div className="h-28 animate-pulse rounded-2xl border border-border-subtle bg-surface" />
+        </div>
+      )}
+
+      {isReady && hasChosenLevel && levelHasContent && (
+        <section className="mt-6 px-4 pb-2">
+          <button
+            onClick={() => setMissedOpen((v) => !v)}
+            className="flex w-full items-center justify-between rounded-2xl border border-border-subtle bg-surface px-4 py-3.5"
+          >
+            <span className="text-sm font-bold text-white">Missed Challenges ({missedChallenges.length})</span>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`text-zinc-400 transition-transform ${missedOpen ? "rotate-180" : ""}`}
+            >
+              <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          {missedOpen && (
+            <div className="mt-2 space-y-2">
+              {missedChallenges.length === 0 ? (
+                <p className="px-1 py-2 text-xs text-zinc-500">Nothing missed — you&apos;re caught up.</p>
+              ) : (
+                missedChallenges.map((c) => <MissedChallengeRow key={c.id} challenge={c} onSubmit={setActiveChallenge} />)
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {confirmedName && (
         <div className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-full bg-rival-red px-4 py-2 text-xs font-bold text-white shadow-lg">
@@ -368,6 +507,18 @@ export default function FoundationScreen() {
 
       {activeChallenge && (
         <SubmitFoundationModal challenge={activeChallenge} onClose={() => setActiveChallenge(null)} onSubmit={handleSubmit} />
+      )}
+
+      {pendingLevel && (
+        <LevelSwitchConfirmModal
+          fromLevel={activeLevel}
+          toLevel={pendingLevel}
+          onCancel={() => setPendingLevel(null)}
+          onConfirm={() => {
+            selectLevel(pendingLevel);
+            setPendingLevel(null);
+          }}
+        />
       )}
     </div>
   );

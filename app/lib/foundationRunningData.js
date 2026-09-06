@@ -1,11 +1,17 @@
-// Running -> Foundation: a fully locked, day-based calendar. Every athlete sees the exact
-// same challenge on the exact same calendar date (see Section "CORE PRINCIPLE" in the spec) —
-// there is no per-athlete rolling schedule and nothing here is browsable. All 12 weeks (Months
-// 1-3) are seeded, except the Weeks 5-12 weekend Recovery Stretch body-focus/duration, which
-// the spec's Section 4 note flags as not yet decided — those stay `active: false` placeholders
-// (see WEEKS_DATA) until real values are supplied, rather than inventing content for them. The
-// UI still degrades gracefully (getChallengeForDate/getRequiredFoundationChallenges skip
-// inactive entries) in case the calendar is ever asked about a date past what's seeded.
+// Running -> locked, day-based calendars, one per level (Foundation, Intermediate, Advanced —
+// see Section 12/13 of the spec). Every athlete on a given level sees the exact same challenge
+// on the exact same calendar date (see Section "CORE PRINCIPLE") — there is no per-athlete
+// rolling schedule and nothing here is browsable. Only Foundation has seeded content today; all
+// 12 weeks (Months 1-3), including the weekend Recovery Stretch body-focus/duration, are filled
+// in. Intermediate/Advanced are registered in LEVEL_CHALLENGES with no content yet — see
+// hasLevelContent — architecture first, content later, same approach Month 1 used for Months
+// 2-3 before they were seeded.
+//
+// The *content* calendar below is global and per-level, not per-athlete — but each athlete's
+// personal 3-month completion window and missed-challenge backlog are anchored to whenever they
+// personally switched onto that level (see Section 13), not to this file's calendar anchor.
+// That per-athlete window math lives in FoundationContext.js; this file only answers "what's
+// the content for level L on date D" and "what's level L's full required list."
 
 export const RUN_TYPES = {
   BASE: "BASE",
@@ -54,21 +60,28 @@ const DAY_LABELS = { 1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5
 const DAY_ABBR = { 1: "mon", 2: "tue", 3: "wed", 4: "thu", 5: "fri", 6: "sat", 7: "sun" };
 export { DAY_LABELS };
 
-// Global calendar anchor — Week 1, Monday. Every athlete's "today" is resolved against this
-// single shared date, not against when they personally joined. Stored as a UTC-midnight Date
-// so week/day math below is never off-by-one across timezones or DST changes.
+// Global calendar anchor — Week 1, Monday. Content for a given date is resolved against this
+// single shared date, the same for every athlete on a level, regardless of when they personally
+// joined it. Stored as a UTC-midnight Date so week/day math below is never off-by-one across
+// timezones or DST changes.
 export const FOUNDATION_START_DATE_ISO = "2026-08-31";
 const [ANCHOR_Y, ANCHOR_M, ANCHOR_D] = FOUNDATION_START_DATE_ISO.split("-").map(Number);
 const FOUNDATION_START = new Date(Date.UTC(ANCHOR_Y, ANCHOR_M - 1, ANCHOR_D));
 
-const FOUNDATION_WINDOW_WEEKS = 12;
-export const FOUNDATION_WINDOW_END = new Date(FOUNDATION_START.getTime() + FOUNDATION_WINDOW_WEEKS * 7 * 86400000);
+// Every level's completion window is the same length (12 weeks) — see Section 13: switching
+// into a level always grants a full personal runway of this length from the switch date.
+export const RUNNING_WINDOW_WEEKS = 12;
 
 // Reads a Date's LOCAL calendar fields (so "today" always means the athlete's own local
 // calendar day, not UTC's) and re-expresses them as a UTC-midnight instant purely so calendar
 // days can be diffed with plain integer math below.
 function toUTCDateOnly(date) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+
+// A given athlete's personal window-close date for a level, given when they switched onto it.
+export function getWindowEnd(windowStart) {
+  return new Date(toUTCDateOnly(windowStart).getTime() + RUNNING_WINDOW_WEEKS * 7 * 86400000);
 }
 
 // Returns a local-midnight Date for the given week/day slot. Deliberately built by reading
@@ -98,21 +111,9 @@ export function formatAssignedDate(weekNumber, dayOfWeek) {
   });
 }
 
-// A TBD weekend Recovery Stretch (Weeks 5-12) — body focus/duration not yet decided per the
-// spec's Section 4 note. `active: false` keeps it out of "today", the missed-challenge
-// backlog, and the Foundation-complete check entirely until real values replace it.
-const RECOVERY_STRETCH_TBD = {
-  run_type: RUN_TYPES.RECOVERY_STRETCH,
-  name: "Recovery Stretch (TBD)",
-  measurement_type: "Stretch",
-  duration: null,
-  bodyFocus: null,
-  active: false,
-};
-
 // ---------------------------------------------------------------------------
-// FULL CALENDAR (WEEKS 1-12 / MONTHS 1-3) — the exact, specific content from the spec.
-// Weekend Long Run/Recovery Stretch alternates every week (odd weeks = Week A: Sat Long
+// FOUNDATION'S FULL CALENDAR (WEEKS 1-12 / MONTHS 1-3) — the exact, specific content from the
+// spec. Weekend Long Run/Recovery Stretch alternates every week (odd weeks = Week A: Sat Long
 // Run/Sun Recovery Stretch; even weeks = Week B, flipped).
 // ---------------------------------------------------------------------------
 
@@ -285,7 +286,13 @@ const WEEKS_DATA = [
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "14-Minute Shakeout", measurement_type: "Time", duration: "14 min" },
       6: { run_type: RUN_TYPES.LONG_RUN, name: "3-Mile Long Run", measurement_type: "Distance", distance: "3 mi" },
-      7: RECOVERY_STRETCH_TBD,
+      7: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Lower-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "20 min",
+        bodyFocus: "Lower-Body",
+      },
     },
   },
   {
@@ -317,7 +324,13 @@ const WEEKS_DATA = [
         repetitions: 8,
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "1.5-Mile Shakeout", measurement_type: "Distance", distance: "1.5 mi" },
-      6: RECOVERY_STRETCH_TBD,
+      6: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Full-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "25 min",
+        bodyFocus: "Full-Body",
+      },
       7: { run_type: RUN_TYPES.LONG_RUN, name: "36-Minute Long Run", measurement_type: "Time", duration: "36 min" },
     },
   },
@@ -345,7 +358,13 @@ const WEEKS_DATA = [
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "16-Minute Shakeout", measurement_type: "Time", duration: "16 min" },
       6: { run_type: RUN_TYPES.LONG_RUN, name: "3.5-Mile Long Run", measurement_type: "Distance", distance: "3.5 mi" },
-      7: RECOVERY_STRETCH_TBD,
+      7: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Upper-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "25 min",
+        bodyFocus: "Upper-Body",
+      },
     },
   },
   {
@@ -377,7 +396,13 @@ const WEEKS_DATA = [
         repetitions: 8,
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "1.75-Mile Shakeout", measurement_type: "Distance", distance: "1.75 mi" },
-      6: RECOVERY_STRETCH_TBD,
+      6: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Full-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "30 min",
+        bodyFocus: "Full-Body",
+      },
       7: { run_type: RUN_TYPES.LONG_RUN, name: "40-Minute Long Run", measurement_type: "Time", duration: "40 min" },
     },
   },
@@ -408,7 +433,13 @@ const WEEKS_DATA = [
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "18-Minute Shakeout", measurement_type: "Time", duration: "18 min" },
       // Hits the Foundation 4-mile cap (see the "not exceed 4 miles" rule at the top of the spec).
       6: { run_type: RUN_TYPES.LONG_RUN, name: "4-Mile Long Run", measurement_type: "Distance", distance: "4 mi" },
-      7: RECOVERY_STRETCH_TBD,
+      7: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Lower-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "25 min",
+        bodyFocus: "Lower-Body",
+      },
     },
   },
   {
@@ -440,7 +471,13 @@ const WEEKS_DATA = [
         repetitions: 7,
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "2-Mile Shakeout", measurement_type: "Distance", distance: "2 mi" },
-      6: RECOVERY_STRETCH_TBD,
+      6: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Full-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "30 min",
+        bodyFocus: "Full-Body",
+      },
       7: { run_type: RUN_TYPES.LONG_RUN, name: "44-Minute Long Run", measurement_type: "Time", duration: "44 min" },
     },
   },
@@ -469,7 +506,13 @@ const WEEKS_DATA = [
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "20-Minute Shakeout", measurement_type: "Time", duration: "20 min" },
       // Holds at the Foundation 4-mile cap rather than exceeding it (see Section 5 note).
       6: { run_type: RUN_TYPES.LONG_RUN, name: "4-Mile Long Run", measurement_type: "Distance", distance: "4 mi" },
-      7: RECOVERY_STRETCH_TBD,
+      7: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Upper-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "30 min",
+        bodyFocus: "Upper-Body",
+      },
     },
   },
   {
@@ -501,18 +544,24 @@ const WEEKS_DATA = [
         repetitions: 8,
       },
       5: { run_type: RUN_TYPES.SHAKEOUT, name: "2.25-Mile Shakeout", measurement_type: "Distance", distance: "2.25 mi" },
-      6: RECOVERY_STRETCH_TBD,
+      6: {
+        run_type: RUN_TYPES.RECOVERY_STRETCH,
+        name: "Full-Body Recovery Stretch",
+        measurement_type: "Stretch",
+        duration: "30 min",
+        bodyFocus: "Full-Body",
+      },
       7: { run_type: RUN_TYPES.LONG_RUN, name: "48-Minute Long Run", measurement_type: "Time", duration: "48 min" },
     },
   },
 ];
 
-function buildChallenge({ week, dayOfWeek, def, isBonus }) {
+function buildChallenge({ level, week, dayOfWeek, def, isBonus }) {
   const abbr = DAY_ABBR[dayOfWeek];
   return {
-    id: `foundation-w${week}-${abbr}${isBonus ? "-bonus" : ""}`,
+    id: `${level.toLowerCase()}-w${week}-${abbr}${isBonus ? "-bonus" : ""}`,
     sport: "Running",
-    level: "Foundation",
+    level,
     // Bonus (Strides) entries never set their own run_type in WEEKS_DATA since every bonus so
     // far rides along with that day's Speed – Repeats — default to it here so the UI's
     // RUN_TYPE_LABELS lookup never renders blank.
@@ -531,73 +580,122 @@ function buildChallenge({ week, dayOfWeek, def, isBonus }) {
     is_bonus: isBonus,
     week_number: week,
     day_of_week: dayOfWeek,
+    // The real calendar date this slot falls on, on the shared global calendar (Section 1's
+    // day -> run_type mapping is identical across levels, so the same week/day math applies
+    // regardless of which level this challenge belongs to). Used to test a challenge against an
+    // athlete's *personal* window (see getMissedFoundationChallenges/isFoundationComplete)
+    // without re-deriving it from week_number/day_of_week at every call site.
+    assignedDate: dateForWeekDay(week, dayOfWeek),
     active: def.active ?? true,
   };
 }
 
-// Flat list of every seeded Foundation challenge (required + bonus), Months 1-3.
-export const FOUNDATION_CHALLENGES = WEEKS_DATA.flatMap(({ week, days }) =>
-  Object.entries(days).flatMap(([dayOfWeek, def]) => {
-    const day = Number(dayOfWeek);
-    const entries = [buildChallenge({ week, dayOfWeek: day, def, isBonus: false })];
-    if (def.bonus) entries.push(buildChallenge({ week, dayOfWeek: day, def: def.bonus, isBonus: true }));
-    return entries;
-  })
-);
-
-// Excludes `active: false` placeholders (currently the Weeks 5-12 weekend Recovery Stretch
-// TBDs) — they aren't real assignments yet, so they can't be "today", can't be missed, and
-// don't block the Foundation-complete badge.
-export function getRequiredFoundationChallenges() {
-  return FOUNDATION_CHALLENGES.filter((c) => !c.is_bonus && c.active);
+function buildLevelChallenges(level, weeksData) {
+  return weeksData.flatMap(({ week, days }) =>
+    Object.entries(days).flatMap(([dayOfWeek, def]) => {
+      const day = Number(dayOfWeek);
+      const entries = [buildChallenge({ level, week, dayOfWeek: day, def, isBonus: false })];
+      if (def.bonus) entries.push(buildChallenge({ level, week, dayOfWeek: day, def: def.bonus, isBonus: true }));
+      return entries;
+    })
+  );
 }
 
-export function getChallengeForDate(date) {
+// Flat list of every seeded Foundation challenge (required + bonus), Months 1-3.
+export const FOUNDATION_CHALLENGES = buildLevelChallenges("Foundation", WEEKS_DATA);
+
+// Levels the athlete can pick from today (Section 13 — Advanced isn't offered yet, but the
+// architecture below is already level-generic so adding it later is just another key here).
+export const RUNNING_LEVELS = ["Foundation", "Intermediate"];
+
+// Per-level challenge lists. Intermediate has no seeded content yet (Section 12 — architecture
+// first, content later, same as Foundation's Months 2-3 before they were written) — its empty
+// array is what drives the "coming soon" empty state instead of fabricated placeholder content.
+const LEVEL_CHALLENGES = {
+  Foundation: FOUNDATION_CHALLENGES,
+  Intermediate: [],
+};
+
+function levelChallenges(level) {
+  return LEVEL_CHALLENGES[level] || [];
+}
+
+export function hasLevelContent(level) {
+  return levelChallenges(level).length > 0;
+}
+
+// Excludes `active: false` placeholders — none currently exist, but the mechanism stays so a
+// future not-yet-decided value (the way Weeks 5-12's Recovery Stretch content briefly was) can
+// be seeded as an inactive placeholder without it being "today", missable, or completion-blocking.
+export function getRequiredFoundationChallenges(level) {
+  return levelChallenges(level).filter((c) => !c.is_bonus && c.active);
+}
+
+export function getChallengeForDate(level, date) {
   const slot = getWeekDayForDate(date);
   if (!slot) return null;
   return (
-    FOUNDATION_CHALLENGES.find(
+    levelChallenges(level).find(
       (c) => !c.is_bonus && c.active && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
     ) || null
   );
 }
 
-export function getBonusForDate(date) {
+export function getBonusForDate(level, date) {
   const slot = getWeekDayForDate(date);
   if (!slot) return null;
   return (
-    FOUNDATION_CHALLENGES.find(
+    levelChallenges(level).find(
       (c) => c.is_bonus && c.active && c.week_number === slot.week_number && c.day_of_week === slot.day_of_week
     ) || null
   );
 }
 
-// Every required challenge strictly before "today" that isn't in `completedIds` — this
-// athlete's personal backlog. It is derived, not stored: a missed challenge simply stays in
-// the shared schedule and keeps showing up here until this athlete completes it, which is
-// exactly what keeps it from ever being "reassigned to the whole userbase" the following week.
-export function getMissedFoundationChallenges(date, completedIds) {
-  const slot = getWeekDayForDate(date);
-  if (!slot) return [];
-  return getRequiredFoundationChallenges().filter((c) => {
+// Every required challenge assigned between this athlete's personal window start on this level
+// (see Section 13 — set when they switched onto it, not the global calendar anchor) and today,
+// that isn't in `completedIds` — this athlete's personal backlog. It is derived, not stored: a
+// missed challenge simply stays in the shared schedule and keeps showing up here until this
+// athlete completes it, which is exactly what keeps it from ever being "reassigned to the whole
+// userbase" the following week. Days before `windowStart` are excluded outright — they were
+// never assigned to this athlete on this level, so there's nothing to have missed.
+export function getMissedFoundationChallenges(level, today, windowStart, completedIds) {
+  if (!windowStart) return [];
+  const todayUTC = toUTCDateOnly(today);
+  const startUTC = toUTCDateOnly(windowStart);
+  return getRequiredFoundationChallenges(level).filter((c) => {
     if (completedIds.has(c.id)) return false;
-    if (c.week_number > slot.week_number) return false;
-    if (c.week_number === slot.week_number && c.day_of_week >= slot.day_of_week) return false;
+    const assignedUTC = toUTCDateOnly(c.assignedDate);
+    if (assignedUTC < startUTC) return false;
+    if (assignedUTC >= todayUTC) return false;
     return true;
   });
 }
 
-// Whether every required challenge that has come due so far (out of what's currently active —
-// see getRequiredFoundationChallenges) has been completed. The Weeks 5-12 weekend Recovery
-// Stretch TBDs are `active: false` and so are excluded from "required" entirely; once real
-// values replace them and they're flipped to active, they start counting here too.
-export function isFoundationComplete(date, completedIds) {
-  const required = getRequiredFoundationChallenges();
-  const slot = getWeekDayForDate(date);
-  if (!slot) return false;
-  const dueSoFar = required.filter(
-    (c) => c.week_number < slot.week_number || (c.week_number === slot.week_number && c.day_of_week <= slot.day_of_week)
-  );
+// Whether every required challenge that has come due so far within this athlete's personal
+// window on this level (assigned between `windowStart` and today, inclusive) has been
+// completed. A level with no seeded content yet (Intermediate/Advanced) can never be complete.
+export function isFoundationComplete(level, today, windowStart, completedIds) {
+  if (!windowStart) return false;
+  const required = getRequiredFoundationChallenges(level);
+  if (required.length === 0) return false;
+  const todayUTC = toUTCDateOnly(today);
+  const startUTC = toUTCDateOnly(windowStart);
+  const dueSoFar = required.filter((c) => {
+    const assignedUTC = toUTCDateOnly(c.assignedDate);
+    return assignedUTC >= startUTC && assignedUTC <= todayUTC;
+  });
   if (dueSoFar.length < required.length) return false; // more seeded content still ahead
   return dueSoFar.every((c) => completedIds.has(c.id));
+}
+
+// Section 14 — Recovery/Recovery Stretch are completion-based, not performance-based, so they
+// never get a leaderboard. The two ranking rules the spec defines (distance-in-fixed-time for
+// "Time", completion-time for "Distance") only cover measurement_type "Time"/"Distance" — Speed
+// – Repeats/Intervals use interval-shaped measurement types the spec doesn't define a ranking
+// rule for, so (rather than inventing one) they're treated the same as Recovery: no leaderboard.
+const NO_LEADERBOARD_RUN_TYPES = new Set([RUN_TYPES.RECOVERY, RUN_TYPES.RECOVERY_STRETCH]);
+export function challengeHasLeaderboard(challenge) {
+  if (!challenge || challenge.is_bonus) return false;
+  if (NO_LEADERBOARD_RUN_TYPES.has(challenge.run_type)) return false;
+  return challenge.measurement_type === "Time" || challenge.measurement_type === "Distance";
 }

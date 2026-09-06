@@ -163,7 +163,7 @@ export default function ProfileScreen({ id }) {
   const athlete = getAthlete(id);
   const { challenges } = useChallenges();
   const { user } = useAuth();
-  const { completedIds: foundationCompletedIds, isFoundationComplete } = useFoundation();
+  const { foundationCompletedIds, isFoundationComplete } = useFoundation();
   const [activeTab, setActiveTab] = useState("Activity");
   const [following, setFollowing] = useState(false);
   const [showReportIssue, setShowReportIssue] = useState(false);
