@@ -109,9 +109,9 @@ export function LevelSwitchConfirmModal({ fromLevel, toLevel, onConfirm, onCance
           <button
             type="button"
             onClick={onConfirm}
-            className="min-h-11 flex-1 rounded-full bg-rival-red text-sm font-extrabold tracking-wide text-white transition hover:bg-red-600"
+            className="min-h-11 flex-1 whitespace-nowrap rounded-full bg-rival-red text-sm font-extrabold tracking-wide text-white transition hover:bg-red-600"
           >
-            Switch to {toLevel}
+            Confirm Switch
           </button>
         </div>
       </div>
