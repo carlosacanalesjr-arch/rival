@@ -59,12 +59,12 @@ export default function BusinessSignupScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <AuthHeader showBack />
       <main className="mx-auto w-full max-w-md flex-1 px-6 pb-12">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-extrabold text-white">Create your business account</h2>
-          <p className="mt-1 text-sm text-zinc-500">List your gym, run events, and reach athletes.</p>
+          <h2 className="text-2xl font-extrabold text-foreground">Create your business account</h2>
+          <p className="mt-1 text-sm text-muted-2">List your gym, run events, and reach athletes.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -151,7 +151,7 @@ export default function BusinessSignupScreen() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-muted-2">
           Already have an account?{" "}
           <button onClick={() => router.push("/login")} className="font-semibold text-rival-red hover:text-red-400">
             Log in

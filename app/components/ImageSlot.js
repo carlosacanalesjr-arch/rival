@@ -144,12 +144,12 @@ export default function ImageSlot({
           )}
         </>
       ) : !isTrainer ? (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-border-subtle bg-surface-raised text-muted-2">
           <ImageIcon size={compact ? 15 : 20} />
         </div>
       ) : cornerControlsOnly ? (
         <>
-          <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500">
+          <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-border-subtle bg-surface-raised text-muted-2">
             <ImageIcon size={20} />
             {showLabel && <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>}
           </div>
@@ -167,7 +167,7 @@ export default function ImageSlot({
           type="button"
           onClick={openPicker}
           aria-label={label}
-          className="flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-zinc-700 bg-surface-raised text-zinc-500 transition hover:border-zinc-500 hover:text-zinc-300"
+          className="flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-border-subtle bg-surface-raised text-muted-2 transition hover:border-border-strong hover:text-foreground-secondary"
         >
           <ImageIcon size={compact ? 15 : 20} />
           {showLabel && <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>}

@@ -24,7 +24,7 @@ export default function EventsFilterBar({ filters, onChange }) {
               className={`min-h-11 shrink-0 rounded-full border px-4 text-xs font-bold transition ${
                 selected
                   ? "border-rival-red bg-rival-red/15 text-rival-red"
-                  : "border-border-subtle bg-surface text-zinc-400 hover:border-zinc-600"
+                  : "border-border-subtle bg-surface text-muted hover:border-border-strong"
               }`}
             >
               {type}
@@ -38,7 +38,7 @@ export default function EventsFilterBar({ filters, onChange }) {
           value={filters.location}
           onChange={(e) => set({ location: e.target.value })}
           placeholder="Location"
-          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
         />
         <div className="grid grid-cols-2 gap-1.5">
           <input
@@ -46,14 +46,14 @@ export default function EventsFilterBar({ filters, onChange }) {
             value={filters.dateFrom}
             onChange={(e) => set({ dateFrom: e.target.value })}
             aria-label="From date"
-            className="min-h-11 rounded-xl border border-border-subtle bg-surface px-2 text-xs text-white focus:border-rival-red focus:outline-none"
+            className="min-h-11 rounded-xl border border-border-subtle bg-surface px-2 text-xs text-foreground focus:border-rival-red focus:outline-none"
           />
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => set({ dateTo: e.target.value })}
             aria-label="To date"
-            className="min-h-11 rounded-xl border border-border-subtle bg-surface px-2 text-xs text-white focus:border-rival-red focus:outline-none"
+            className="min-h-11 rounded-xl border border-border-subtle bg-surface px-2 text-xs text-foreground focus:border-rival-red focus:outline-none"
           />
         </div>
       </div>

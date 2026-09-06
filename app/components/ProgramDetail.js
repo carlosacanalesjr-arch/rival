@@ -37,8 +37,8 @@ function TrophyIcon({ className }) {
 function InfoTile({ label, value }) {
   return (
     <div className="rounded-xl border border-border-subtle bg-surface p-3">
-      <p className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</p>
-      <p className="mt-1 text-sm font-bold text-white">{value}</p>
+      <p className="text-[10px] uppercase tracking-wide text-muted-2">{label}</p>
+      <p className="mt-1 text-sm font-bold text-foreground">{value}</p>
     </div>
   );
 }
@@ -75,7 +75,7 @@ function DayBreakdown({ program, week, day }) {
   const dayKeyPrefix = `${program.id}:${resolveLevelKey(program)}:${week.week}:${day.day}`;
   return (
     <div className="rounded-xl border border-border-subtle bg-surface-raised p-3">
-      <p className="text-xs font-extrabold text-white">
+      <p className="text-xs font-extrabold text-foreground">
         Day {day.day}
         {content.label ? ` · ${content.label}` : ""}
       </p>
@@ -98,8 +98,8 @@ export default function ProgramDetail({ id }) {
 
   if (!program) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-        <p className="text-lg font-bold text-white">Program not found</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <p className="text-lg font-bold text-foreground">Program not found</p>
         <button
           onClick={() => router.push("/programs")}
           className="rounded-full bg-rival-red px-5 py-2.5 text-sm font-bold text-white"
@@ -143,16 +143,16 @@ export default function ProgramDetail({ id }) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="text-zinc-300 hover:text-white"
+          className="text-foreground-secondary hover:text-foreground"
         >
           <BackIcon />
         </button>
-        <h1 className="truncate text-base font-bold text-white">{program.title}</h1>
+        <h1 className="truncate text-base font-bold text-foreground">{program.title}</h1>
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-28">
@@ -170,11 +170,11 @@ export default function ProgramDetail({ id }) {
           <span className="inline-block rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
             {program.category}
           </span>
-          <h2 className="mt-3 text-2xl font-extrabold text-white">{program.title}</h2>
+          <h2 className="mt-3 text-2xl font-extrabold text-foreground">{program.title}</h2>
 
           {isHyrox && nextLevelProgram && (
             <div className="mt-3 flex items-center gap-2">
-              <span className="text-xs font-semibold text-zinc-500">Next Level</span>
+              <span className="text-xs font-semibold text-muted-2">Next Level</span>
               <button
                 onClick={() => router.push(`/programs/${nextLevelProgram.id}`)}
                 className="flex items-center gap-1.5 rounded-full border border-rival-red/40 bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red transition hover:bg-rival-red/25"
@@ -189,7 +189,7 @@ export default function ProgramDetail({ id }) {
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {showLevelRow && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-zinc-500">Level</span>
+                  <span className="text-xs font-semibold text-muted-2">Level</span>
                   {canEditSelections ? (
                     <LevelSelector
                       selected={program.enrolledLevel || null}
@@ -204,7 +204,7 @@ export default function ProgramDetail({ id }) {
               )}
               {showFocusRow && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-zinc-500">Agency Focus</span>
+                  <span className="text-xs font-semibold text-muted-2">Agency Focus</span>
                   {canEditSelections ? (
                     <FocusSelector
                       options={program.focusOptions}
@@ -219,7 +219,7 @@ export default function ProgramDetail({ id }) {
             </div>
           )}
 
-          <p className="mt-3 text-sm leading-relaxed text-zinc-400">{program.fullDescription}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{program.fullDescription}</p>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
             <InfoTile label="Duration" value={`${program.duration} weeks`} />
@@ -230,11 +230,11 @@ export default function ProgramDetail({ id }) {
 
           {program.joined && (
             <div className="mt-4">
-              <div className="flex items-center justify-between text-xs text-zinc-500">
+              <div className="flex items-center justify-between text-xs text-muted-2">
                 <span>Your progress</span>
-                <span className="font-semibold text-white">{percent}%</span>
+                <span className="font-semibold text-foreground">{percent}%</span>
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
                   style={{ width: `${percent}%` }}
@@ -245,21 +245,21 @@ export default function ProgramDetail({ id }) {
         </div>
 
         <section className="mt-6 px-4">
-          <h3 className="text-base font-bold text-white">Your Coach</h3>
+          <h3 className="text-base font-bold text-foreground">Your Coach</h3>
           <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border-subtle bg-surface p-4">
             <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rival-red to-rival-red-dim text-lg font-extrabold text-white">
               {program.coach.initials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-white">{program.coach.name}</p>
+              <p className="truncate text-sm font-bold text-foreground">{program.coach.name}</p>
               <p className="truncate text-xs text-rival-red">{program.coach.title}</p>
-              <p className="mt-1 text-xs text-zinc-400">{program.coach.bio}</p>
+              <p className="mt-1 text-xs text-muted">{program.coach.bio}</p>
             </div>
           </div>
         </section>
 
         <section className="mt-6">
-          <h3 className="px-4 text-base font-bold text-white">3-Month Breakdown</h3>
+          <h3 className="px-4 text-base font-bold text-foreground">3-Month Breakdown</h3>
           <div className="mx-4 mt-3 space-y-3">
             {phases.map((phase) => {
               const firstWeek = phase.weeks[0].week;
@@ -279,7 +279,7 @@ export default function ProgramDetail({ id }) {
                     className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-2 text-sm font-extrabold text-white">
+                      <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
                         Month {phase.number}: {phase.label}
                         {isPhaseCurrent && (
                           <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
@@ -287,10 +287,10 @@ export default function ProgramDetail({ id }) {
                           </span>
                         )}
                       </p>
-                      <p className="mt-0.5 text-xs text-zinc-500">{phase.summary}</p>
+                      <p className="mt-0.5 text-xs text-muted-2">{phase.summary}</p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="text-[11px] text-zinc-500">
+                      <span className="text-[11px] text-muted-2">
                         {firstWeek === lastWeek ? `Week ${firstWeek}` : `Weeks ${firstWeek}–${lastWeek}`}
                       </span>
                       <svg
@@ -300,7 +300,7 @@ export default function ProgramDetail({ id }) {
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
-                        className={`shrink-0 text-zinc-400 transition-transform duration-200 ${
+                        className={`shrink-0 text-muted transition-transform duration-200 ${
                           isPhaseOpen ? "rotate-180" : ""
                         }`}
                       >
@@ -374,7 +374,7 @@ export default function ProgramDetail({ id }) {
                             <div className="relative z-10 flex items-end justify-between gap-2 p-3">
                               <div className="min-w-0">
                                 <p className="text-xs font-bold text-white/80">Week {w.week}</p>
-                                <p className="truncate text-sm font-extrabold text-white">{w.title}</p>
+                                <p className="truncate text-sm font-extrabold text-foreground">{w.title}</p>
                               </div>
                               {canExpandDays && (
                                 <svg
@@ -412,18 +412,18 @@ export default function ProgramDetail({ id }) {
         </section>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md border-t border-border-subtle bg-black/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md border-t border-border-subtle bg-background/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         {status === "completed" ? (
           <div className="flex items-center justify-center gap-2 rounded-full border border-border-subtle bg-surface-raised py-3">
             <TrophyIcon className="text-yellow-400" />
-            <span className="text-sm font-bold text-zinc-100">Completed ✓</span>
+            <span className="text-sm font-bold text-foreground-secondary">Completed ✓</span>
           </div>
         ) : status === "enrolled" ? (
           <button
             onClick={() => router.push(`/programs/${program.id}/train`)}
             className="flex w-full items-center gap-3 rounded-full bg-rival-red px-4 py-3 transition hover:bg-red-600"
           >
-            <span className="text-sm font-bold text-white">Continue Training</span>
+            <span className="text-sm font-bold text-foreground">Continue Training</span>
             <span className="ml-auto text-xs text-white/80">
               Week {program.currentWeek} of {program.duration}
             </span>

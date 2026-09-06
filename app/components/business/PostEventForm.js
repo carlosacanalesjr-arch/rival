@@ -79,7 +79,7 @@ export default function PostEventForm() {
         value={form.title}
         onChange={update("title")}
         placeholder="Event name"
-        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
       />
 
       <div className="flex flex-wrap gap-2">
@@ -91,7 +91,7 @@ export default function PostEventForm() {
             className={`min-h-11 rounded-full border px-4 text-xs font-bold transition ${
               form.type === type
                 ? "border-rival-red bg-rival-red/15 text-rival-red"
-                : "border-border-subtle bg-black text-zinc-400 hover:border-zinc-600"
+                : "border-border-subtle bg-background text-muted hover:border-border-strong"
             }`}
           >
             {type}
@@ -104,13 +104,13 @@ export default function PostEventForm() {
           value={form.date}
           onChange={update("date")}
           placeholder="Date (e.g. Oct 18, 2026)"
-          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
         />
         <input
           value={form.location}
           onChange={update("location")}
           placeholder="Location"
-          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+          className="min-h-11 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
         />
       </div>
 
@@ -119,18 +119,18 @@ export default function PostEventForm() {
         onChange={update("description")}
         placeholder="Description"
         rows={3}
-        className="w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        className="w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
       />
 
       <input
         value={form.registrationLink}
         onChange={update("registrationLink")}
         placeholder="Registration link (https://…)"
-        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
       />
 
       <div>
-        <label className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-surface text-xs font-semibold text-zinc-400 hover:border-zinc-500">
+        <label className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-border-subtle bg-surface text-xs font-semibold text-muted hover:border-border-strong">
           {imageUrl ? "Image selected — tap to replace" : "Add a thumbnail image (optional)"}
           <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
         </label>

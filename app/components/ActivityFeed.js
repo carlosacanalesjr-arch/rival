@@ -34,7 +34,7 @@ function WorkoutPost({ post }) {
   };
 
   return (
-    <article className="border-b border-border-subtle bg-black px-4 py-4">
+    <article className="border-b border-border-subtle bg-background px-4 py-4">
       <div className="flex items-center gap-3">
         <Link
           href={`/profile/${post.user.athleteId}`}
@@ -44,31 +44,31 @@ function WorkoutPost({ post }) {
             {post.user.initials}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white">
+            <p className="truncate text-sm font-semibold text-foreground">
               {post.user.name}
             </p>
-            <p className="truncate text-xs text-zinc-500">
+            <p className="truncate text-xs text-muted-2">
               {post.user.handle} · {post.time}
             </p>
           </div>
         </Link>
         <span
           className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-            typeStyles[post.type] ?? "bg-zinc-800 text-zinc-300"
+            typeStyles[post.type] ?? "bg-surface-raised text-foreground-secondary"
           }`}
         >
           {post.type}
         </span>
       </div>
 
-      <p className="mt-3 text-sm font-semibold text-white">{post.title}</p>
-      <p className="mt-1 text-sm text-zinc-400">{post.caption}</p>
+      <p className="mt-3 text-sm font-semibold text-foreground">{post.title}</p>
+      <p className="mt-1 text-sm text-muted">{post.caption}</p>
 
       <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl border border-border-subtle bg-surface p-3">
         {post.stats.map((s) => (
           <div key={s.label} className="text-center">
-            <p className="text-sm font-extrabold text-white">{s.value}</p>
-            <p className="text-[10px] uppercase tracking-wide text-zinc-500">
+            <p className="text-sm font-extrabold text-foreground">{s.value}</p>
+            <p className="text-[10px] uppercase tracking-wide text-muted-2">
               {s.label}
             </p>
           </div>
@@ -88,21 +88,21 @@ function WorkoutPost({ post }) {
             fill={liked ? "#ff1f3d" : "none"}
             stroke={liked ? "#ff1f3d" : "currentColor"}
             strokeWidth="2"
-            className={liked ? "" : "text-zinc-400"}
+            className={liked ? "" : "text-muted"}
           >
             <path
               d="M12 21s-7.5-4.6-10-9.3C.5 8.2 2.3 4.5 6 4c2.1-.3 4 .8 6 3 2-2.2 3.9-3.3 6-3 3.7.5 5.5 4.2 4 7.7C19.5 16.4 12 21 12 21Z"
               strokeLinejoin="round"
             />
           </svg>
-          <span className={liked ? "text-rival-red" : "text-zinc-400"}>
+          <span className={liked ? "text-rival-red" : "text-muted"}>
             {likes}
           </span>
         </button>
 
         <button
           onClick={() => setShowComments((v) => !v)}
-          className="flex items-center gap-1.5 text-sm font-medium text-zinc-400"
+          className="flex items-center gap-1.5 text-sm font-medium text-muted"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path
@@ -115,7 +115,7 @@ function WorkoutPost({ post }) {
         </button>
 
         <button
-          className="ml-auto text-zinc-400 hover:text-white"
+          className="ml-auto text-muted hover:text-foreground"
           aria-label="Share workout"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -127,11 +127,11 @@ function WorkoutPost({ post }) {
       {showComments && (
         <div className="mt-3 space-y-2 border-t border-border-subtle pt-3">
           {comments.length === 0 && (
-            <p className="text-xs text-zinc-500">No comments yet. Be the first.</p>
+            <p className="text-xs text-muted-2">No comments yet. Be the first.</p>
           )}
           {comments.map((c) => (
-            <p key={c.id} className="text-sm text-zinc-300">
-              <span className="font-semibold text-white">{c.user}</span>{" "}
+            <p key={c.id} className="text-sm text-foreground-secondary">
+              <span className="font-semibold text-foreground">{c.user}</span>{" "}
               {c.text}
             </p>
           ))}
@@ -140,7 +140,7 @@ function WorkoutPost({ post }) {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Add a comment..."
-              className="min-w-0 flex-1 rounded-full border border-border-subtle bg-surface px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+              className="min-w-0 flex-1 rounded-full border border-border-subtle bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
             />
             <button
               type="submit"
@@ -159,7 +159,7 @@ function WorkoutPost({ post }) {
 export default function ActivityFeed() {
   return (
     <section className="mt-6">
-      <h2 className="px-4 text-base font-bold text-white">Activity</h2>
+      <h2 className="px-4 text-base font-bold text-foreground">Activity</h2>
       <div className="mt-3">
         {feedPosts.map((post) => (
           <WorkoutPost key={post.id} post={post} />

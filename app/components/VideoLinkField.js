@@ -62,7 +62,7 @@ export default function VideoLinkField({ mediaKey }) {
           }}
           placeholder="Paste video URL"
           autoFocus
-          className="min-w-0 flex-1 rounded-lg border border-border-subtle bg-black px-2 py-1 text-[11px] text-zinc-200 outline-none focus:border-rival-red"
+          className="min-w-0 flex-1 rounded-lg border border-border-subtle bg-background px-2 py-1 text-[11px] text-foreground-secondary outline-none focus:border-rival-red"
         />
         <button type="button" onClick={save} className="shrink-0 text-[11px] font-bold text-rival-red">
           Save
@@ -84,13 +84,13 @@ export default function VideoLinkField({ mediaKey }) {
         </a>
         {isTrainer && (
           <>
-            <button type="button" onClick={startEdit} className="text-[10px] text-zinc-500 hover:text-zinc-300">
+            <button type="button" onClick={startEdit} className="text-[10px] text-muted-2 hover:text-foreground-secondary">
               Edit
             </button>
             <button
               type="button"
               onClick={removeVideoUrl}
-              className="text-[10px] text-zinc-500 hover:text-zinc-300"
+              className="text-[10px] text-muted-2 hover:text-foreground-secondary"
             >
               Remove
             </button>
@@ -106,7 +106,7 @@ export default function VideoLinkField({ mediaKey }) {
     <button
       type="button"
       onClick={startEdit}
-      className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-zinc-300"
+      className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-muted-2 hover:text-foreground-secondary"
     >
       <LinkIcon /> Add video link
     </button>

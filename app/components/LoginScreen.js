@@ -70,12 +70,12 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <AuthHeader showBack />
       <main className="mx-auto w-full max-w-md flex-1 px-6 pb-12">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-extrabold text-white">Welcome back</h2>
-          <p className="mt-1 text-sm text-zinc-500">Log in to keep the streak going.</p>
+          <h2 className="text-2xl font-extrabold text-foreground">Welcome back</h2>
+          <p className="mt-1 text-sm text-muted-2">Log in to keep the streak going.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -112,7 +112,7 @@ export default function LoginScreen() {
 
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-border-subtle" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-zinc-600">or continue with</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-3">or continue with</span>
           <div className="h-px flex-1 bg-border-subtle" />
         </div>
 
@@ -133,7 +133,7 @@ export default function LoginScreen() {
           </button>
         </div>
 
-        <p className="mt-8 text-center text-sm text-zinc-500">
+        <p className="mt-8 text-center text-sm text-muted-2">
           Don&apos;t have an account?{" "}
           <button onClick={() => router.push("/welcome")} className="font-semibold text-rival-red hover:text-red-400">
             Sign up

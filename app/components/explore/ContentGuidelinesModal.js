@@ -36,10 +36,10 @@ export default function ContentGuidelinesModal({ onAgree, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center">
       <div className="w-full max-w-md rounded-t-2xl border border-border-subtle bg-surface p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:rounded-2xl sm:pb-5">
-        <h3 className="text-base font-bold text-white">Before you post</h3>
-        <p className="mt-1 text-xs text-zinc-500">A quick heads-up — this only shows once.</p>
+        <h3 className="text-base font-bold text-foreground">Before you post</h3>
+        <p className="mt-1 text-xs text-muted-2">A quick heads-up — this only shows once.</p>
 
-        <ul className="mt-4 space-y-2.5 text-sm text-zinc-300">
+        <ul className="mt-4 space-y-2.5 text-sm text-foreground-secondary">
           <li className="flex gap-2.5">
             <span className="text-rival-red">•</span>
             No spam, scams, or content unrelated to fitness events and deals.
@@ -62,7 +62,7 @@ export default function ContentGuidelinesModal({ onAgree, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-11 flex-1 rounded-full border border-border-subtle bg-black text-sm font-bold text-zinc-300 transition hover:bg-surface-raised"
+            className="min-h-11 flex-1 rounded-full border border-border-subtle bg-background text-sm font-bold text-foreground-secondary transition hover:bg-surface-raised"
           >
             Cancel
           </button>

@@ -62,13 +62,13 @@ export default function ExploreScreen() {
   );
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-black">
+    <div className="flex min-h-screen flex-1 flex-col bg-background">
       <TopBar />
 
       <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <div className="px-4 pt-5">
-          <h1 className="text-xl font-extrabold text-white">Explore</h1>
-          <p className="mt-1 text-sm text-zinc-400">Races, events, and deals from the community.</p>
+          <h1 className="text-xl font-extrabold text-foreground">Explore</h1>
+          <p className="mt-1 text-sm text-muted">Races, events, and deals from the community.</p>
         </div>
 
         <div className="px-4 pt-4">
@@ -82,7 +82,7 @@ export default function ExploreScreen() {
             </div>
             <div className="space-y-3 px-4">
               {visibleEvents.length === 0 ? (
-                <p className="mt-6 text-center text-sm text-zinc-500">No events match those filters.</p>
+                <p className="mt-6 text-center text-sm text-muted-2">No events match those filters.</p>
               ) : (
                 visibleEvents.map((event) => (
                   <EventCard
@@ -112,7 +112,7 @@ export default function ExploreScreen() {
             </div>
             <div className="space-y-3 px-4">
               {visibleDeals.length === 0 ? (
-                <p className="mt-6 text-center text-sm text-zinc-500">No deals match those filters.</p>
+                <p className="mt-6 text-center text-sm text-muted-2">No deals match those filters.</p>
               ) : (
                 visibleDeals.map((deal) => (
                   <DealCard

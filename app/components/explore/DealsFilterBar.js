@@ -21,7 +21,7 @@ export default function DealsFilterBar({ filters, onChange }) {
               className={`min-h-11 shrink-0 rounded-full border px-4 text-xs font-bold transition ${
                 selected
                   ? "border-rival-red bg-rival-red/15 text-rival-red"
-                  : "border-border-subtle bg-surface text-zinc-400 hover:border-zinc-600"
+                  : "border-border-subtle bg-surface text-muted hover:border-border-strong"
               }`}
             >
               {category}
@@ -34,7 +34,7 @@ export default function DealsFilterBar({ filters, onChange }) {
         value={filters.location}
         onChange={(e) => set({ location: e.target.value })}
         placeholder="Location"
-        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+        className="min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
       />
     </div>
   );

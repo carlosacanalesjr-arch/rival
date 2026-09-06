@@ -91,8 +91,8 @@ function CategoryDropdown({ categories, counts, selected, onSelect }) {
           <span className="text-xl" aria-hidden>
             {CATEGORY_EMOJI[selected]}
           </span>
-          <span className="truncate text-sm font-bold text-white">{selected}</span>
-          <span className="shrink-0 text-xs text-zinc-500">{counts[selected] ?? 0}</span>
+          <span className="truncate text-sm font-bold text-foreground">{selected}</span>
+          <span className="shrink-0 text-xs text-muted-2">{counts[selected] ?? 0}</span>
         </span>
         <ChevronIcon open={open} />
       </button>
@@ -112,14 +112,14 @@ function CategoryDropdown({ categories, counts, selected, onSelect }) {
                 onSelect(category);
               }}
               className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition ${
-                category === selected ? "bg-rival-red/15 text-rival-red" : "text-zinc-300 hover:bg-black/40"
+                category === selected ? "bg-rival-red/15 text-rival-red" : "text-foreground-secondary hover:bg-black/40"
               }`}
             >
               <span className="flex items-center gap-2">
                 <span aria-hidden>{CATEGORY_EMOJI[category]}</span>
                 {category}
               </span>
-              <span className="text-xs text-zinc-500">{counts[category] ?? 0}</span>
+              <span className="text-xs text-muted-2">{counts[category] ?? 0}</span>
             </button>
           ))}
         </div>
@@ -149,15 +149,15 @@ function ChallengeCard({ challenge, onOpen, onToggleJoin }) {
         <span className="text-5xl" aria-hidden>
           {CATEGORY_EMOJI[challenge.category]}
         </span>
-        <span className="absolute right-2 top-2 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
+        <span className="absolute right-2 top-2 rounded-full bg-background/40 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
           {challenge.duration}
         </span>
       </div>
 
       <div className="p-3.5">
-        <p className="truncate text-sm font-bold text-white">{challenge.title}</p>
-        <p className="mt-0.5 text-xs text-zinc-400">{formatDateRange(challenge.startDate, challenge.endDate)}</p>
-        <p className="mt-1.5 text-[11px] text-zinc-500">{challenge.participants.toLocaleString()} joined</p>
+        <p className="truncate text-sm font-bold text-foreground">{challenge.title}</p>
+        <p className="mt-0.5 text-xs text-muted">{formatDateRange(challenge.startDate, challenge.endDate)}</p>
+        <p className="mt-1.5 text-[11px] text-muted-2">{challenge.participants.toLocaleString()} joined</p>
 
         <button
           onClick={(e) => {
@@ -184,8 +184,8 @@ function ChallengeRow({ title, items, onOpen, onToggleJoin }) {
   return (
     <section className="mt-5">
       <div className="flex items-center justify-between px-4">
-        <h2 className="text-base font-bold text-white">{title}</h2>
-        <span className="text-xs text-zinc-500">
+        <h2 className="text-base font-bold text-foreground">{title}</h2>
+        <span className="text-xs text-muted-2">
           {items.length} {items.length === 1 ? "challenge" : "challenges"}
         </span>
       </div>
@@ -197,7 +197,7 @@ function ChallengeRow({ title, items, onOpen, onToggleJoin }) {
             ))}
           </ScrollFadeRow>
         ) : (
-          <div className="flex h-32 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-zinc-500">
+          <div className="flex h-32 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-muted-2">
             Coming soon
           </div>
         )}
@@ -231,13 +231,13 @@ export default function ChallengesScreen() {
   const openChallenge = (id) => router.push(`/challenges/${id}`);
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-black">
+    <div className="flex min-h-screen flex-1 flex-col bg-background">
       <TopBar />
 
       <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <div className="px-4 pt-5">
-          <h1 className="text-xl font-extrabold text-white">Challenges</h1>
-          <p className="mt-1 text-sm text-zinc-400">Join a challenge and climb the leaderboard.</p>
+          <h1 className="text-xl font-extrabold text-foreground">Challenges</h1>
+          <p className="mt-1 text-sm text-muted">Join a challenge and climb the leaderboard.</p>
         </div>
 
         <div className="px-4 pt-4">

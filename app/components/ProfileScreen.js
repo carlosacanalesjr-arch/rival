@@ -72,26 +72,26 @@ function ProfilePostCard({ post }) {
   };
 
   return (
-    <article className="border-b border-border-subtle bg-black px-4 py-4">
+    <article className="border-b border-border-subtle bg-background px-4 py-4">
       <div className="flex items-center justify-between">
         <span
           className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
-            typeStyles[post.type] ?? "bg-zinc-800 text-zinc-300"
+            typeStyles[post.type] ?? "bg-surface-raised text-foreground-secondary"
           }`}
         >
           {post.type}
         </span>
-        <span className="text-xs text-zinc-500">{post.time}</span>
+        <span className="text-xs text-muted-2">{post.time}</span>
       </div>
 
-      <p className="mt-2 text-sm font-semibold text-white">{post.title}</p>
-      <p className="mt-1 text-sm text-zinc-400">{post.caption}</p>
+      <p className="mt-2 text-sm font-semibold text-foreground">{post.title}</p>
+      <p className="mt-1 text-sm text-muted">{post.caption}</p>
 
       <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl border border-border-subtle bg-surface p-3">
         {post.stats.map((s) => (
           <div key={s.label} className="text-center">
-            <p className="text-sm font-extrabold text-white">{s.value}</p>
-            <p className="text-[10px] uppercase tracking-wide text-zinc-500">{s.label}</p>
+            <p className="text-sm font-extrabold text-foreground">{s.value}</p>
+            <p className="text-[10px] uppercase tracking-wide text-muted-2">{s.label}</p>
           </div>
         ))}
       </div>
@@ -105,17 +105,17 @@ function ProfilePostCard({ post }) {
             fill={liked ? "#ff1f3d" : "none"}
             stroke={liked ? "#ff1f3d" : "currentColor"}
             strokeWidth="2"
-            className={liked ? "" : "text-zinc-400"}
+            className={liked ? "" : "text-muted"}
           >
             <path
               d="M12 21s-7.5-4.6-10-9.3C.5 8.2 2.3 4.5 6 4c2.1-.3 4 .8 6 3 2-2.2 3.9-3.3 6-3 3.7.5 5.5 4.2 4 7.7C19.5 16.4 12 21 12 21Z"
               strokeLinejoin="round"
             />
           </svg>
-          <span className={liked ? "text-rival-red" : "text-zinc-400"}>{likes}</span>
+          <span className={liked ? "text-rival-red" : "text-muted"}>{likes}</span>
         </button>
 
-        <button onClick={() => setShowComments((v) => !v)} className="flex items-center gap-1.5 text-sm font-medium text-zinc-400">
+        <button onClick={() => setShowComments((v) => !v)} className="flex items-center gap-1.5 text-sm font-medium text-muted">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path
               d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
@@ -129,10 +129,10 @@ function ProfilePostCard({ post }) {
 
       {showComments && (
         <div className="mt-3 space-y-2 border-t border-border-subtle pt-3">
-          {comments.length === 0 && <p className="text-xs text-zinc-500">No comments yet. Be the first.</p>}
+          {comments.length === 0 && <p className="text-xs text-muted-2">No comments yet. Be the first.</p>}
           {comments.map((c) => (
-            <p key={c.id} className="text-sm text-zinc-300">
-              <span className="font-semibold text-white">{c.user}</span> {c.text}
+            <p key={c.id} className="text-sm text-foreground-secondary">
+              <span className="font-semibold text-foreground">{c.user}</span> {c.text}
             </p>
           ))}
           <form onSubmit={submitComment} className="flex items-center gap-2 pt-1">
@@ -140,7 +140,7 @@ function ProfilePostCard({ post }) {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Add a comment..."
-              className="min-w-0 flex-1 rounded-full border border-border-subtle bg-surface px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+              className="min-w-0 flex-1 rounded-full border border-border-subtle bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
             />
             <button
               type="submit"
@@ -197,8 +197,8 @@ export default function ProfileScreen({ id }) {
 
   if (!athlete) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-        <p className="text-lg font-bold text-white">Athlete not found</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <p className="text-lg font-bold text-foreground">Athlete not found</p>
         <button onClick={() => router.push("/")} className="rounded-full bg-rival-red px-5 py-2.5 text-sm font-bold text-white">
           Back to Home
         </button>
@@ -242,12 +242,12 @@ export default function ProfileScreen({ id }) {
   const allAchievements = [...athlete.achievements, ...challengeBadges];
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-        <button onClick={() => router.back()} aria-label="Back" className="text-zinc-300 hover:text-white">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
+        <button onClick={() => router.back()} aria-label="Back" className="text-foreground-secondary hover:text-foreground">
           <BackIcon />
         </button>
-        <h1 className="truncate text-base font-bold text-white">{profileLoading ? "" : displayHandle}</h1>
+        <h1 className="truncate text-base font-bold text-foreground">{profileLoading ? "" : displayHandle}</h1>
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-24">
@@ -257,11 +257,11 @@ export default function ProfileScreen({ id }) {
               {profileLoading ? "" : displayInitials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-extrabold text-white">{profileLoading ? "Loading…" : displayName}</p>
+              <p className="truncate text-lg font-extrabold text-foreground">{profileLoading ? "Loading…" : displayName}</p>
               {!profileLoading && (!isSelf || realProfile?.username) && (
-                <p className="truncate text-sm text-zinc-500">{displayHandle}</p>
+                <p className="truncate text-sm text-muted-2">{displayHandle}</p>
               )}
-              <p className="mt-1 flex items-center gap-1 truncate text-xs text-zinc-400">
+              <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 21h18M6 21V9l6-5 6 5v12M10 21v-6h4v6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -273,14 +273,14 @@ export default function ProfileScreen({ id }) {
                 <button
                   onClick={() => router.push("/settings")}
                   aria-label="Edit profile"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-zinc-300 transition hover:bg-surface-raised hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-foreground-secondary transition hover:bg-surface-raised hover:text-foreground"
                 >
                   <PencilIcon />
                 </button>
                 <button
                   onClick={() => setShowReportIssue(true)}
                   aria-label="Report an issue"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-zinc-400 transition hover:bg-surface-raised hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle text-muted transition hover:bg-surface-raised hover:text-foreground"
                 >
                   <FlagIcon />
                 </button>
@@ -290,19 +290,19 @@ export default function ProfileScreen({ id }) {
 
           <div className="mt-5 grid grid-cols-3 divide-x divide-border-subtle rounded-xl border border-border-subtle">
             <div className="px-2 py-2.5 text-center">
-              <p className="text-base font-extrabold text-white">{athlete.followers.toLocaleString()}</p>
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Followers</p>
+              <p className="text-base font-extrabold text-foreground">{athlete.followers.toLocaleString()}</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">Followers</p>
             </div>
             <div className="px-2 py-2.5 text-center">
-              <p className="text-base font-extrabold text-white">{athlete.following.toLocaleString()}</p>
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Following</p>
+              <p className="text-base font-extrabold text-foreground">{athlete.following.toLocaleString()}</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">Following</p>
             </div>
             <div className="px-2 py-2.5 text-center">
-              <p className="flex items-center justify-center gap-1 text-base font-extrabold text-white">
+              <p className="flex items-center justify-center gap-1 text-base font-extrabold text-foreground">
                 {athlete.streak}
                 <span aria-hidden>🔥</span>
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Day Streak</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">Day Streak</p>
             </div>
           </div>
 
@@ -310,7 +310,7 @@ export default function ProfileScreen({ id }) {
             {athlete.sportBadges.map((b) => (
               <span
                 key={b.label}
-                className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-black px-3 py-1.5 text-xs font-semibold text-zinc-200"
+                className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-background px-3 py-1.5 text-xs font-semibold text-foreground-secondary"
               >
                 <span aria-hidden>{b.emoji}</span>
                 {b.label}
@@ -319,23 +319,23 @@ export default function ProfileScreen({ id }) {
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Total Workouts</p>
-              <p className="mt-1 text-xl font-extrabold text-white">{athlete.stats.totalWorkouts}</p>
+            <div className="rounded-xl border border-border-subtle bg-background p-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">Total Workouts</p>
+              <p className="mt-1 text-xl font-extrabold text-foreground">{athlete.stats.totalWorkouts}</p>
             </div>
-            <div className="rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Lifetime Miles</p>
-              <p className="mt-1 text-xl font-extrabold text-white">
+            <div className="rounded-xl border border-border-subtle bg-background p-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">Lifetime Miles</p>
+              <p className="mt-1 text-xl font-extrabold text-foreground">
                 {athlete.runningStats.lifetimeMiles.toLocaleString()}
               </p>
             </div>
-            <div className="rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">PRs Broken</p>
-              <p className="mt-1 text-xl font-extrabold text-white">{athlete.runningStats.totalPRsBroken}</p>
+            <div className="rounded-xl border border-border-subtle bg-background p-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">PRs Broken</p>
+              <p className="mt-1 text-xl font-extrabold text-foreground">{athlete.runningStats.totalPRsBroken}</p>
             </div>
-            <div className="rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">PRs This Year</p>
-              <p className="mt-1 text-xl font-extrabold text-white">{athlete.runningStats.prsBrokenThisYear}</p>
+            <div className="rounded-xl border border-border-subtle bg-background p-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-2">PRs This Year</p>
+              <p className="mt-1 text-xl font-extrabold text-foreground">{athlete.runningStats.prsBrokenThisYear}</p>
             </div>
           </div>
 
@@ -353,13 +353,13 @@ export default function ProfileScreen({ id }) {
           )}
         </div>
 
-        <div className="sticky top-[49px] z-20 flex border-b border-border-subtle bg-black/95 backdrop-blur">
+        <div className="sticky top-[49px] z-20 flex border-b border-border-subtle bg-background/95 backdrop-blur">
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 border-b-2 py-3 text-sm font-bold transition ${
-                activeTab === tab ? "border-rival-red text-white" : "border-transparent text-zinc-500"
+                activeTab === tab ? "border-rival-red text-foreground" : "border-transparent text-muted-2"
               }`}
             >
               {tab}
@@ -378,7 +378,7 @@ export default function ProfileScreen({ id }) {
         {activeTab === "Challenges" && (
           <div className="space-y-3 p-4">
             {joinedChallenges.length === 0 && (
-              <p className="text-sm text-zinc-500">Not participating in any challenges yet.</p>
+              <p className="text-sm text-muted-2">Not participating in any challenges yet.</p>
             )}
             {joinedChallenges.map(({ challenge, entry }) => (
               <Link
@@ -387,12 +387,12 @@ export default function ProfileScreen({ id }) {
                 className="block rounded-xl border border-border-subtle bg-surface p-4"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-bold text-white">{challenge.title}</p>
+                  <p className="text-sm font-bold text-foreground">{challenge.title}</p>
                   <span className="rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
                     {challenge.category}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-muted-2">
                   {entry
                     ? `Rank #${entry.rank} · ${entry.score.toLocaleString()} ${challenge.unit}`
                     : "Participating"}
@@ -412,14 +412,14 @@ export default function ProfileScreen({ id }) {
                 }`}
               >
                 <BadgeIcon id={a.iconId ?? a.id} earned={a.earned} />
-                <p className="mt-2 text-sm font-bold text-white">{a.title}</p>
-                <p className="mt-1 text-[11px] text-zinc-500">{a.detail}</p>
+                <p className="mt-2 text-sm font-bold text-foreground">{a.title}</p>
+                <p className="mt-1 text-[11px] text-muted-2">{a.detail}</p>
                 {a.kind === "tiered" && (
                   <div className="mt-2 flex items-center justify-center gap-1">
                     {Array.from({ length: a.tierCount }).map((_, i) => (
                       <span
                         key={i}
-                        className={`h-1.5 w-1.5 rounded-full ${i < a.tier ? "bg-rival-red" : "bg-zinc-700"}`}
+                        className={`h-1.5 w-1.5 rounded-full ${i < a.tier ? "bg-rival-red" : "bg-surface-raised"}`}
                       />
                     ))}
                   </div>

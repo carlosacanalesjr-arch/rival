@@ -61,15 +61,15 @@ export default function VerifyEmailScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <AuthHeader showBack />
       <main className="mx-auto w-full max-w-md flex-1 px-6 pb-12">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-extrabold text-white">Check your email</h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h2 className="text-2xl font-extrabold text-foreground">Check your email</h2>
+          <p className="mt-1 text-sm text-muted-2">
             {email ? (
               <>
-                Enter the 8-digit code we sent to <span className="text-zinc-300">{email}</span>.
+                Enter the 8-digit code we sent to <span className="text-foreground-secondary">{email}</span>.
               </>
             ) : (
               "Enter the 8-digit code we emailed you."
@@ -97,7 +97,7 @@ export default function VerifyEmailScreen() {
           </Field>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          {resendMessage && <p className="text-sm text-zinc-400">{resendMessage}</p>}
+          {resendMessage && <p className="text-sm text-muted">{resendMessage}</p>}
 
           <button
             type="submit"
@@ -108,7 +108,7 @@ export default function VerifyEmailScreen() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-muted-2">
           Didn&apos;t get a code?{" "}
           <button
             type="button"

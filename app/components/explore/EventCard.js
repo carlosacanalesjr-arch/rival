@@ -61,7 +61,7 @@ export default function EventCard({ event, onOpen, onReport }) {
       className="relative cursor-pointer overflow-hidden rounded-2xl border border-border-subtle bg-surface"
     >
       <div className="flex gap-3 p-3 pr-11">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border-subtle bg-surface-raised text-zinc-600">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border-subtle bg-surface-raised text-muted-3">
           {event.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- runtime data URLs, not static assets
             <img src={event.imageUrl} alt={event.title} className="h-full w-full object-cover" />
@@ -72,18 +72,18 @@ export default function EventCard({ event, onOpen, onReport }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{event.title}</p>
+            <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">{event.title}</p>
             <span className="shrink-0 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
               {event.type}
             </span>
           </div>
-          <p className="mt-1 flex items-center gap-1 truncate text-xs text-zinc-400">
+          <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted">
             <CalendarIcon /> {event.date}
           </p>
-          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-zinc-400">
+          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted">
             <PinIcon /> {event.location}
           </p>
-          <p className="mt-1 truncate text-[11px] text-zinc-500">Hosted by {event.hostName}</p>
+          <p className="mt-1 truncate text-[11px] text-muted-2">Hosted by {event.hostName}</p>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export default function EventCard({ event, onOpen, onReport }) {
           aria-label="More options"
           aria-haspopup="menu"
           aria-expanded={menuOpen}
-          className="flex h-11 w-11 items-center justify-center text-zinc-500 hover:text-zinc-300"
+          className="flex h-11 w-11 items-center justify-center text-muted-2 hover:text-foreground-secondary"
         >
           <KebabIcon />
         </button>
@@ -111,7 +111,7 @@ export default function EventCard({ event, onOpen, onReport }) {
                 setMenuOpen(false);
                 setShowReport(true);
               }}
-              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-semibold text-zinc-200 hover:bg-black/40"
+              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-semibold text-foreground-secondary hover:bg-black/40"
             >
               Report
             </button>

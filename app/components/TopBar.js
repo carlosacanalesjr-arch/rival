@@ -54,9 +54,9 @@ export default function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
       <h1 className="text-xl font-extrabold tracking-tight">
-        <Link href="/" className="text-white">
+        <Link href="/" className="text-foreground">
           KAIROS<span className="text-rival-red">.</span>
         </Link>
       </h1>
@@ -65,7 +65,7 @@ export default function TopBar() {
           <Link
             href="/admin"
             aria-label="Admin"
-            className="-my-1.5 flex h-11 w-11 items-center justify-center text-zinc-300 hover:text-white"
+            className="-my-1.5 flex h-11 w-11 items-center justify-center text-foreground-secondary hover:text-foreground"
           >
             <AdminIcon />
           </Link>
@@ -74,14 +74,14 @@ export default function TopBar() {
           <Link
             href="/business"
             aria-label="Business dashboard"
-            className="-my-1.5 flex h-11 w-11 items-center justify-center text-zinc-300 hover:text-white"
+            className="-my-1.5 flex h-11 w-11 items-center justify-center text-foreground-secondary hover:text-foreground"
           >
             <BusinessIcon />
           </Link>
         )}
         <button
           aria-label="Notifications"
-          className="relative text-zinc-300 hover:text-white"
+          className="relative text-foreground-secondary hover:text-foreground"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
@@ -105,7 +105,7 @@ export default function TopBar() {
                 <Link
                   href="/profile/you"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2.5 text-sm text-zinc-200 hover:bg-black/40"
+                  className="block px-4 py-2.5 text-sm text-foreground-secondary hover:bg-black/40"
                 >
                   View Profile
                 </Link>
@@ -122,7 +122,7 @@ export default function TopBar() {
         ) : (
           <Link
             href="/login"
-            className="rounded-full border border-border-subtle px-3.5 py-1.5 text-xs font-semibold text-zinc-200 hover:border-zinc-500 hover:text-white"
+            className="rounded-full border border-border-subtle px-3.5 py-1.5 text-xs font-semibold text-foreground-secondary hover:border-border-strong hover:text-foreground"
           >
             Sign In
           </Link>

@@ -24,13 +24,13 @@ function DayLabelField({ label, onSave }) {
 
   return (
     <div className="mt-3">
-      <label className="text-xs font-bold uppercase tracking-wide text-zinc-500">Day label</label>
+      <label className="text-xs font-bold uppercase tracking-wide text-muted-2">Day label</label>
       <div className="mt-1 flex items-center gap-2">
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Optional day label"
-          className="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-white outline-none focus:border-rival-red"
+          className="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-rival-red"
         />
         {dirty && (
           <button type="button" onClick={() => onSave(value)} className="shrink-0 text-xs font-bold text-rival-red">
@@ -56,7 +56,7 @@ function ExerciseSectionEditor({
   const sectionSlug = getSectionSlug(title);
   return (
     <div className="mt-4">
-      <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{title}</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-2">{title}</p>
       <div className="mt-2 space-y-2">
         {(items || []).map((item, i) =>
           editingIndex === i ? (
@@ -67,9 +67,9 @@ function ExerciseSectionEditor({
               className="flex items-center justify-between gap-2 rounded-xl border border-border-subtle bg-surface p-3"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white">{item.name}</p>
-                <p className="text-[11px] text-zinc-500">{formatPrescription(item)}</p>
-                {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
+                <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
+                <p className="text-[11px] text-muted-2">{formatPrescription(item)}</p>
+                {item.notes && <p className="mt-0.5 text-[11px] text-muted-2">{item.notes}</p>}
                 <VideoLinkField mediaKey={`exercise:${mediaKeyPrefix}:${sectionSlug}:${i}`} />
               </div>
               <div className="flex shrink-0 gap-3">
@@ -85,7 +85,7 @@ function ExerciseSectionEditor({
                   onClick={() => {
                     if (window.confirm(`Remove "${item.name}"?`)) onRemove(i);
                   }}
-                  className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-300"
+                  className="text-[11px] font-semibold text-muted-2 hover:text-foreground-secondary"
                 >
                   Remove
                 </button>
@@ -99,7 +99,7 @@ function ExerciseSectionEditor({
           <button
             type="button"
             onClick={() => onStartEdit("new")}
-            className="w-full rounded-xl border border-dashed border-zinc-700 p-3 text-xs font-semibold text-zinc-500 transition hover:border-zinc-500 hover:text-zinc-300"
+            className="w-full rounded-xl border border-dashed border-border-subtle p-3 text-xs font-semibold text-muted-2 transition hover:border-border-strong hover:text-foreground-secondary"
           >
             + Add exercise
           </button>
@@ -129,7 +129,7 @@ export default function AdminDayEditor({ programId, levelKey, week, day }) {
   );
 
   if (!program || !weekData) {
-    return <p className="text-sm text-zinc-500">Not found.</p>;
+    return <p className="text-sm text-muted-2">Not found.</p>;
   }
 
   const startEdit = (section, index) => setEditing((e) => ({ ...e, [section]: index }));
@@ -139,11 +139,11 @@ export default function AdminDayEditor({ programId, levelKey, week, day }) {
     <div>
       <button
         onClick={() => router.push(`/admin/${programId}/${levelKey}/${week}`)}
-        className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white"
+        className="flex items-center gap-2 text-sm text-muted hover:text-foreground"
       >
         <BackIcon /> Days
       </button>
-      <h1 className="mt-3 text-xl font-extrabold text-white">
+      <h1 className="mt-3 text-xl font-extrabold text-foreground">
         {program.title} · Week {week} · Day {day}
       </h1>
 
@@ -182,7 +182,7 @@ export default function AdminDayEditor({ programId, levelKey, week, day }) {
           onClick={() => {
             if (window.confirm("Reset this day back to the placeholder content?")) resetDay();
           }}
-          className="mt-6 text-xs font-semibold text-zinc-500 hover:text-zinc-300"
+          className="mt-6 text-xs font-semibold text-muted-2 hover:text-foreground-secondary"
         >
           Reset day to placeholder
         </button>

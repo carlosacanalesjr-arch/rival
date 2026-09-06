@@ -109,19 +109,19 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center">
       <div className="w-full max-w-md rounded-t-2xl border border-border-subtle bg-surface p-5 sm:rounded-2xl">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white">Submit Photo + Result</h3>
-          <button onClick={onClose} aria-label="Close" className="text-zinc-400 hover:text-white">
+          <h3 className="text-base font-bold text-foreground">Submit Photo + Result</h3>
+          <button onClick={onClose} aria-label="Close" className="text-muted hover:text-foreground">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
             </svg>
           </button>
         </div>
-        <p className="mt-1 text-xs text-zinc-500">{challenge.name}</p>
+        <p className="mt-1 text-xs text-muted-2">{challenge.name}</p>
 
         {step === "form" && (
           <form onSubmit={runAnalysis} className="mt-4 space-y-4">
             <div>
-              <label className="text-xs font-medium text-zinc-400" htmlFor="foundation-result-value">
+              <label className="text-xs font-medium text-muted" htmlFor="foundation-result-value">
                 Your result {unit ? `(${unit})` : ""}
               </label>
               <input
@@ -131,15 +131,15 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder={unit === "reps" ? "e.g. 6" : "e.g. 18"}
-                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
               />
             </div>
 
             {leaderboardEligible && (
               <div>
-                <label className="text-xs font-medium text-zinc-400" htmlFor="foundation-leaderboard-value">
+                <label className="text-xs font-medium text-muted" htmlFor="foundation-leaderboard-value">
                   {leaderboardUnit === "mi" ? "Distance covered" : "Finish time"} ({leaderboardUnit})
-                  <span className="ml-1 text-zinc-600">— for today&apos;s leaderboard</span>
+                  <span className="ml-1 text-muted-3">— for today&apos;s leaderboard</span>
                 </label>
                 <input
                   id="foundation-leaderboard-value"
@@ -147,16 +147,16 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
                   value={leaderboardValue}
                   onChange={(e) => setLeaderboardValue(e.target.value)}
                   placeholder={leaderboardUnit === "mi" ? "e.g. 1.8" : "e.g. 16.5"}
-                  className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+                  className="mt-1.5 w-full rounded-xl border border-border-subtle bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
                 />
               </div>
             )}
 
             <div>
-              <p className="text-xs font-medium text-zinc-400">
-                Proof photo <span className="text-zinc-600">(required)</span>
+              <p className="text-xs font-medium text-muted">
+                Proof photo <span className="text-muted-3">(required)</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-zinc-500">
+              <p className="mt-0.5 text-[11px] text-muted-2">
                 A screenshot from Garmin, Strava, Apple Health, another wearable, or a treadmill display.
               </p>
               <input type="file" accept="image/*" id="foundation-proof-photo" className="hidden" onChange={handleFile} />
@@ -171,7 +171,7 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
               ) : (
                 <label
                   htmlFor="foundation-proof-photo"
-                  className="mt-2 flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-zinc-700 bg-black text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
+                  className="mt-2 flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border-subtle bg-background text-muted-2 hover:border-border-strong hover:text-foreground-secondary"
                 >
                   <CameraIcon />
                   <span className="text-[11px] font-semibold uppercase tracking-wide">Add photo</span>
@@ -192,8 +192,8 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
 
         {step === "analyzing" && (
           <div className="mt-8 flex flex-col items-center gap-3 pb-4 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-rival-red" />
-            <p className="text-sm text-zinc-400">Analyzing your photo…</p>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border-subtle border-t-rival-red" />
+            <p className="text-sm text-muted">Analyzing your photo…</p>
           </div>
         )}
 
@@ -202,14 +202,14 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
             {analysis.verification === "confirmed" ? (
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
                 <p className="text-sm font-bold text-emerald-400">✓ Confirmed</p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted">
                   Your photo shows about {analysis.detectedValue} {unit}, matching your entry of {value} {unit}.
                 </p>
               </div>
             ) : (
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
                 <p className="text-sm font-bold text-amber-400">⚠ Needs Review</p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted">
                   {analysis.detectedValue == null
                     ? "We couldn't read a result from this photo. It'll be flagged for manual review."
                     : `We couldn't confirm this matches your photo. You entered ${value} ${unit}, but the photo appears to show about ${analysis.detectedValue} ${unit}.`}
@@ -221,7 +221,7 @@ function SubmitFoundationModal({ challenge, onClose, onSubmit }) {
               {analysis.verification !== "confirmed" && (
                 <button
                   onClick={tryAgain}
-                  className="flex-1 rounded-full border border-border-subtle py-3 text-sm font-bold text-white hover:bg-surface-raised"
+                  className="flex-1 rounded-full border border-border-subtle py-3 text-sm font-bold text-foreground hover:bg-surface-raised"
                 >
                   Try Again
                 </button>
@@ -269,9 +269,9 @@ function ChallengeCard({ challenge, isBonus, isDone, onSubmit }) {
           </span>
         )}
       </div>
-      <h3 className="mt-2 text-lg font-extrabold text-white">{challenge.name}</h3>
-      {prescription && <p className="mt-0.5 text-sm text-zinc-400">{prescription}</p>}
-      {challenge.bodyFocus && <p className="mt-0.5 text-xs text-zinc-500">{challenge.bodyFocus} focus</p>}
+      <h3 className="mt-2 text-lg font-extrabold text-foreground">{challenge.name}</h3>
+      {prescription && <p className="mt-0.5 text-sm text-muted">{prescription}</p>}
+      {challenge.bodyFocus && <p className="mt-0.5 text-xs text-muted-2">{challenge.bodyFocus} focus</p>}
 
       {!isDone && (
         <button
@@ -304,13 +304,13 @@ function DailyLeaderboard({ challenge, selfCompletion }) {
     <div className="mt-4 overflow-hidden rounded-2xl border border-border-subtle bg-surface">
       <div className="flex items-center justify-between px-4 pt-4">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-white">Today&apos;s Leaderboard</h3>
+          <h3 className="text-sm font-bold text-foreground">Today&apos;s Leaderboard</h3>
           <span className="flex items-center gap-1 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
             <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-rival-red" />
             LIVE
           </span>
         </div>
-        <span className="text-[10px] text-zinc-500">Locks at midnight</span>
+        <span className="text-[10px] text-muted-2">Locks at midnight</span>
       </div>
       <ul className="mt-2 divide-y divide-border-subtle">
         {ranked.map((entry) => (
@@ -320,21 +320,21 @@ function DailyLeaderboard({ challenge, selfCompletion }) {
           >
             <span
               className={`w-5 shrink-0 text-sm font-extrabold ${
-                entry.rank === 1 ? "text-yellow-400" : entry.rank === 2 ? "text-zinc-300" : entry.rank === 3 ? "text-orange-400" : "text-zinc-500"
+                entry.rank === 1 ? "text-yellow-400" : entry.rank === 2 ? "text-foreground-secondary" : entry.rank === 3 ? "text-orange-400" : "text-muted-2"
               }`}
             >
               {entry.rank}
             </span>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-raised text-[11px] font-bold text-white">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-raised text-[11px] font-bold text-foreground">
               {entry.initials}
             </span>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
               {entry.name}
               {entry.isSelf && <span className="ml-1.5 text-[10px] font-bold text-rival-red">YOU</span>}
             </span>
-            <span className="shrink-0 text-right text-sm font-bold text-white">
+            <span className="shrink-0 text-right text-sm font-bold text-foreground">
               {entry.score}
-              <span className="ml-1 text-[10px] font-normal text-zinc-500">{unit}</span>
+              <span className="ml-1 text-[10px] font-normal text-muted-2">{unit}</span>
             </span>
           </li>
         ))}
@@ -351,8 +351,8 @@ function MissedChallengeRow({ challenge, onSubmit }) {
       className="flex w-full items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface p-3 text-left transition hover:bg-surface-raised"
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-bold text-white">{challenge.name}</p>
-        <p className="mt-0.5 text-xs text-zinc-500">
+        <p className="truncate text-sm font-bold text-foreground">{challenge.name}</p>
+        <p className="mt-0.5 text-xs text-muted-2">
           {RUN_TYPE_LABELS[challenge.run_type]} · {DAY_LABELS[challenge.day_of_week]}, Week {challenge.week_number}
           {prescription ? ` · ${prescription}` : ""}
         </p>
@@ -402,7 +402,7 @@ export default function FoundationScreen() {
             <p className="text-xs font-bold uppercase tracking-wide text-rival-red">Running</p>
           )}
         </div>
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="mt-2 text-sm text-muted">
           One locked challenge a day, on a shared calendar — everyone on a level sees the same thing on the same date.
         </p>
       </div>
@@ -413,8 +413,8 @@ export default function FoundationScreen() {
 
       {isReady && hasChosenLevel && !levelHasContent && (
         <div className="mx-4 mt-4 flex flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border-subtle p-8 text-center">
-          <p className="text-sm font-bold text-white">{activeLevel} is coming soon</p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm font-bold text-foreground">{activeLevel} is coming soon</p>
+          <p className="text-xs text-muted-2">
             This level&apos;s calendar hasn&apos;t been built yet — check back once it launches.
           </p>
         </div>
@@ -431,7 +431,7 @@ export default function FoundationScreen() {
 
           <div className="mt-4 space-y-3 px-4">
             <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">Today</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-2">Today</p>
               {todayChallenge ? (
                 <>
                   <ChallengeCard
@@ -444,7 +444,7 @@ export default function FoundationScreen() {
                   )}
                 </>
               ) : (
-                <div className="flex h-28 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-zinc-500">
+                <div className="flex h-28 items-center justify-center rounded-2xl border border-dashed border-border-subtle text-xs text-muted-2">
                   Nothing scheduled yet — check back soon.
                 </div>
               )}
@@ -474,7 +474,7 @@ export default function FoundationScreen() {
             onClick={() => setMissedOpen((v) => !v)}
             className="flex w-full items-center justify-between rounded-2xl border border-border-subtle bg-surface px-4 py-3.5"
           >
-            <span className="text-sm font-bold text-white">Missed Challenges ({missedChallenges.length})</span>
+            <span className="text-sm font-bold text-foreground">Missed Challenges ({missedChallenges.length})</span>
             <svg
               width="18"
               height="18"
@@ -482,7 +482,7 @@ export default function FoundationScreen() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className={`text-zinc-400 transition-transform ${missedOpen ? "rotate-180" : ""}`}
+              className={`text-muted transition-transform ${missedOpen ? "rotate-180" : ""}`}
             >
               <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -490,7 +490,7 @@ export default function FoundationScreen() {
           {missedOpen && (
             <div className="mt-2 space-y-2">
               {missedChallenges.length === 0 ? (
-                <p className="px-1 py-2 text-xs text-zinc-500">Nothing missed — you&apos;re caught up.</p>
+                <p className="px-1 py-2 text-xs text-muted-2">Nothing missed — you&apos;re caught up.</p>
               ) : (
                 missedChallenges.map((c) => <MissedChallengeRow key={c.id} challenge={c} onSubmit={setActiveChallenge} />)
               )}

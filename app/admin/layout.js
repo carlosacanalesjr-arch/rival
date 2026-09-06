@@ -22,32 +22,32 @@ export default function AdminLayout({ children }) {
 
   if (initializing || !isTrainer) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <p className="text-sm text-zinc-500">Checking access…</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-2">Checking access…</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-        <Link href="/admin" className="text-sm font-extrabold text-white">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
+        <Link href="/admin" className="text-sm font-extrabold text-foreground">
           Admin <span className="text-rival-red">·</span> Kairos
         </Link>
         <nav className="ml-auto flex items-center gap-4">
           <Link
             href="/admin"
-            className={`text-xs font-semibold ${pathname === "/admin" ? "text-white" : "text-zinc-400 hover:text-white"}`}
+            className={`text-xs font-semibold ${pathname === "/admin" ? "text-foreground" : "text-muted hover:text-foreground"}`}
           >
             Programs
           </Link>
           <Link
             href="/admin/reports"
-            className={`text-xs font-semibold ${pathname === "/admin/reports" ? "text-white" : "text-zinc-400 hover:text-white"}`}
+            className={`text-xs font-semibold ${pathname === "/admin/reports" ? "text-foreground" : "text-muted hover:text-foreground"}`}
           >
             Reports
           </Link>
-          <Link href="/" className="text-xs font-semibold text-zinc-400 hover:text-white">
+          <Link href="/" className="text-xs font-semibold text-muted hover:text-foreground">
             Back to app
           </Link>
         </nav>

@@ -32,16 +32,16 @@ export default function AdminReportsList() {
 
   return (
     <div>
-      <h1 className="text-xl font-extrabold text-white">Reports</h1>
-      <p className="mt-1 text-sm text-zinc-500">Event/deal reports and app feedback from athletes.</p>
+      <h1 className="text-xl font-extrabold text-foreground">Reports</h1>
+      <p className="mt-1 text-sm text-muted-2">Event/deal reports and app feedback from athletes.</p>
 
       <div className="mt-4 space-y-3">
         {loading && (
-          <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-zinc-500">Loading…</p>
+          <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-muted-2">Loading…</p>
         )}
 
         {!loading && active.length === 0 && (
-          <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-zinc-500">
+          <p className="rounded-xl border border-border-subtle bg-surface p-4 text-sm text-muted-2">
             No active reports.
           </p>
         )}
@@ -49,27 +49,27 @@ export default function AdminReportsList() {
         {active.map((r) => (
           <div key={r.id} className="rounded-xl border border-border-subtle bg-surface p-3">
             <div className="flex items-center justify-between gap-2">
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${KIND_STYLES[r.kind] ?? "bg-zinc-800 text-zinc-300"}`}>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${KIND_STYLES[r.kind] ?? "bg-surface-raised text-foreground-secondary"}`}>
                 {KIND_LABELS[r.kind] ?? r.kind}
               </span>
-              <span className="text-[11px] text-zinc-500">{formatTimestamp(r.createdAt)}</span>
+              <span className="text-[11px] text-muted-2">{formatTimestamp(r.createdAt)}</span>
             </div>
 
-            {r.itemLabel && <p className="mt-2 text-sm font-bold text-white">{r.itemLabel}</p>}
-            {r.reason && <p className="mt-1 text-xs font-semibold text-zinc-300">Reason: {r.reason}</p>}
-            {r.details && <p className="mt-1.5 text-sm text-zinc-400">{r.details}</p>}
+            {r.itemLabel && <p className="mt-2 text-sm font-bold text-foreground">{r.itemLabel}</p>}
+            {r.reason && <p className="mt-1 text-xs font-semibold text-foreground-secondary">Reason: {r.reason}</p>}
+            {r.details && <p className="mt-1.5 text-sm text-muted">{r.details}</p>}
 
             {r.screenshotUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- runtime data URL, not a static asset
               <img src={r.screenshotUrl} alt="Attached screenshot" className="mt-2 max-h-40 rounded-lg border border-border-subtle object-contain" />
             )}
 
-            <p className="mt-2 text-[11px] text-zinc-500">Reported by {r.reporterEmail || "anonymous"}</p>
+            <p className="mt-2 text-[11px] text-muted-2">Reported by {r.reporterEmail || "anonymous"}</p>
 
             <button
               type="button"
               onClick={() => markReviewed(r.id)}
-              className="mt-3 min-h-11 w-full rounded-full border border-border-subtle bg-black text-xs font-bold text-zinc-300 transition hover:bg-surface-raised"
+              className="mt-3 min-h-11 w-full rounded-full border border-border-subtle bg-background text-xs font-bold text-foreground-secondary transition hover:bg-surface-raised"
             >
               Mark as reviewed
             </button>

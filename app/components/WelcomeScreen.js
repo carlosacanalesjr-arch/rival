@@ -43,17 +43,17 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-10">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white">
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
             KAIROS<span className="text-rival-red">.</span>
           </h1>
-          <p className="mt-2 text-sm text-zinc-400">Train. Compete. Conquer.</p>
+          <p className="mt-2 text-sm text-muted">Train. Compete. Conquer.</p>
         </div>
 
         <div className="mt-10 space-y-3">
-          <p className="text-center text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <p className="text-center text-xs font-semibold uppercase tracking-wide text-muted-2">
             Choose your account type
           </p>
           {ACCOUNT_TYPES.map((type) => (
@@ -66,17 +66,17 @@ export default function WelcomeScreen() {
                 {type.icon}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-base font-bold text-white">{type.title}</span>
-                <span className="mt-0.5 block text-xs text-zinc-500">{type.description}</span>
+                <span className="block text-base font-bold text-foreground">{type.title}</span>
+                <span className="mt-0.5 block text-xs text-muted-2">{type.description}</span>
               </span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-zinc-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-muted-3">
                 <path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           ))}
         </div>
 
-        <p className="mt-10 text-center text-sm text-zinc-500">
+        <p className="mt-10 text-center text-sm text-muted-2">
           Already have an account?{" "}
           <button onClick={() => router.push("/login")} className="font-semibold text-rival-red hover:text-red-400">
             Log in

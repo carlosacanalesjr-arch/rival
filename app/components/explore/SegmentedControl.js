@@ -18,7 +18,7 @@ export default function SegmentedControl({ options, selected, onSelect }) {
             aria-selected={isSelected}
             onClick={() => onSelect(option)}
             className={`min-h-11 flex-1 rounded-full text-sm font-bold transition ${
-              isSelected ? "bg-rival-red text-white" : "text-zinc-400 hover:text-zinc-200"
+              isSelected ? "bg-rival-red text-white" : "text-muted hover:text-foreground-secondary"
             }`}
           >
             {option}

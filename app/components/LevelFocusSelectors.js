@@ -10,7 +10,7 @@ export const LEVEL_STYLES = {
   "Test-Ready": { trigger: "border-rival-red/40 bg-rival-red/15 text-rival-red", option: "bg-rival-red/15 text-rival-red" },
 };
 
-export const PLACEHOLDER_TRIGGER_STYLE = "border-border-subtle bg-surface-raised text-zinc-400";
+export const PLACEHOLDER_TRIGGER_STYLE = "border-border-subtle bg-surface-raised text-muted";
 
 // variant "picker" is the pre-enrollment preview (no commitment yet, no confirm needed).
 // variant "current" is a live enrollment: trigger is forced red with a dot, and switching
@@ -88,7 +88,7 @@ export function LevelSelector({ selected, onSelect, variant = "picker", category
               aria-selected={level === selected}
               onClick={() => handlePick(level)}
               className={`flex w-full items-center gap-1.5 px-3 py-2 text-left text-xs font-semibold transition ${
-                level === selected ? LEVEL_STYLES[level].option : "text-zinc-300 hover:bg-black/40"
+                level === selected ? LEVEL_STYLES[level].option : "text-foreground-secondary hover:bg-black/40"
               }`}
             >
               {level === selected && variant === "current" && (
@@ -165,7 +165,7 @@ export function FocusSelector({ options, selected, onSelect }) {
               aria-selected={focus === selected}
               onClick={() => handlePick(focus)}
               className={`flex w-full items-center px-3 py-2 text-left text-xs font-semibold transition ${
-                focus === selected ? "bg-amber-500/15 text-amber-400" : "text-zinc-300 hover:bg-black/40"
+                focus === selected ? "bg-amber-500/15 text-amber-400" : "text-foreground-secondary hover:bg-black/40"
               }`}
             >
               {focus}

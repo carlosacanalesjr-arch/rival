@@ -25,19 +25,19 @@ export default function BusinessLayout({ children }) {
 
   if (!hasMounted || !isBusiness) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <p className="text-sm text-zinc-500">Checking access…</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-2">Checking access…</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-        <Link href="/business" className="text-sm font-extrabold text-white">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
+        <Link href="/business" className="text-sm font-extrabold text-foreground">
           Business <span className="text-rival-red">·</span> Kairos
         </Link>
-        <Link href="/" className="ml-auto text-xs font-semibold text-zinc-400 hover:text-white">
+        <Link href="/" className="ml-auto text-xs font-semibold text-muted hover:text-foreground">
           Back to app
         </Link>
       </header>

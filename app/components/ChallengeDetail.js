@@ -32,8 +32,8 @@ function CameraIcon() {
 function InfoTile({ label, value }) {
   return (
     <div className="rounded-xl border border-border-subtle bg-surface p-3">
-      <p className="text-[10px] uppercase tracking-wide text-zinc-500">{label}</p>
-      <p className="mt-1 text-sm font-bold text-white">{value}</p>
+      <p className="text-[10px] uppercase tracking-wide text-muted-2">{label}</p>
+      <p className="mt-1 text-sm font-bold text-foreground">{value}</p>
     </div>
   );
 }
@@ -63,7 +63,7 @@ function PhotoLightbox({ photoUrl, onClose }) {
       tabIndex={0}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
-      <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 text-white">
+      <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 text-foreground">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
         </svg>
@@ -129,19 +129,19 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center">
       <div className="w-full max-w-md rounded-t-2xl border border-border-subtle bg-surface p-5 sm:rounded-2xl">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white">Submit Result</h3>
-          <button onClick={onClose} aria-label="Close" className="text-zinc-400 hover:text-white">
+          <h3 className="text-base font-bold text-foreground">Submit Result</h3>
+          <button onClick={onClose} aria-label="Close" className="text-muted hover:text-foreground">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
             </svg>
           </button>
         </div>
-        <p className="mt-1 text-xs text-zinc-500">{challenge.title}</p>
+        <p className="mt-1 text-xs text-muted-2">{challenge.title}</p>
 
         {step === "form" && (
           <form onSubmit={runAnalysis} className="mt-4 space-y-4">
             <div>
-              <label className="text-xs font-medium text-zinc-400" htmlFor="result-value">
+              <label className="text-xs font-medium text-muted" htmlFor="result-value">
                 Your result ({challenge.unit})
               </label>
               <input
@@ -151,15 +151,15 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="e.g. 12.4"
-                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-black px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
               />
             </div>
 
             <div>
-              <p className="text-xs font-medium text-zinc-400">
-                Proof photo <span className="text-zinc-600">(required)</span>
+              <p className="text-xs font-medium text-muted">
+                Proof photo <span className="text-muted-3">(required)</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-zinc-500">
+              <p className="mt-0.5 text-[11px] text-muted-2">
                 A screenshot of your run app or watch showing your distance and time.
               </p>
               <input type="file" accept="image/*" id="proof-photo" className="hidden" onChange={handleFile} />
@@ -174,7 +174,7 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
               ) : (
                 <label
                   htmlFor="proof-photo"
-                  className="mt-2 flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-zinc-700 bg-black text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
+                  className="mt-2 flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border-subtle bg-background text-muted-2 hover:border-border-strong hover:text-foreground-secondary"
                 >
                   <CameraIcon />
                   <span className="text-[11px] font-semibold uppercase tracking-wide">Add photo</span>
@@ -195,8 +195,8 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
 
         {step === "analyzing" && (
           <div className="mt-8 flex flex-col items-center gap-3 pb-4 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-rival-red" />
-            <p className="text-sm text-zinc-400">Analyzing your photo…</p>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border-subtle border-t-rival-red" />
+            <p className="text-sm text-muted">Analyzing your photo…</p>
           </div>
         )}
 
@@ -205,7 +205,7 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
             {analysis.verification === "confirmed" ? (
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
                 <p className="text-sm font-bold text-emerald-400">✓ Confirmed</p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted">
                   Your photo shows about {analysis.detectedValue} {challenge.unit}, matching your entry of {value}{" "}
                   {challenge.unit}.
                 </p>
@@ -213,7 +213,7 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
             ) : (
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
                 <p className="text-sm font-bold text-amber-400">⚠ Needs Review</p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-muted">
                   {analysis.detectedValue == null
                     ? "We couldn't read a distance from this photo. It'll be flagged for manual review."
                     : `We couldn't confirm this matches your photo. You entered ${value} ${challenge.unit}, but the photo appears to show about ${analysis.detectedValue} ${challenge.unit}.`}
@@ -225,7 +225,7 @@ function SubmitResultModal({ challenge, onClose, onSubmit }) {
               {analysis.verification !== "confirmed" && (
                 <button
                   onClick={tryAgain}
-                  className="flex-1 rounded-full border border-border-subtle py-3 text-sm font-bold text-white hover:bg-surface-raised"
+                  className="flex-1 rounded-full border border-border-subtle py-3 text-sm font-bold text-foreground hover:bg-surface-raised"
                 >
                   Try Again
                 </button>
@@ -255,8 +255,8 @@ export default function ChallengeDetail({ id }) {
 
   if (!challenge) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-        <p className="text-lg font-bold text-white">Challenge not found</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <p className="text-lg font-bold text-foreground">Challenge not found</p>
         <button
           onClick={() => router.push("/")}
           className="rounded-full bg-rival-red px-5 py-2.5 text-sm font-bold text-white"
@@ -275,16 +275,16 @@ export default function ChallengeDetail({ id }) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="text-zinc-300 hover:text-white"
+          className="text-foreground-secondary hover:text-foreground"
         >
           <BackIcon />
         </button>
-        <h1 className="truncate text-base font-bold text-white">{challenge.title}</h1>
+        <h1 className="truncate text-base font-bold text-foreground">{challenge.title}</h1>
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 pb-28">
@@ -293,9 +293,9 @@ export default function ChallengeDetail({ id }) {
           <span className="inline-block rounded-full bg-rival-red/15 px-2.5 py-1 text-[11px] font-bold text-rival-red">
             {challenge.category}
           </span>
-          <h2 className="mt-3 text-2xl font-extrabold text-white">{challenge.title}</h2>
-          <p className="mt-1 text-sm font-semibold text-zinc-300">Goal: {challenge.goal}</p>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
+          <h2 className="mt-3 text-2xl font-extrabold text-foreground">{challenge.title}</h2>
+          <p className="mt-1 text-sm font-semibold text-foreground-secondary">Goal: {challenge.goal}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{challenge.description}</p>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
             <InfoTile label="Duration" value={challenge.duration} />
@@ -305,9 +305,9 @@ export default function ChallengeDetail({ id }) {
             <InfoTile label="Participants" value={challenge.participants.toLocaleString()} />
           </div>
 
-          <div className="mt-4 rounded-xl border border-border-subtle bg-black p-3">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">Requirements</p>
-            <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+          <div className="mt-4 rounded-xl border border-border-subtle bg-background p-3">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-2">Requirements</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
               Submit a photo of your run app or watch showing your result — no submission is accepted without one.
               We automatically check the photo against what you enter: matches are confirmed right away, and
               anything that doesn&apos;t match (or can&apos;t be read) is flagged for manual review instead of rejected.
@@ -315,21 +315,21 @@ export default function ChallengeDetail({ id }) {
           </div>
 
           {challenge.components && (
-            <div className="mt-4 rounded-xl border border-border-subtle bg-black p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">By Discipline</p>
+            <div className="mt-4 rounded-xl border border-border-subtle bg-background p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-2">By Discipline</p>
               <div className="mt-2 space-y-2.5">
                 {challenge.components.map((c) => (
                   <div key={c.label}>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300">{c.label}</span>
-                      <span className="font-semibold text-white">
+                      <span className="text-foreground-secondary">{c.label}</span>
+                      <span className="font-semibold text-foreground">
                         {formatCompactDistance(c.current)}
-                        {c.goal != null && <span className="text-zinc-500">/{formatCompactDistance(c.goal)}</span>}
-                        <span className="ml-1 text-[10px] font-normal text-zinc-500">{c.unit}</span>
+                        {c.goal != null && <span className="text-muted-2">/{formatCompactDistance(c.goal)}</span>}
+                        <span className="ml-1 text-[10px] font-normal text-muted-2">{c.unit}</span>
                       </span>
                     </div>
                     {c.goal != null && (
-                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-surface-raised">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
                           style={{ width: `${Math.min(100, Math.round((c.current / c.goal) * 100))}%` }}
@@ -344,11 +344,11 @@ export default function ChallengeDetail({ id }) {
 
           {challenge.joined && (
             <div className="mt-4">
-              <div className="flex items-center justify-between text-xs text-zinc-500">
+              <div className="flex items-center justify-between text-xs text-muted-2">
                 <span>Your progress</span>
-                <span className="font-semibold text-white">{challenge.progress}%</span>
+                <span className="font-semibold text-foreground">{challenge.progress}%</span>
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
                   style={{ width: `${challenge.progress}%` }}
@@ -361,7 +361,7 @@ export default function ChallengeDetail({ id }) {
         <section className="mt-5">
           <div className="flex items-center justify-between px-4">
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white">Leaderboard</h3>
+              <h3 className="text-base font-bold text-foreground">Leaderboard</h3>
               <span className="flex items-center gap-1 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
                 <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-rival-red" />
                 LIVE
@@ -380,19 +380,19 @@ export default function ChallengeDetail({ id }) {
                     entry.rank === 1
                       ? "text-yellow-400"
                       : entry.rank === 2
-                      ? "text-zinc-300"
+                      ? "text-foreground-secondary"
                       : entry.rank === 3
                       ? "text-orange-400"
-                      : "text-zinc-500"
+                      : "text-muted-2"
                   }`}
                 >
                   {entry.rank}
                 </span>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-white">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-foreground">
                   {entry.initials}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1.5 truncate text-sm font-medium text-white">
+                  <span className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
                     {entry.name}
                     {entry.isSelf && <span className="text-[10px] font-bold text-rival-red">YOU</span>}
                   </span>
@@ -411,9 +411,9 @@ export default function ChallengeDetail({ id }) {
                     </span>
                   )}
                 </span>
-                <span className="shrink-0 text-right text-sm font-bold text-white">
+                <span className="shrink-0 text-right text-sm font-bold text-foreground">
                   {entry.score.toLocaleString()}
-                  <span className="ml-1 text-[10px] font-normal text-zinc-500">{challenge.unit}</span>
+                  <span className="ml-1 text-[10px] font-normal text-muted-2">{challenge.unit}</span>
                 </span>
               </li>
             ))}
@@ -427,7 +427,7 @@ export default function ChallengeDetail({ id }) {
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md border-t border-border-subtle bg-black/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md border-t border-border-subtle bg-background/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         {challenge.joined ? (
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1 rounded-full border border-rival-red px-3 py-3 text-xs font-bold text-rival-red">

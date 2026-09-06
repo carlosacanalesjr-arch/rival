@@ -43,12 +43,12 @@ export default function SelectSportsScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
+    <div className="flex min-h-screen flex-col bg-background">
       <AuthHeader />
       <main className="mx-auto w-full max-w-md flex-1 px-6 pb-12">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-extrabold text-white">Select your sports</h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h2 className="text-2xl font-extrabold text-foreground">Select your sports</h2>
+          <p className="mt-1 text-sm text-muted-2">
             Pick what you&apos;re into so we can show you relevant deals and content.
           </p>
         </div>

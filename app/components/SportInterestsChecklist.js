@@ -38,13 +38,13 @@ export default function SportInterestsChecklist({ options = SPORT_INTEREST_OPTIO
             className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition ${
               checked
                 ? "border-rival-red bg-rival-red/15 text-white"
-                : "border-border-subtle bg-surface text-zinc-400 hover:border-zinc-600"
+                : "border-border-subtle bg-surface text-muted hover:border-border-strong"
             }`}
           >
             {option}
             <span
               className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${
-                checked ? "border-rival-red bg-rival-red" : "border-zinc-600"
+                checked ? "border-rival-red bg-rival-red" : "border-border-strong"
               }`}
             >
               {checked && <CheckIcon />}

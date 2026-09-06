@@ -12,7 +12,7 @@ const RUNNING_LEVEL_STYLES = {
 };
 
 function levelStyle(level) {
-  return RUNNING_LEVEL_STYLES[level] || { trigger: "border-border-subtle bg-surface-raised text-zinc-300", option: "text-zinc-300" };
+  return RUNNING_LEVEL_STYLES[level] || { trigger: "border-border-subtle bg-surface-raised text-foreground-secondary", option: "text-foreground-secondary" };
 }
 
 // The real Foundation/Intermediate selector that replaces the old static "Foundation" label at
@@ -71,7 +71,7 @@ export function RunningLevelDropdown({ levels, activeLevel, onRequestSwitch }) {
                 if (level !== activeLevel) onRequestSwitch(level);
               }}
               className={`flex w-full items-center px-3 py-2.5 text-left text-sm font-semibold transition ${
-                level === activeLevel ? levelStyle(level).option : "text-zinc-300 hover:bg-black/40"
+                level === activeLevel ? levelStyle(level).option : "text-foreground-secondary hover:bg-black/40"
               }`}
             >
               {level}
@@ -91,18 +91,18 @@ export function LevelSwitchConfirmModal({ fromLevel, toLevel, onConfirm, onCance
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center">
       <div className="w-full max-w-md rounded-t-2xl border border-border-subtle bg-surface p-5 sm:rounded-2xl">
-        <h3 className="text-base font-bold text-white">Switch to {toLevel}?</h3>
-        <p className="mt-2 text-sm text-zinc-400">
+        <h3 className="text-base font-bold text-foreground">Switch to {toLevel}?</h3>
+        <p className="mt-2 text-sm text-muted">
           Your {fromLevel} progress is saved, but your 3-month window for {toLevel} starts today.
         </p>
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-muted-2">
           You can switch back to {fromLevel} anytime — nothing you&apos;ve done there is lost.
         </p>
         <div className="mt-5 flex gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-11 flex-1 rounded-full border border-border-subtle bg-black text-sm font-bold text-zinc-300 transition hover:bg-surface-raised"
+            className="min-h-11 flex-1 rounded-full border border-border-subtle bg-background text-sm font-bold text-foreground-secondary transition hover:bg-surface-raised"
           >
             Cancel
           </button>
@@ -128,8 +128,8 @@ export function FirstLevelPicker({ levels, hasContent, onChoose }) {
   return (
     <div className="px-4 pt-4">
       <div className="rounded-2xl border border-border-subtle bg-surface p-5">
-        <h2 className="text-base font-bold text-white">Choose your starting level</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h2 className="text-base font-bold text-foreground">Choose your starting level</h2>
+        <p className="mt-1 text-sm text-muted">
           Every athlete on a level sees the same locked daily calendar. You can switch levels anytime later.
         </p>
         <div className="mt-4 space-y-2.5">
@@ -145,12 +145,12 @@ export function FirstLevelPicker({ levels, hasContent, onChoose }) {
                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition ${
                   available
                     ? `${style.trigger} hover:brightness-110`
-                    : "border-border-subtle bg-black/40 text-zinc-600 opacity-60"
+                    : "border-border-subtle bg-surface-raised text-muted-3 opacity-60"
                 }`}
               >
                 <span className="text-sm font-bold">{level}</span>
                 {!available && (
-                  <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-500">
+                  <span className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-2">
                     Coming soon
                   </span>
                 )}

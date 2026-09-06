@@ -19,11 +19,11 @@ function MyPostsList({ title, items, labelKey }) {
   if (items.length === 0) return null;
   return (
     <div className="mt-6">
-      <h3 className="text-sm font-bold text-white">{title}</h3>
+      <h3 className="text-sm font-bold text-foreground">{title}</h3>
       <div className="mt-2 space-y-2">
         {items.map((item) => (
           <div key={item.id} className="flex items-center justify-between gap-2 rounded-xl border border-border-subtle bg-surface p-3">
-            <p className="min-w-0 flex-1 truncate text-sm text-zinc-200">{item[labelKey]}</p>
+            <p className="min-w-0 flex-1 truncate text-sm text-foreground-secondary">{item[labelKey]}</p>
             <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${STATUS_STYLE[item.status] || STATUS_STYLE.approved}`}>
               {item.status}
             </span>
@@ -45,8 +45,8 @@ export default function BusinessDashboardScreen() {
 
   return (
     <div>
-      <h1 className="text-xl font-extrabold text-white">Business Dashboard</h1>
-      <p className="mt-1 text-sm text-zinc-400">Post races, events, and deals for {user.businessName}.</p>
+      <h1 className="text-xl font-extrabold text-foreground">Business Dashboard</h1>
+      <p className="mt-1 text-sm text-muted">Post races, events, and deals for {user.businessName}.</p>
 
       <div className="mt-4">
         <SegmentedControl options={SEGMENTS} selected={segment} onSelect={setSegment} />

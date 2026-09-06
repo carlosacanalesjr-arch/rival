@@ -35,7 +35,7 @@ export function ExerciseGroup({ title, items, keyPrefix }) {
   const sectionSlug = getSectionSlug(title);
   return (
     <div className="mt-2 first:mt-0">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{title}</p>
+      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-2">{title}</p>
       <ul className="mt-1.5 space-y-2.5">
         {items.map((item, i) => (
           <li key={i} className="flex gap-2.5">
@@ -48,10 +48,10 @@ export function ExerciseGroup({ title, items, keyPrefix }) {
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
-                <span className="shrink-0 text-[11px] text-zinc-500">{formatPrescription(item)}</span>
+                <span className="text-xs font-semibold text-foreground-secondary">{item.name}</span>
+                <span className="shrink-0 text-[11px] text-muted-2">{formatPrescription(item)}</span>
               </div>
-              {item.notes && <p className="mt-0.5 text-[11px] text-zinc-500">{item.notes}</p>}
+              {item.notes && <p className="mt-0.5 text-[11px] text-muted-2">{item.notes}</p>}
               <VideoLinkField mediaKey={`exercise:${keyPrefix}:${sectionSlug}:${i}`} />
             </div>
           </li>

@@ -1,6 +1,6 @@
 export const inputClass =
-  "w-full rounded-xl border border-border-subtle bg-surface px-3.5 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none";
-export const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-500";
+  "w-full rounded-xl border border-border-subtle bg-surface px-3.5 py-3 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none";
+export const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-2";
 
 export function EyeIcon() {
   return (
@@ -45,7 +45,7 @@ export function ChipGroup({ options, value, onChange }) {
             className={`rounded-full border px-3.5 py-2 text-xs font-semibold transition ${
               selected
                 ? "border-rival-red bg-rival-red/15 text-rival-red"
-                : "border-border-subtle bg-surface text-zinc-400 hover:border-zinc-600"
+                : "border-border-subtle bg-surface text-muted hover:border-border-strong"
             }`}
           >
             {option}
@@ -72,7 +72,7 @@ export function PasswordField({ label = "Password", value, onChange, showPasswor
           type="button"
           onClick={onToggle}
           aria-label={showPassword ? "Hide password" : "Show password"}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-2 hover:text-foreground-secondary"
         >
           {showPassword ? <EyeOffIcon /> : <EyeIcon />}
         </button>

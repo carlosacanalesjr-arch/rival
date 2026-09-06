@@ -6,7 +6,7 @@ import { leaderboard } from "@/app/lib/mockData";
 const trendIcon = {
   up: <span className="text-emerald-400">▲</span>,
   down: <span className="text-rival-red">▼</span>,
-  same: <span className="text-zinc-600">–</span>,
+  same: <span className="text-muted-3">–</span>,
 };
 
 export default function Leaderboard() {
@@ -16,7 +16,7 @@ export default function Leaderboard() {
     <section className="mx-4 mt-6 overflow-hidden rounded-2xl border border-border-subtle bg-surface">
       <div className="flex items-center justify-between px-4 pt-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold text-white">Leaderboard</h2>
+          <h2 className="text-base font-bold text-foreground">Leaderboard</h2>
           <span className="flex items-center gap-1 rounded-full bg-rival-red/15 px-2 py-0.5 text-[10px] font-bold text-rival-red">
             <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-rival-red" />
             LIVE
@@ -40,18 +40,18 @@ export default function Leaderboard() {
                 entry.rank === 1
                   ? "text-yellow-400"
                   : entry.rank === 2
-                  ? "text-zinc-300"
+                  ? "text-foreground-secondary"
                   : entry.rank === 3
                   ? "text-orange-400"
-                  : "text-zinc-500"
+                  : "text-muted-2"
               }`}
             >
               {entry.rank}
             </span>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-xs font-bold text-foreground">
               {entry.initials}
             </span>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
               {entry.name}
               {entry.isSelf && (
                 <span className="ml-1.5 text-[10px] font-bold text-rival-red">
@@ -60,9 +60,9 @@ export default function Leaderboard() {
               )}
             </span>
             <span className="text-xs">{trendIcon[entry.trend]}</span>
-            <span className="w-16 shrink-0 text-right text-sm font-bold text-white">
+            <span className="w-16 shrink-0 text-right text-sm font-bold text-foreground">
               {entry.score.toLocaleString()}
-              <span className="ml-1 text-[10px] font-normal text-zinc-500">
+              <span className="ml-1 text-[10px] font-normal text-muted-2">
                 {entry.unit}
               </span>
             </span>

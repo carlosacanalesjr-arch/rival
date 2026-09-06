@@ -51,14 +51,14 @@ export default function ExerciseRowForm({ item, onSave, onCancel }) {
   };
 
   return (
-    <div className="rounded-xl border border-rival-red/40 bg-black p-3">
+    <div className="rounded-xl border border-rival-red/40 bg-background p-3">
       <div className="grid grid-cols-2 gap-2">
         <input
           value={draft.name}
           onChange={update("name")}
           placeholder="Name"
           autoFocus
-          className="col-span-2 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-white outline-none focus:border-rival-red"
+          className="col-span-2 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-foreground outline-none focus:border-rival-red"
         />
         {FIELDS.map((f) => (
           <input
@@ -66,7 +66,7 @@ export default function ExerciseRowForm({ item, onSave, onCancel }) {
             value={draft[f.key]}
             onChange={update(f.key)}
             placeholder={f.label}
-            className="rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-white outline-none focus:border-rival-red"
+            className="rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-foreground outline-none focus:border-rival-red"
           />
         ))}
         <textarea
@@ -74,11 +74,11 @@ export default function ExerciseRowForm({ item, onSave, onCancel }) {
           onChange={update("notes")}
           placeholder="Notes"
           rows={2}
-          className="col-span-2 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-white outline-none focus:border-rival-red"
+          className="col-span-2 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-xs text-foreground outline-none focus:border-rival-red"
         />
       </div>
       <div className="mt-2 flex justify-end gap-3">
-        <button type="button" onClick={onCancel} className="text-xs font-semibold text-zinc-500 hover:text-zinc-300">
+        <button type="button" onClick={onCancel} className="text-xs font-semibold text-muted-2 hover:text-foreground-secondary">
           Cancel
         </button>
         <button type="button" onClick={handleSave} className="text-xs font-bold text-rival-red">

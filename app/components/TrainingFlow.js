@@ -63,7 +63,7 @@ function DayRow({ program, week, day, isComplete, onToggle, mediaKey }) {
       >
         <span
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-extrabold transition ${
-            isComplete ? "bg-emerald-500 text-black" : "border border-border-subtle text-zinc-400"
+            isComplete ? "bg-emerald-500 text-black" : "border border-border-subtle text-muted"
           }`}
         >
           {isComplete ? <CheckIcon /> : day.day}
@@ -79,13 +79,13 @@ function DayRow({ program, week, day, isComplete, onToggle, mediaKey }) {
           />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-white">{content.label ?? day.label}</p>
+          <p className="text-sm font-bold text-foreground">{content.label ?? day.label}</p>
           {content.exercises?.length > 0 ? (
-            <p className="mt-0.5 truncate text-xs text-zinc-500">
+            <p className="mt-0.5 truncate text-xs text-muted-2">
               {content.exercises.map((e) => e.name).join(" · ")}
             </p>
           ) : (
-            <p className="mt-0.5 text-xs text-zinc-500">{isComplete ? "Complete" : "Pending"}</p>
+            <p className="mt-0.5 text-xs text-muted-2">{isComplete ? "Complete" : "Pending"}</p>
           )}
         </div>
         {isComplete && (
@@ -100,7 +100,7 @@ function DayRow({ program, week, day, isComplete, onToggle, mediaKey }) {
             }}
             aria-label={expanded ? "Hide exercise details" : "Show exercise details"}
             aria-expanded={expanded}
-            className="shrink-0 p-1 text-zinc-400 transition hover:text-white"
+            className="shrink-0 p-1 text-muted transition hover:text-foreground"
           >
             <svg
               width="16"
@@ -151,7 +151,7 @@ function WeekPanel({ program, week, onDayToggle }) {
           <p className="text-xs font-bold text-white/80">
             Week {week.week} of {program.duration}
           </p>
-          <h2 className="mt-1 text-xl font-extrabold text-white">{week.title}</h2>
+          <h2 className="mt-1 text-xl font-extrabold text-foreground">{week.title}</h2>
           <p className="mt-1 text-sm text-white/80">{week.focus}</p>
         </div>
       </div>
@@ -209,8 +209,8 @@ export default function TrainingFlow({ id }) {
 
   if (!program) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-        <p className="text-lg font-bold text-white">Program not found</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <p className="text-lg font-bold text-foreground">Program not found</p>
         <button
           onClick={() => router.push("/programs")}
           className="rounded-full bg-rival-red px-5 py-2.5 text-sm font-bold text-white"
@@ -223,8 +223,8 @@ export default function TrainingFlow({ id }) {
 
   if (status === "not-enrolled") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-black px-6 text-center">
-        <p className="text-lg font-bold text-white">You haven&apos;t started {program.title} yet</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <p className="text-lg font-bold text-foreground">You haven&apos;t started {program.title} yet</p>
         <button
           onClick={() => router.push(`/programs/${id}`)}
           className="rounded-full bg-rival-red px-5 py-2.5 text-sm font-bold text-white"
@@ -283,12 +283,12 @@ export default function TrainingFlow({ id }) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-        <button onClick={() => router.push("/programs")} aria-label="Back" className="text-zinc-300 hover:text-white">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
+        <button onClick={() => router.push("/programs")} aria-label="Back" className="text-foreground-secondary hover:text-foreground">
           <BackIcon />
         </button>
-        <h1 className="min-w-0 flex-1 truncate text-base font-bold text-white">{program.title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-base font-bold text-foreground">{program.title}</h1>
         <button
           onClick={() => router.push(`/programs/${id}`)}
           className="shrink-0 text-xs font-semibold text-rival-red"
@@ -302,12 +302,12 @@ export default function TrainingFlow({ id }) {
           onClick={() => goToIndex(viewedIndex - 1)}
           disabled={viewedIndex <= 0}
           aria-label="Previous week"
-          className="rounded-full p-2 text-zinc-400 transition hover:text-white disabled:opacity-20"
+          className="rounded-full p-2 text-muted transition hover:text-foreground disabled:opacity-20"
         >
           <ChevronIcon direction="left" />
         </button>
         <div className="text-center">
-          <p className="text-sm font-bold text-white">
+          <p className="text-sm font-bold text-foreground">
             Week {viewedWeek} of {program.duration}
           </p>
           {viewedWeek === program.currentWeek && (
@@ -318,7 +318,7 @@ export default function TrainingFlow({ id }) {
           onClick={() => goToIndex(viewedIndex + 1)}
           disabled={viewedIndex >= weeks.length - 1}
           aria-label="Next week"
-          className="rounded-full p-2 text-zinc-400 transition hover:text-white disabled:opacity-20"
+          className="rounded-full p-2 text-muted transition hover:text-foreground disabled:opacity-20"
         >
           <ChevronIcon direction="right" />
         </button>
@@ -335,7 +335,7 @@ export default function TrainingFlow({ id }) {
               onClick={() => goToIndex(i)}
               aria-label={`Jump to Week ${w.week}`}
               className={`h-2 rounded-full transition-all ${
-                isViewed ? "w-5 bg-rival-red" : isWeekComplete ? "w-2 bg-emerald-500" : "w-2 bg-zinc-700"
+                isViewed ? "w-5 bg-rival-red" : isWeekComplete ? "w-2 bg-emerald-500" : "w-2 bg-surface-raised"
               }`}
             />
           );
@@ -359,8 +359,8 @@ export default function TrainingFlow({ id }) {
               🔔
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white">{toast.title}</p>
-              <p className="mt-0.5 text-xs text-zinc-400">{toast.body}</p>
+              <p className="text-sm font-bold text-foreground">{toast.title}</p>
+              <p className="mt-0.5 text-xs text-muted">{toast.body}</p>
             </div>
           </div>
         </div>

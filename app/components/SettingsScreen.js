@@ -85,25 +85,25 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-black">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-black/90 px-4 py-3 backdrop-blur">
-        <button onClick={() => router.back()} aria-label="Back" className="text-zinc-300 hover:text-white">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border-subtle bg-background/90 px-4 py-3 backdrop-blur">
+        <button onClick={() => router.back()} aria-label="Back" className="text-foreground-secondary hover:text-foreground">
           <BackIcon />
         </button>
-        <h1 className="text-base font-bold text-white">Settings</h1>
+        <h1 className="text-base font-bold text-foreground">Settings</h1>
       </header>
 
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-6">
         {!user ? (
-          <p className="text-sm text-zinc-500">You need to be logged in to view settings.</p>
+          <p className="text-sm text-muted-2">You need to be logged in to view settings.</p>
         ) : user.isBusiness ? (
-          <p className="text-sm text-zinc-500">There&apos;s nothing to configure here yet for business accounts.</p>
+          <p className="text-sm text-muted-2">There&apos;s nothing to configure here yet for business accounts.</p>
         ) : loading ? (
-          <p className="text-sm text-zinc-500">Loading…</p>
+          <p className="text-sm text-muted-2">Loading…</p>
         ) : (
           <section>
-            <h2 className="text-lg font-extrabold text-white">Sport Profile</h2>
-            <p className="mt-1 text-sm text-zinc-500">Your primary sport and skill level.</p>
+            <h2 className="text-lg font-extrabold text-foreground">Sport Profile</h2>
+            <p className="mt-1 text-sm text-muted-2">Your primary sport and skill level.</p>
 
             <div className="mt-4 space-y-4">
               <Field label="Primary sport">
@@ -114,8 +114,8 @@ export default function SettingsScreen() {
               </Field>
             </div>
 
-            <h2 className="mt-8 text-lg font-extrabold text-white">Sport Interests</h2>
-            <p className="mt-1 text-sm text-zinc-500">
+            <h2 className="mt-8 text-lg font-extrabold text-foreground">Sport Interests</h2>
+            <p className="mt-1 text-sm text-muted-2">
               Choose the sports you care about so we can show you relevant deals and content.
             </p>
 

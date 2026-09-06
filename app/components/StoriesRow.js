@@ -15,7 +15,7 @@ export default function StoriesRow() {
   return (
     <section
       aria-label="Stories"
-      className="no-scrollbar flex gap-4 overflow-x-auto border-b border-border-subtle bg-black px-4 py-3"
+      className="no-scrollbar flex gap-4 overflow-x-auto border-b border-border-subtle bg-background px-4 py-3"
     >
       {stories.map((s) => (
         <button
@@ -26,26 +26,26 @@ export default function StoriesRow() {
           <span
             className={`flex h-16 w-16 items-center justify-center rounded-full p-[2px] ${
               s.viewed
-                ? "bg-zinc-700"
+                ? "bg-surface-raised"
                 : "bg-gradient-to-tr from-rival-red-dim via-rival-red to-orange-500"
             }`}
           >
-            <span className="flex h-full w-full items-center justify-center rounded-full bg-black">
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-background">
               {s.isSelf ? (
-                <span className="relative flex h-[92%] w-[92%] items-center justify-center rounded-full bg-surface-raised text-sm font-bold text-white">
+                <span className="relative flex h-[92%] w-[92%] items-center justify-center rounded-full bg-surface-raised text-sm font-bold text-foreground">
                   {s.initials}
                   <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-rival-red text-[11px] leading-none text-white">
                     +
                   </span>
                 </span>
               ) : (
-                <span className="flex h-[92%] w-[92%] items-center justify-center rounded-full bg-surface-raised text-sm font-bold text-white">
+                <span className="flex h-[92%] w-[92%] items-center justify-center rounded-full bg-surface-raised text-sm font-bold text-foreground">
                   {s.initials}
                 </span>
               )}
             </span>
           </span>
-          <span className="w-full truncate text-center text-[11px] text-zinc-400">
+          <span className="w-full truncate text-center text-[11px] text-muted">
             {s.isSelf ? "Your Story" : s.name}
           </span>
         </button>

@@ -117,11 +117,11 @@ export default function ProgramImportScreen() {
 
   return (
     <div>
-      <button onClick={() => router.push("/admin")} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white">
+      <button onClick={() => router.push("/admin")} className="flex items-center gap-2 text-sm text-muted hover:text-foreground">
         <BackIcon /> Programs
       </button>
-      <h1 className="mt-3 text-xl font-extrabold text-white">Import from Spreadsheet</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="mt-3 text-xl font-extrabold text-foreground">Import from Spreadsheet</h1>
+      <p className="mt-1 text-sm text-muted-2">
         Upload a .xlsx or .csv with columns Week, Day, Exercise, Sets, Reps, Rest, RPE, Notes.
       </p>
 
@@ -130,7 +130,7 @@ export default function ProgramImportScreen() {
           type="button"
           onClick={() => setMode("create")}
           className={`flex-1 rounded-full py-2.5 text-xs font-bold transition ${
-            mode === "create" ? "bg-rival-red text-white" : "border border-border-subtle text-zinc-400"
+            mode === "create" ? "bg-rival-red text-white" : "border border-border-subtle text-muted"
           }`}
         >
           Create New Program
@@ -139,7 +139,7 @@ export default function ProgramImportScreen() {
           type="button"
           onClick={() => setMode("update")}
           className={`flex-1 rounded-full py-2.5 text-xs font-bold transition ${
-            mode === "update" ? "bg-rival-red text-white" : "border border-border-subtle text-zinc-400"
+            mode === "update" ? "bg-rival-red text-white" : "border border-border-subtle text-muted"
           }`}
         >
           Update Existing
@@ -148,14 +148,14 @@ export default function ProgramImportScreen() {
 
       {mode === "update" && (
         <div className="mt-4">
-          <label className="text-xs font-medium text-zinc-400" htmlFor="target-program">
+          <label className="text-xs font-medium text-muted" htmlFor="target-program">
             Program to update
           </label>
           <select
             id="target-program"
             value={targetId}
             onChange={(e) => setTargetId(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white focus:border-rival-red focus:outline-none"
+            className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-foreground focus:border-rival-red focus:outline-none"
           >
             {programs.map((p) => (
               <option key={p.id} value={p.id}>
@@ -169,7 +169,7 @@ export default function ProgramImportScreen() {
       {mode === "create" && (
         <div className="mt-4 space-y-3">
           <div>
-            <label className="text-xs font-medium text-zinc-400" htmlFor="program-name">
+            <label className="text-xs font-medium text-muted" htmlFor="program-name">
               Program name
             </label>
             <input
@@ -177,19 +177,19 @@ export default function ProgramImportScreen() {
               value={programName}
               onChange={(e) => setProgramName(e.target.value)}
               placeholder="e.g. Marathon Base Building"
-              className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-rival-red focus:outline-none"
+              className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-muted-3 focus:border-rival-red focus:outline-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-medium text-zinc-400" htmlFor="program-category">
+              <label className="text-xs font-medium text-muted" htmlFor="program-category">
                 Category
               </label>
               <select
                 id="program-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white focus:border-rival-red focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-foreground focus:border-rival-red focus:outline-none"
               >
                 {programCategories.map((c) => (
                   <option key={c} value={c}>
@@ -199,14 +199,14 @@ export default function ProgramImportScreen() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-medium text-zinc-400" htmlFor="program-difficulty">
+              <label className="text-xs font-medium text-muted" htmlFor="program-difficulty">
                 Difficulty
               </label>
               <select
                 id="program-difficulty"
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-white focus:border-rival-red focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-border-subtle bg-surface px-3 py-2.5 text-sm text-foreground focus:border-rival-red focus:outline-none"
               >
                 {["Beginner", "Intermediate", "Advanced"].map((d) => (
                   <option key={d} value={d}>
@@ -223,12 +223,12 @@ export default function ProgramImportScreen() {
         <input type="file" accept=".xlsx,.xls,.csv" id="program-file" className="hidden" onChange={handleFile} />
         <label
           htmlFor="program-file"
-          className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-surface px-3 text-sm font-semibold text-zinc-300 hover:border-zinc-500"
+          className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-border-subtle bg-surface px-3 text-sm font-semibold text-foreground-secondary hover:border-border-strong"
         >
           {fileName || "Choose spreadsheet file…"}
         </label>
         {fileError && <p className="mt-1.5 text-xs text-rival-red">{fileError}</p>}
-        {parsing && <p className="mt-1.5 text-xs text-zinc-500">Reading file…</p>}
+        {parsing && <p className="mt-1.5 text-xs text-muted-2">Reading file…</p>}
       </div>
 
       {hasErrors && (
@@ -238,7 +238,7 @@ export default function ProgramImportScreen() {
           </p>
           <ul className="mt-2 space-y-1">
             {parsed.errors.map((err, i) => (
-              <li key={i} className="text-xs text-zinc-300">
+              <li key={i} className="text-xs text-foreground-secondary">
                 {err}
               </li>
             ))}
@@ -249,8 +249,8 @@ export default function ProgramImportScreen() {
       {hasPreview && (
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-white">Preview</p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm font-bold text-foreground">Preview</p>
+            <p className="text-xs text-muted-2">
               {parsed.duration} weeks · {parsed.sessionsPerWeek}
             </p>
           </div>
@@ -260,11 +260,11 @@ export default function ProgramImportScreen() {
                 <p className="text-xs font-bold uppercase tracking-wide text-rival-red">{week.title}</p>
                 <div className="mt-1.5 space-y-2">
                   {week.days.map((day) => (
-                    <div key={day.day} className="rounded-lg border border-border-subtle bg-black p-2.5">
-                      <p className="text-xs font-semibold text-white">{day.label}</p>
+                    <div key={day.day} className="rounded-lg border border-border-subtle bg-background p-2.5">
+                      <p className="text-xs font-semibold text-foreground">{day.label}</p>
                       <ul className="mt-1 space-y-1">
                         {day.exercises.map((ex, i) => (
-                          <li key={i} className="text-[11px] text-zinc-400">
+                          <li key={i} className="text-[11px] text-muted">
                             {ex.name}
                             {ex.sets != null && ` · ${ex.sets} sets`}
                             {ex.reps && ` · ${ex.reps} reps`}

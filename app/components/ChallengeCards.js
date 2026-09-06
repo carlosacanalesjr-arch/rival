@@ -10,7 +10,7 @@ export default function ChallengeCards() {
   return (
     <section className="mt-6">
       <div className="flex items-center justify-between px-4">
-        <h2 className="text-base font-bold text-white">Active Challenges</h2>
+        <h2 className="text-base font-bold text-foreground">Active Challenges</h2>
         <button onClick={() => router.push("/challenges")} className="text-xs font-semibold text-rival-red">
           See all
         </button>
@@ -34,23 +34,23 @@ export default function ChallengeCards() {
               className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rival-red to-orange-500"
               aria-hidden
             />
-            <p className="text-sm font-bold text-white">{c.title}</p>
-            <p className="mt-0.5 text-xs text-zinc-400">{c.sub}</p>
+            <p className="text-sm font-bold text-foreground">{c.title}</p>
+            <p className="mt-0.5 text-xs text-muted">{c.sub}</p>
 
             <div className="mt-3">
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
                   style={{ width: `${c.progress}%` }}
                 />
               </div>
-              <p className="mt-1 text-[11px] text-zinc-500">
+              <p className="mt-1 text-[11px] text-muted-2">
                 {c.progress}% complete
               </p>
             </div>
 
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-[11px] text-zinc-500">
+              <span className="text-[11px] text-muted-2">
                 {c.participants.toLocaleString()} joined
               </span>
               <button

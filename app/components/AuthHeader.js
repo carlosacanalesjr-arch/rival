@@ -19,12 +19,12 @@ export default function AuthHeader({ showBack = false, onBack }) {
         <button
           onClick={onBack ?? (() => router.back())}
           aria-label="Back"
-          className="absolute left-4 text-zinc-300 hover:text-white"
+          className="absolute left-4 text-foreground-secondary hover:text-foreground"
         >
           <BackIcon />
         </button>
       )}
-      <h1 className="text-xl font-extrabold tracking-tight text-white">
+      <h1 className="text-xl font-extrabold tracking-tight text-foreground">
         KAIROS<span className="text-rival-red">.</span>
       </h1>
     </header>

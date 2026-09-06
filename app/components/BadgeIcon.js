@@ -16,7 +16,7 @@ export default function BadgeIcon({ id, earned }) {
   return (
     <div
       className={`relative mx-auto h-16 w-16 shrink-0 p-1 ${
-        earned ? "bg-gradient-to-br from-rival-red to-rival-red-dim" : "bg-zinc-800"
+        earned ? "bg-gradient-to-br from-rival-red to-rival-red-dim" : "bg-surface-raised"
       }`}
       style={{ clipPath: DIAMOND_CLIP }}
     >

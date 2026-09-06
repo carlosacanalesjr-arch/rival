@@ -41,7 +41,7 @@ function EnrollButton({ status, onClick }) {
     return (
       <button
         onClick={onClick}
-        className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-4 py-1.5 text-xs font-bold text-zinc-200"
+        className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-4 py-1.5 text-xs font-bold text-foreground-secondary"
       >
         <TrophyIcon className="text-yellow-400" />
         Completed ✓
@@ -71,7 +71,7 @@ function CompletionActionButton({ action, onAction }) {
       <div className="mt-2 flex gap-2">
         <button
           onClick={(e) => onAction(e, { kind: "continue" })}
-          className="flex-1 rounded-full border border-border-subtle bg-surface-raised py-2 text-xs font-bold text-zinc-200 transition hover:bg-black/40"
+          className="flex-1 rounded-full border border-border-subtle bg-surface-raised py-2 text-xs font-bold text-foreground-secondary transition hover:bg-black/40"
         >
           Repeat
         </button>
@@ -146,11 +146,11 @@ function ProgramCard({ program, onOpen, onChangeLevel, onChangeFocus, allProgram
       <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-rival-red to-orange-500" aria-hidden />
 
       <div className="flex items-start justify-between gap-2">
-        <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{program.title}</p>
+        <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">{program.title}</p>
         {levelControl}
       </div>
 
-      <p className="mt-2 text-sm text-zinc-400">{program.shortDescription}</p>
+      <p className="mt-2 text-sm text-muted">{program.shortDescription}</p>
 
       {program.focusOptions && (
         <div className="mt-2">
@@ -218,14 +218,14 @@ function MyProgramRow({ program, onOpen, allPrograms, onCompletionAction }) {
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-white">{program.title}</p>
-          <p className="mt-0.5 text-xs text-zinc-500">
+          <p className="truncate text-sm font-bold text-foreground">{program.title}</p>
+          <p className="mt-0.5 text-xs text-muted-2">
             {program.category}
             {program.enrolledFocus ? ` · ${program.enrolledFocus}` : ""}
           </p>
         </div>
         {badgeStatus === "completed" ? (
-          <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-zinc-200">
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-raised px-2.5 py-1 text-[11px] font-bold text-foreground-secondary">
             <TrophyIcon className="text-yellow-400" />
             {completedLevel ? `${completedLevel} Completed ✓` : "Completed ✓"}
           </span>
@@ -238,11 +238,11 @@ function MyProgramRow({ program, onOpen, allPrograms, onCompletionAction }) {
 
       {badgeStatus !== "completed" && (
         <div className="mt-3">
-          <div className="flex items-center justify-between text-xs text-zinc-500">
+          <div className="flex items-center justify-between text-xs text-muted-2">
             <span>Progress</span>
-            <span className="font-semibold text-white">{percent}%</span>
+            <span className="font-semibold text-foreground">{percent}%</span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
             <div
               className="h-full rounded-full bg-gradient-to-r from-rival-red to-orange-500"
               style={{ width: `${percent}%` }}
@@ -312,7 +312,7 @@ function CategoryDropdown({
         />
         <div className="relative z-10 flex items-end justify-between gap-3 p-4">
           <div className="min-w-0">
-            <p className="text-base font-bold text-white">{category}</p>
+            <p className="text-base font-bold text-foreground">{category}</p>
             <p className="mt-0.5 text-xs text-white/80">
               {programsInCategory.length} program{programsInCategory.length === 1 ? "" : "s"}
             </p>
@@ -397,24 +397,24 @@ export default function ProgramsScreen() {
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-black">
+    <div className="flex min-h-screen flex-1 flex-col bg-background">
       <TopBar />
 
       <main className="mx-auto w-full max-w-md flex-1 pb-24">
         <div className="px-4 pt-5">
-          <h1 className="text-xl font-extrabold text-white">Programs</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-xl font-extrabold text-foreground">Programs</h1>
+          <p className="mt-1 text-sm text-muted">
             Structured training plans across every discipline.
           </p>
         </div>
 
-        <div className="sticky top-[57px] z-20 mt-4 flex border-b border-border-subtle bg-black/95 backdrop-blur">
+        <div className="sticky top-[57px] z-20 mt-4 flex border-b border-border-subtle bg-background/95 backdrop-blur">
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 border-b-2 py-3 text-sm font-bold transition ${
-                activeTab === tab ? "border-rival-red text-white" : "border-transparent text-zinc-500"
+                activeTab === tab ? "border-rival-red text-foreground" : "border-transparent text-muted-2"
               }`}
             >
               {tab}
@@ -449,8 +449,8 @@ export default function ProgramsScreen() {
           <div className="p-4">
             {myPrograms.length === 0 ? (
               <div className="mt-8 flex flex-col items-center gap-3 text-center">
-                <p className="text-sm font-bold text-white">No programs yet</p>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm font-bold text-foreground">No programs yet</p>
+                <p className="text-sm text-muted-2">
                   Enroll in a program from the Browse tab to start tracking your progress.
                 </p>
                 <button
